@@ -128,9 +128,9 @@ window.GI = window.GI || {};
     cung3Diem: P('M5.2 18.1A11 11 0 0 1 26.3 16.2', K, 2.2) + D(5.2, 18.1) + D(16, 9) + D(26.3, 16.2),
     quatTam: P('M8 25h19A19 19 0 0 0 17.5 8.6z', NAU, 2, NAUT) + D(8, 25, '#3A3F47') + D(27, 25) + D(17.5, 8.6),
     quat3Diem: P('M16 24L3.8 19.6A13 13 0 0 1 28.2 19.6z', NAU, 2, NAUT) + D(3.8, 19.6) + D(16, 11) + D(28.2, 19.6),
-    goc: L(5, 26, 29, 26) + L(5, 26, 20, 6) + P('M5 26h10A10 10 0 0 0 11 18z', R, 1.4, RT) + T(17, 23, 'α', R, 12) + D(5, 26) + D(29, 26) + D(20, 6),
+    goc: L(5, 26, 29, 26) + L(5, 26, 20, 6) + P('M15 26A10 10 0 0 0 11 18', R, 1.8) + T(17, 23, 'α', R, 12) + D(5, 26) + D(29, 26) + D(20, 6),
     gocChoTruoc: L(5, 26, 29, 26) + L(5, 26, 20, 6) + P('M5 26h10A10 10 0 0 0 11 18z', R, 1.4, RT) + T(15.5, 22.5, '45°', R, 9.5, 'dung') + D(5, 26) + D(29, 26) + D(20, 6, R),
-    gocVuong: L(6, 26, 29, 26) + L(6, 26, 6, 4) + P('M6 17h9v9', R, 2.2, RT) + D(6, 26) + D(29, 26) + D(6, 4),
+    gocVuong: L(6, 26, 29, 26) + L(6, 26, 6, 4) + P('M6 16h10v10', R, 2) + D(6, 26) + D(29, 26) + D(6, 4),
     doDai: L(5, 24, 27, 24) + D(5, 24) + D(27, 24) + L(7, 12, 25, 12, R, 1.5) + muiTen(5.5, 12, 180, R) + muiTen(26.5, 12, 0, R) + L(5, 8, 5, 16, R, 1.2) + L(27, 8, 27, 16, R, 1.2) + T(16, 9, 'cm', R, 8.5, 'dung', 1),
     dienTich: P('M4 27l6-12 7 5 11-15v22z', '#1D4ED8', 2, '#A9C9F7') + T(4, 11, 'S', '#1D4ED8', 13),
     dxTruc: L(7, 3, 25, 29) + L(8, 19, 21.6, 9.6, XAM, 1.4, '2 2.2') + D(8, 19) + D(21.6, 9.6, R),
@@ -147,6 +147,14 @@ window.GI = window.GI || {};
     parabol: P('M4 4Q16 40 28 4', K, 2.2) + L(3, 29, 29, 29, R, 2) + D(16, 13),
     xoa: '<g transform="rotate(-35 16 16)"><rect x="5" y="10.5" width="22" height="11" rx="2.2" fill="#F9A8D4" stroke="#BE185D" stroke-width="1.6"/><rect x="5" y="10.5" width="8.5" height="11" rx="2.2" fill="#fff" stroke="#BE185D" stroke-width="1.6"/></g>' + L(15, 28.5, 28, 28.5, XAM, 1.6),
   };
+  // các kiểu kí hiệu góc: n nét cung, có / không có gạch
+  function iconGoc(n, gach) {
+    var g = L(4, 26, 29, 26) + L(4, 26, 20, 5), a = Math.atan2(-21, 16);
+    for (var i = 0; i < n; i++) { var r = 9 + i * 3.4; g += P('M' + (4 + r) + ' 26A' + r + ' ' + r + ' 0 0 0 ' + (4 + r * Math.cos(a)).toFixed(2) + ' ' + (26 + r * Math.sin(a)).toFixed(2), R, 1.8); }
+    if (gach) { var m = a / 2, r1 = 6, r2 = 9 + (n - 1) * 3.4 + 4; g += L(4 + r1 * Math.cos(m), 26 + r1 * Math.sin(m), 4 + r2 * Math.cos(m), 26 + r2 * Math.sin(m), R, 1.8); }
+    return g + D(4, 26) + D(29, 26) + D(20, 5);
+  }
+  B32.goc2 = iconGoc(2); B32.goc3 = iconGoc(3); B32.gocGach1 = iconGoc(1, true); B32.gocGach2 = iconGoc(2, true);
   // ----- Nhóm hình không gian (nét liền: cạnh thấy, nét đứt: cạnh khuất) -----
   function NL(dd) { return P(dd, K, 1.9); }
   function ND(dd) { return P(dd, K, 1.5, null, '2.4 2'); }
@@ -185,8 +193,10 @@ window.GI = window.GI || {};
   B32.p_lucGiac = DG('M10 4.5h12l6 11.5-6 11.5H10L4 16z', [[10, 4.5], [22, 4.5], [28, 16], [22, 27.5], [10, 27.5], [4, 16]]);
   // ----- Nhóm đường đặc biệt trong tam giác -----
   function TG() { return NL('M12 4L3 27h26z'); }
-  B32.d_trungTuyen = TG() + P('M12 4l4 23M3 27l17.5-11.5M29 27L7.5 15.5', R, 1.4) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(14.7, 19.3, R);
-  B32.d_duongCao = TG() + P('M12 4v23', R, 1.6) + P('M12 23h4v4', R, 1.2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(12, 27, R);
+  B32.d_trungTuyen = TG() + P('M12 4l4 23', R, 2) + L(8.5, 25, 8.5, 29, R, 1.2) + L(22.5, 25, 22.5, 29, R, 1.2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(16, 27, R);
+  B32.d_trongTam = TG() + P('M12 4l4 23M3 27l17.5-11.5M29 27L7.5 15.5', R, 1.1, null, '2 1.6') + d3(12, 4) + d3(3, 27) + d3(29, 27) + D(14.7, 19.3, R, 2.6);
+  B32.d_duongCao = TG() + P('M12 4v23', R, 2) + P('M12 22.5h4.5v4.5', R, 1.3) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(12, 27, R);
+  B32.d_trucTam = TG() + P('M12 4v23M3 27L19.8 14.6M29 27L6.5 18.2', R, 1.1, null, '2 1.6') + d3(12, 4) + d3(3, 27) + d3(29, 27) + D(12, 20.4, R, 2.6);
   B32.d_phanGiac = TG() + C(13.5, 20.5, 5.6, R, 1.4) + P('M12 4l3 23M3 27l20-11', R, 1.2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(13.5, 20.5, R);
   B32.d_trungTruc = C(16, 18, 13, R, 1.3) + TG() + P('M16 30V8', R, 1.3) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(16, 18, R);
   B32.d_trungBinh = TG() + P('M7.5 15.5h13', R, 2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(7.5, 15.5, R) + d3(20.5, 15.5, R);
