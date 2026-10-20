@@ -16,10 +16,10 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - **Hàng trên:** menu ☰ (bảng mới, mở, lưu, nhập PDF, xuất ảnh, nền trang, thêm/xoá trang), mở, lưu, hoàn tác, làm lại, nhập PDF, thêm trang; giữa là số trang và mức phóng; bên phải là toàn màn hình.
 - **Hàng viết tay:** bút chì, tẩy, bút dạ quang (biểu tượng có màu) (mũi tên ⌄ để chỉnh độ dày, màu), các chấm màu bút, độ dày, màu dạ quang; bên phải là mũi tên chọn và bàn tay kéo trang.
 - **Hàng hình học (sắp xếp như GeoGebra):** điểm · đường · đường đặc biệt · đa giác · đường tròn · đường conic · góc và đo · biến hình · thanh trượt · di chuyển hình vẽ · chữ ABC, rồi mô hình GeoLab. Mỗi ô có tam giác ▽ ở góc; bấm lại vào ô đang chọn để mở danh sách công cụ cùng nhóm. Bên phải là nút bật/tắt số đo và hệ trục.
-- Chữ trong phần mềm dùng font Arial giống GeoGebra; tên điểm, tên đường trên bảng dùng font LaTeX (Latin Modern, chữ đứng).
+- Chữ trong phần mềm dùng font Arial giống GeoGebra; tên điểm, tên đường trên bảng dùng font LaTeX (Latin Modern, in nghiêng như $A$).
 - **Cột trái:** vùng trắng riêng, hiện các trang nhỏ của tệp PDF. Kéo tay nắm ở mép phải cột để mở rộng / thu hẹp, bấm vào tay nắm để đóng / mở cột.
 
-## Chức năng (bản 0.9)
+## Chức năng (bản 0.10)
 
 **Viết**
 - Bút có lực nhấn (nét to nhỏ theo tay), nét được làm mượt; bút dạ quang; chỉnh độ dày bằng thanh kéo (có xem trước nét), bảng màu.
@@ -51,7 +51,8 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - **Kéo tên** điểm, đường, đường tròn… để đặt tên chỗ dễ nhìn (tên đi được trong vòng khoảng 40 điểm ảnh quanh chỗ mặc định).
 - **Chuột phải** vào hình: Hiển thị đối tượng, Hiển thị tên, Đặt lại vị trí tên, Đổi tên, Xoá, Thuộc tính.
 
-**Thuộc tính (giống GeoGebra)**: dùng công cụ **Chọn** bấm vào một hình (hoặc chuột phải vào hình) để mở bảng Thuộc tính:
+**Thuộc tính (giống GeoGebra)**: bấm **chuột phải** vào hình → **Thuộc tính…** để mở bảng (bấm chuột trái chỉ để chọn, kéo). Khi bảng đang mở, chọn hình khác thì bảng đổi theo.
+- Bấm vào tên nhóm (Điểm, Đường thẳng…) để chọn hết các đối tượng trong nhóm.
 - Danh sách mọi đối tượng theo nhóm (điểm, đoạn thẳng, đường thẳng, tia, đường gấp khúc, đường tròn, cung / quạt, đa giác, số đo, thanh trượt, chữ) để chọn nhanh, kể cả hình đang ẩn.
 - **Cơ bản**: tên, định nghĩa, hiển thị đối tượng, hiển thị tên, cố định điểm, xoá đối tượng.
 - **Màu sắc**: bảng 24 màu và màu tự chọn; độ mờ tô với đa giác.
