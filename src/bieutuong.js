@@ -42,6 +42,12 @@ window.GI = window.GI || {};
     xoaX: p('M6 6l12 12M18 6L6 18', 'currentColor', 2.2),
     soDo: p('M3 18l6-11 6 11z', DEN, 1.6, '#FEE2E2') + chu(13.5, 10, '60°', DO, 7.5),
     truc: n(4, 20, 4, 3, DEN, 1.6) + n(4, 20, 21, 20, DEN, 1.6) + p('M2.3 5L4 3l1.7 2M19 18.3l2 1.7-2 1.7', DEN, 1.4) + p('M6 17c4-1 6-10 13-12', DO, 1.8),
+    congThuc: '<rect x="2" y="2" width="20" height="20" rx="5" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.3"/><path d="M15.5 6.5H7.5l4.6 5.5-4.6 5.5h8" fill="none" stroke="#5B21B6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><text x="15.6" y="10.2" font-family="Arial" font-weight="700" font-size="5.6" fill="#EA580C">n</text>',
+    mayTinh: '<rect x="4.5" y="1.5" width="15" height="21" rx="2.6" fill="#334155"/><rect x="6.5" y="3.6" width="11" height="5" rx="1" fill="#BBF7D0"/><path d="M8 6.2h5" stroke="#166534" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<circle cx="8" cy="11.8" r="1.15" fill="#F8FAFC"/><circle cx="12" cy="11.8" r="1.15" fill="#F8FAFC"/><circle cx="16" cy="11.8" r="1.15" fill="#F59E0B"/><circle cx="8" cy="15.3" r="1.15" fill="#F8FAFC"/><circle cx="12" cy="15.3" r="1.15" fill="#F8FAFC"/><circle cx="16" cy="15.3" r="1.15" fill="#F59E0B"/><circle cx="8" cy="18.8" r="1.15" fill="#F8FAFC"/><circle cx="12" cy="18.8" r="1.15" fill="#F8FAFC"/><rect x="14.9" y="17.7" width="2.2" height="2.2" rx=".6" fill="#22C55E"/>',
+    dungCu: '<path d="M2.5 16.5a9.5 9.5 0 0 1 19 0z" fill="#FDE68A" fill-opacity=".9" stroke="#B45309" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.6 16.5a6.4 6.4 0 0 1 12.8 0" fill="none" stroke="#B45309" stroke-width=".8"/>' +
+      '<path d="M12 7v2.2M7.3 8.3l1 1.8M16.7 8.3l-1 1.8M4.2 12l1.9.9M19.8 12l-1.9.9" stroke="#92400E" stroke-width=".9" stroke-linecap="round"/><path d="M12 16.5l4.6-6.4" stroke="#DC2626" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.3" fill="#DC2626"/>' +
+      '<rect x="2" y="18.6" width="20" height="3.6" rx=".8" fill="#93C5FD" stroke="#1D4ED8" stroke-width=".9"/><path d="M5 18.6v1.6M8 18.6v1M11 18.6v1.6M14 18.6v1M17 18.6v1.6M20 18.6v1" stroke="#1D4ED8" stroke-width=".7"/>',
     // ----- hàng 2: hình học -----
     diem: d(9, 14) + chu(13, 10, 'A', VIEN, 10),
     diemTren: '<path d="M3 17L10 5l11 7-6 9z" fill="#F5D0C5" stroke="#9A3412" stroke-width="1.4" stroke-linejoin="round"/>' + d(11, 13) + chu(13.5, 11, 'A', VIEN, 8),
@@ -141,11 +147,75 @@ window.GI = window.GI || {};
     parabol: P('M4 4Q16 40 28 4', K, 2.2) + L(3, 29, 29, 29, R, 2) + D(16, 13),
     xoa: '<g transform="rotate(-35 16 16)"><rect x="5" y="10.5" width="22" height="11" rx="2.2" fill="#F9A8D4" stroke="#BE185D" stroke-width="1.6"/><rect x="5" y="10.5" width="8.5" height="11" rx="2.2" fill="#fff" stroke="#BE185D" stroke-width="1.6"/></g>' + L(15, 28.5, 28, 28.5, XAM, 1.6),
   };
+  // ----- Nhóm hình không gian (nét liền: cạnh thấy, nét đứt: cạnh khuất) -----
+  function NL(dd) { return P(dd, K, 1.9); }
+  function ND(dd) { return P(dd, K, 1.5, null, '2.4 2'); }
+  function d2(x, y) { return D(x, y, X, 2.2); }
+  B32.k_hop = NL('M4 13h17v14H4zM4 13l7-6h17l-7 6M28 7v14l-7 6') + ND('M4 27l7-6h17M11 21V7') + d2(4, 27) + d2(21, 27) + d2(4, 13);
+  B32.k_lapPhuong = NL('M5 11h15v16H5zM5 11l6-6h16l-7 6M27 5v16l-7 6') + ND('M5 27l6-6h16M11 21V5') + d2(5, 27) + d2(20, 27);
+  B32.k_lang3 = NL('M5 9v17M24 9v17M15 13v17M5 9L15 13 24 9zM5 26l10 4 9-4') + ND('M5 26h19') + d2(5, 26) + d2(15, 30) + d2(24, 26);
+  B32.k_lang4 = NL('M4 12h16v16H4zM4 12l7-6h17l-8 6M28 6v16l-8 6') + ND('M4 28l7-6h17M11 22V6') + d2(4, 28) + d2(20, 28);
+  B32.k_chop3 = NL('M16 4L4 25M16 4l12 21M16 4l-2 25M4 25l10 4 14-4') + ND('M4 25h24') + d2(16, 4) + d2(4, 25) + d2(14, 29) + d2(28, 25);
+  B32.k_chop4 = NL('M15 3L3 26M15 3l5 23M15 3l13 15M3 26h17l8-8') + ND('M3 26l8-8h17M15 3l-4 15') + d2(15, 3) + d2(3, 26) + d2(20, 26);
+  B32.k_tru = '<ellipse cx="16" cy="8" rx="10" ry="3.6" fill="none" stroke="' + K + '" stroke-width="1.9"/>' + NL('M6 8v17M26 8v17M6 25a10 3.6 0 0 0 20 0') + ND('M6 25a10 3.6 0 0 1 20 0M16 8v17h10') + d2(16, 8) + d2(16, 25);
+  B32.k_non = NL('M16 4L5 24M16 4l11 20M5 24a11 4 0 0 0 22 0') + ND('M5 24a11 4 0 0 1 22 0M16 4v20h11') + d2(16, 4) + d2(16, 24);
+  B32.k_cau = C(16, 16, 12, K, 1.9) + NL('M4 16a12 4 0 0 0 24 0') + ND('M4 16a12 4 0 0 1 24 0M16 16h12') + d2(16, 16);
+  // ----- Nhóm đường tròn -----
+  function d3(x, y, m) { return D(x, y, m || X, 2.3); }
+  B32.m_noiTiep = C(16, 16, 12, K, 1.8) + NL('M12.9 4.4L5.6 22 26.4 22z') + d3(12.9, 4.4) + d3(5.6, 22) + d3(26.4, 22) + d3(16, 16, '#3A3F47');
+  B32.m_catHaiCanh = C(16, 20, 11, K, 1.8) + NL('M11 4L5 20 27 20zM11 4l16 16') + d3(11, 4) + d3(5, 20) + d3(27, 20) + d3(7.3, 13.8, R) + d3(19.5, 12.5, R);
+  B32.m_duongKinh = C(16, 16, 12, K, 1.8) + NL('M4 16h24') + d3(4, 16) + d3(28, 16) + d3(16, 16, '#3A3F47');
+  B32.m_veDuongKinh = C(16, 16, 12, K, 1.8) + P('M7 8.5l18 15', R, 2) + d3(7, 8.5) + d3(25, 23.5, R) + d3(16, 16, '#3A3F47');
+  B32.m_tiepTuyen1 = C(12, 18, 9, K, 1.8) + NL('M12 18h18M12 18l4.5-7.8L30 18') + P('M14.6 13.4l2.2 1.2 1.2-2.2', R, 1.3) + d3(12, 18, '#3A3F47') + d3(16.5, 10.2, R) + d3(30, 18);
+  B32.m_tiepTuyen2 = C(12, 16, 9, K, 1.8) + NL('M12 16h18M30 16L16.5 8.2M30 16l-13.5 7.8') + d3(12, 16, '#3A3F47') + d3(16.5, 8.2, R) + d3(16.5, 23.8, R) + d3(30, 16);
+  B32.m_tiepTuyenChung = C(10, 18, 7.5, K, 1.8) + C(24, 20, 5, K, 1.8) + P('M7.5 10.9L22.4 15.2', R, 2) + d3(10, 18, '#3A3F47') + d3(24, 20, '#3A3F47');
+  // ----- Nhóm hình phẳng -----
+  function DG(dd, ps) { return P(dd, NAU, 1.8, NAUT) + ps.map(function (q) { return d3(q[0], q[1]); }).join(''); }
+  B32.p_tamGiac = DG('M12 5L4 26h24z', [[12, 5], [4, 26], [28, 26]]);
+  B32.p_tamGiacCan = DG('M16 4L6 27h20z', [[16, 4], [6, 27], [26, 27]]) + L(9.6, 15, 12.4, 16.4, NAU, 1.3) + L(19.6, 16.4, 22.4, 15, NAU, 1.3);
+  B32.p_tamGiacDeu = DG('M16 5L4 26h24z', [[16, 5], [4, 26], [28, 26]]);
+  B32.p_tamGiacVuong = DG('M5 5v21h22z', [[5, 5], [5, 26], [27, 26]]) + P('M5 21h5v5', R, 1.4);
+  B32.p_hcn = DG('M4 9h24v15H4z', [[4, 9], [28, 9], [28, 24], [4, 24]]);
+  B32.p_hv = DG('M6 6h20v20H6z', [[6, 6], [26, 6], [26, 26], [6, 26]]);
+  B32.p_hbh = DG('M10 8h19l-7 16H3z', [[10, 8], [29, 8], [22, 24], [3, 24]]);
+  B32.p_thoi = DG('M16 3l11 13-11 13L5 16z', [[16, 3], [27, 16], [16, 29], [5, 16]]);
+  B32.p_thang = DG('M10 8h12l7 16H3z', [[10, 8], [22, 8], [29, 24], [3, 24]]);
+  B32.p_thangCan = DG('M10 8h12l6 16H4z', [[10, 8], [22, 8], [28, 24], [4, 24]]);
+  B32.p_thangVuong = DG('M5 8h14l9 16H5z', [[5, 8], [19, 8], [28, 24], [5, 24]]);
+  B32.p_lucGiac = DG('M10 4.5h12l6 11.5-6 11.5H10L4 16z', [[10, 4.5], [22, 4.5], [28, 16], [22, 27.5], [10, 27.5], [4, 16]]);
+  // ----- Nhóm đường đặc biệt trong tam giác -----
+  function TG() { return NL('M12 4L3 27h26z'); }
+  B32.d_trungTuyen = TG() + P('M12 4l4 23M3 27l17.5-11.5M29 27L7.5 15.5', R, 1.4) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(14.7, 19.3, R);
+  B32.d_duongCao = TG() + P('M12 4v23', R, 1.6) + P('M12 23h4v4', R, 1.2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(12, 27, R);
+  B32.d_phanGiac = TG() + C(13.5, 20.5, 5.6, R, 1.4) + P('M12 4l3 23M3 27l20-11', R, 1.2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(13.5, 20.5, R);
+  B32.d_trungTruc = C(16, 18, 13, R, 1.3) + TG() + P('M16 30V8', R, 1.3) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(16, 18, R);
+  B32.d_trungBinh = TG() + P('M7.5 15.5h13', R, 2) + d3(12, 4) + d3(3, 27) + d3(29, 27) + d3(7.5, 15.5, R) + d3(20.5, 15.5, R);
+  // Logo GeoLab (giống trang web nckh-geolab.com)
+  var LOGO_GEOLAB = '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="38" height="38" rx="10" fill="#2451C7"/>' +
+    '<path d="M11 15 L22 10 L30 15 L30 27 L19 31 L11 27 Z" fill="#fff" fill-opacity=".16" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M11 15 L19 19 L30 15 M19 19 L19 31" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M22 10 L22 22 L11 27 M22 22 L30 27" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="2 2" opacity=".75"/></svg>';
   B32.moHinh = to24('moHinh');
   GI.BIEU_TUONG_CC = B;
   // biểu tượng hàng GeoGebra: nét mảnh (0,7 lần), khung nhìn sát hơn để hình to hơn
   function svg32(k) { return '<svg viewBox="1 1 30 30" xmlns="http://www.w3.org/2000/svg">' + B32[k].replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + (+w * 0.7).toFixed(2) + '"'; }) + '</svg>'; }
+  // Icon mẫu hình kiểu logo GeoLab: ô vuông bo góc tô một màu, hình vẽ nét trắng
+  var MAU_NHOM = { k: '#7C3AED', m: '#0D9488', p: '#EA580C', d: '#DB2777' };
+  function iconMau(k) {
+    var mau = MAU_NHOM[k.charAt(0)], g = B32[k]
+      .replace(/<circle([^>]*?)fill="(?!none)[^"]*"([^>]*?)stroke="[^"]*"([^>]*?)stroke-width="[^"]*"/g, '<circle$1fill="#fff"$2stroke="none"$3stroke-width="0"')
+      .replace(/stroke="#[0-9A-Fa-f]{3,6}"/g, 'stroke="#fff"')
+      .replace(/fill="(#EDBFA6|#F6E3D8|#A9C9F7|rgba\(224,53,43,\.22\))"/g, 'fill="#fff" fill-opacity=".2"')
+      .replace(/stroke-dasharray="([^"]*)"/g, 'stroke-dasharray="$1" stroke-opacity=".8"')
+      .replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + Math.max(0.9, +w * 0.85).toFixed(2) + '"'; })
+      .replace(/<text([^>]*?)fill="[^"]*"/g, '<text$1fill="#fff"')
+      .replace(/(<circle[^>]*?)r="([\d.]+)"([^>]*?fill="#fff")/g, function (m, a1, r, a2) { return a1 + 'r="' + Math.min(+r, 1.6) + '"' + a2; });
+    return '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="38" height="38" rx="10" fill="' + mau + '"/>' +
+      '<g transform="translate(5.6 5.6) scale(0.9)">' + g + '</g></svg>';
+  }
   GI.bieuTuong = function (k, hang2) {
+    if (k === 'moHinh' && hang2) return LOGO_GEOLAB;
+    if (/^[kmpd]_/.test(k) && B32[k]) return iconMau(k);
     if (hang2 && B32[k]) return svg32(k);
     if (B32[k] && !B[k]) return svg32(k);
     return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + (B[k] || '') + '</svg>';

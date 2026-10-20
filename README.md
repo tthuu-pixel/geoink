@@ -29,6 +29,16 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Nhiều trang (tab ở đáy); nền giấy kẻ dòng (không có lề đỏ), trắng, ô vuông, ô ly, bảng xanh, nền đen, xám.
 - Hoàn tác / làm lại, lưu và mở tệp `.geoink`, xuất trang ra ảnh PNG.
 
+**Văn bản (nút ABC)**: bấm lên bảng để gõ chữ trong khung soạn có thanh định dạng: phông, cỡ chữ, đậm, nghiêng, gạch chân, gạch ngang, màu chữ, danh sách chấm / số, căn trái / giữa / phải. Kéo khung để di chuyển, bấm ổ khoá để cố định; bấm đúp để sửa.
+
+**Công thức (nút Σ)**: soạn công thức trực quan với bàn phím toán (MathLive) hoặc gõ LaTeX; chọn màu, cỡ, kiểu hiển thị lớn. Công thức đặt lên bảng, kéo được, bấm đúp để sửa. Chạy không cần mạng.
+
+**Máy tính khoa học** (bố cục kiểu fx-880BTG, phần THCS): tính toán hiển thị tự nhiên (phân số, căn, luỹ thừa, sin cos tan và hàm ngược, log, ln, n!, nCr, nPr, %, độ phút giây, Ans, biến nhớ A–F x y M, STO, M+), kết quả dạng phân số / căn / bội của π và nút S⇔D; MENU: Thống kê (một biến, hai biến y = a + bx), Bảng giá trị f(x), g(x), Phương trình (hệ 2–4 ẩn, đa thức bậc 2–4), Bất phương trình bậc 2–4. SETUP đổi độ / radian.
+
+**Dụng cụ học tập**: thước kẻ 20 cm, thước đo độ, ê-ke 30°–60° và 45°, thước parabol, compa — đúng tỉ lệ thật, kéo để dời, nút ↻ để xoay (hiện số độ). Viết bút sát mép dụng cụ thì nét bám theo mép. Compa: kéo đầu kim để dời, kéo đầu bút để chỉnh bán kính, kéo núm trên để quay vẽ cung. Phím R cất dụng cụ.
+
+**Mẫu hình** (cạnh nút GeoLab): hình không gian (hộp chữ nhật, lập phương, lăng trụ đứng, chóp đều, trụ, nón, cầu — kéo điểm có vòng tròn để đổi kích thước theo đúng hướng, nút ↻ để xoay), đường tròn (nội tiếp, đường kính, tiếp tuyến…), hình phẳng (tam giác, tứ giác đặc biệt, lục giác đều), đường đặc biệt trong tam giác (trung tuyến, đường cao, phân giác, trung trực, đường trung bình). Kéo đỉnh thì hình vẫn giữ đúng tính chất.
+
 **Nhập tệp PDF**: bấm nút PDF (hoặc menu ☰ → Nhập tệp PDF…). Các trang PDF xếp từ trên xuống trên bảng, cột trái hiện trang nhỏ (bấm để đến trang đó). Viết, vẽ, dựng hình thẳng lên trang; lăn chuột để cuộn, Ctrl + lăn chuột để phóng to. Tệp PDF được lưu kèm trong tệp `.geoink`. Xuất ảnh PNG sẽ xuất trang PDF đang xem.
 
 **Dựng hình (thao tác như GeoGebra)**: chọn công cụ rồi bấm lên bảng.
@@ -86,6 +96,6 @@ npm install
 npm start          # chạy thử
 ```
 
-Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab), `src/bieutuong.js` (biểu tượng màu, con trỏ bút chì), `src/thu-vien/` (pdf.js 3.11 của Mozilla, giấy phép Apache 2.0; font Latin Modern Roman của GUST, giấy phép GUST Font License).
+Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab), `src/bieutuong.js` (biểu tượng màu, con trỏ bút chì), `src/thu-vien/` (pdf.js 3.11 – Apache 2.0; MathLive 0.111 – MIT; MathJax 3.2 – Apache 2.0; font Latin Modern Roman – GUST Font License).
 
 **Phát hành bản mới**: tăng `version` trong `package.json` (ví dụ `0.1.1`) rồi đẩy lên nhánh `main`. GitHub Actions đóng gói trên máy Windows, tạo bản phát hành `v0.1.1` và đăng tệp cài đặt lên Releases. Đẩy lên `main` mà không đổi `version` thì chỉ đóng gói thử.
