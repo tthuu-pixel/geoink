@@ -118,3 +118,56 @@ button { font-family: inherit; }
 .the-mo-hinh small { color: var(--chu-phu); font-weight: 600; }
 
 #thong-bao { position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%); z-index: 60; background: #1F2937; color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 600; box-shadow: var(--bong); }
+
+/* ---------- Bảng Thuộc tính (kiểu GeoGebra) ---------- */
+#thuoc-tinh {
+  position: absolute; right: 14px; top: 12px; z-index: 30; width: min(620px, calc(100% - 28px)); height: min(470px, calc(100% - 80px));
+  display: flex; flex-direction: column; background: var(--the); border: 1px solid #C9D2DE; border-radius: 12px; box-shadow: 0 12px 36px rgba(17, 24, 39, .22); overflow: hidden;
+}
+.tt-dau { display: flex; align-items: center; justify-content: space-between; height: 40px; padding: 0 6px 0 12px; background: #4F7487; color: #fff; cursor: move; flex: none; }
+.tt-dau span { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.tt-dau i { width: 18px; height: 18px; display: block; }
+.tt-dau i svg { width: 100%; height: 100%; }
+.tt-dong { width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: #fff; cursor: pointer; display: grid; place-items: center; }
+.tt-dong:hover { background: rgba(255,255,255,.18); }
+.tt-dong i { width: 18px; height: 18px; }
+.tt-than { flex: 1; display: flex; min-height: 0; }
+.tt-ds { width: 190px; flex: none; overflow-y: auto; border-right: 1px solid var(--vien); padding: 6px; background: #FAFBFC; }
+.tt-nhom { font-weight: 700; font-size: 14px; padding: 8px 6px 2px; color: #374151; }
+.tt-muc { display: flex; align-items: center; gap: 8px; width: 100%; padding: 4px 6px 4px 16px; border: 0; border-radius: 6px; background: transparent; font: italic 600 16px "Cambria Math", "Times New Roman", serif; color: var(--chu); cursor: pointer; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-muc:hover { background: #EEF1F5; }
+.tt-muc.bat { background: #DCE6F7; }
+.tt-cham { width: 11px; height: 11px; border-radius: 50%; background: var(--m); flex: none; }
+.tt-cham.rong { background: transparent; box-shadow: inset 0 0 0 2px var(--m); }
+.tt-trong { color: var(--chu-phu); padding: 10px; font-size: 14px; }
+.tt-phai { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.tt-tab { display: flex; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--vien); flex: none; }
+.tt-tab button { border: 1px solid transparent; border-bottom: 0; background: transparent; padding: 7px 14px; border-radius: 8px 8px 0 0; font-size: 15px; color: var(--chu-phu); cursor: pointer; margin-bottom: -1px; }
+.tt-tab button.bat { background: var(--the); border-color: var(--vien); color: var(--chu); font-weight: 600; }
+.tt-noi { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px 16px 16px; }
+.tt-dong-tt { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.tt-dong-tt > label { width: 118px; flex: none; font-size: 15px; color: #374151; }
+.tt-o { flex: 1; min-width: 0; height: 36px; padding: 0 10px; border: 1px solid #C9D2DE; border-radius: 8px; font: 16px var(--phong); color: var(--chu); background: #fff; user-select: text; }
+.tt-o:focus { outline: none; border-color: var(--chinh); box-shadow: 0 0 0 3px var(--chinh-nhat); }
+.tt-dn { display: flex; align-items: center; background: #F7F8FA; color: #374151; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tt-tich { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 15px; cursor: pointer; }
+.tt-tich input { width: 18px; height: 18px; accent-color: var(--chinh); cursor: pointer; }
+.tt-hang { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: -4px 0 8px 2px; }
+.tt-xoa { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; height: 38px; padding: 0 14px; border: 1px solid #F3C4C4; border-radius: 10px; background: #FFF5F5; color: #B91C1C; font-weight: 600; cursor: pointer; }
+.tt-xoa i { width: 18px; height: 18px; } .tt-xoa i svg { width: 100%; height: 100%; }
+.tt-xoa.nhe { border-color: var(--vien); background: #fff; color: var(--chu); }
+.tt-bang-mau { display: grid; grid-template-columns: repeat(9, 30px); gap: 6px; margin: -2px 0 12px; }
+.tt-bang-mau button, .tt-mau-khac { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(0,0,0,.15); cursor: pointer; padding: 0; }
+.tt-bang-mau button.bat { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--chinh); }
+.tt-mau-khac { position: relative; background: conic-gradient(#ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444); }
+.tt-mau-khac input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.tt-truot { flex: 1; display: flex; align-items: center; gap: 10px; }
+.tt-truot input { flex: 1; accent-color: var(--chinh); }
+.tt-truot b { min-width: 42px; text-align: right; font-weight: 600; }
+.tt-xo { position: relative; flex: none; }
+.tt-xo-nut { display: flex; align-items: center; gap: 4px; height: 36px; padding: 0 6px 0 4px; border: 1px solid #C9D2DE; border-radius: 8px; background: #fff; cursor: pointer; }
+.tt-xo-nut i { width: 16px; height: 16px; color: #6B7280; } .tt-xo-nut i svg { width: 100%; height: 100%; }
+.tt-xo-ds { position: absolute; left: 0; top: 40px; max-height: 250px; overflow-y: auto; z-index: 5; display: flex; flex-direction: column; background: #fff; border: 1px solid #C9D2DE; border-radius: 8px; box-shadow: var(--bong); padding: 4px; }
+.tt-xo-ds button { display: flex; align-items: center; height: 32px; padding: 0 4px; border: 0; border-radius: 6px; background: transparent; cursor: pointer; }
+.tt-xo-ds button:hover { background: #E8EEF9; }
+.tt-khong { display: inline-block; width: 150px; text-align: left; padding-left: 8px; color: var(--chu-phu); font-size: 14px; }
