@@ -1146,7 +1146,7 @@
     // Rê chuột trên dụng cụ học tập
     if (dungCuDS.length) {
       var hd = GI.dungCu.tim(dungCuDS, M, 1 / V.s, cc === 'but' || cc === 'dq');
-      if (hd) { cv.style.cursor = hd.phan === 'mep' ? conTroCC() : hd.phan === 'than' ? 'move' : 'grab'; if (diDuoi) { diDuoi = null; canVe(); } return; }
+      if (hd) { cv.style.cursor = hd.phan === 'mep' ? conTroCC() : hd.phan === 'than' ? 'move' : hd.phan === 'ghim' ? 'pointer' : 'grab'; if (diDuoi) { diDuoi = null; canVe(); } return; }
     }
     // Rê chuột: làm sáng đối tượng sẽ được chọn
     var cu = diDuoi; diDuoi = null;
@@ -1819,6 +1819,7 @@
       var cfg = cc === 'but' ? butCfg : dqCfg, P = GI.dungCu.chieuMep(h, M);
       netDang = { loai: 'net', kieu: cc, mau: cfg.mau, co: cfg.co, pts: [[P.x, P.y, 0.6]], lucNhan: false, mep: h }; veNhap(); return true;
     }
+    if (h.phan === 'ghim') { dc.ghim = !dc.ghim; thongBao(dc.ghim ? 'Đã ghim: kéo dụng cụ sẽ quay quanh điểm đỏ' : 'Đã bỏ ghim: kéo để di chuyển dụng cụ'); canVe(); return true; }
     if (h.phan === 'xoay') { dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y }; canVe(); return true; }
     if (h.phan === 'butCompa') { dangKeo = { loai: 'butCompa', dc: dc }; return true; }
     if (h.phan === 'quayCompa') {
