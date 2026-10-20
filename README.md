@@ -14,11 +14,11 @@ Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“M
 
 Hai hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink):
 - **Hàng 1 – viết tay:** menu ☰ (bảng mới, mở, lưu, nhập PDF, xuất ảnh, nền trang, thêm/xoá trang), mở, lưu, hoàn tác, làm lại, nhập PDF, tẩy, dạ quang, các chấm màu bút, độ dày, màu dạ quang, rồi chọn – kéo trang – **bút chì** (chọn bút chì thì con trỏ chuột thành cây bút chì). Mũi tên ⌄ cạnh bút, tẩy, dạ quang để chỉnh độ dày, màu.
-- **Hàng 2 – hình học (sắp xếp như GeoGebra):** chọn · điểm · đường · đường đặc biệt · đa giác · đường tròn · đường conic · góc và đo · biến hình · thanh trượt · di chuyển hình vẽ · chữ ABC, rồi mô hình GeoLab. Mỗi ô có tam giác ▽ ở góc; bấm lại vào ô đang chọn để mở danh sách công cụ cùng nhóm. Bên phải là nút bật/tắt số đo và hệ trục.
-- Chữ trong phần mềm và trên bảng dùng font Arial giống GeoGebra.
+- **Hàng 2 – hình học (sắp xếp như GeoGebra):** điểm · đường · đường đặc biệt · đa giác · đường tròn · đường conic · góc và đo · biến hình · thanh trượt · di chuyển hình vẽ · chữ ABC, rồi mô hình GeoLab. Mỗi ô có tam giác ▽ ở góc; bấm lại vào ô đang chọn để mở danh sách công cụ cùng nhóm. Bên phải là nút bật/tắt số đo và hệ trục.
+- Chữ trong phần mềm dùng font Arial giống GeoGebra; tên điểm, tên đường trên bảng dùng font LaTeX (Latin Modern, chữ đứng).
 - **Cột trái:** vùng trắng riêng, hiện các trang nhỏ của tệp PDF. Kéo tay nắm ở mép phải cột để mở rộng / thu hẹp, bấm vào tay nắm để đóng / mở cột.
 
-## Chức năng (bản 0.6)
+## Chức năng (bản 0.7)
 
 **Viết**
 - Bút có lực nhấn (nét to nhỏ theo tay), nét được làm mượt; bút dạ quang; chỉnh độ dày bằng thanh kéo (có xem trước nét), bảng màu.
@@ -42,6 +42,12 @@ Hai hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink):
 - **Thanh trượt**, **chèn chữ**, di chuyển hình vẽ (kéo trang), xoá đối tượng.
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
+
+**Chọn nhiều, menu chuột phải** (công cụ Chọn – mũi tên ở hàng 1, phím V):
+- Giữ **Ctrl** và bấm để thêm / bớt từng đối tượng (điểm, đường, đường tròn, đa giác, chữ, nét viết tay, mô hình).
+- Kéo chỗ trống để **chọn bằng khung**; **Ctrl+A** chọn tất cả.
+- Kéo một hình đang chọn: cả nhóm di chuyển theo. **Delete** xoá cả nhóm. Đổi màu, kiểu trong bảng Thuộc tính áp dụng cho cả nhóm.
+- **Chuột phải** vào hình: Hiển thị đối tượng, Hiển thị tên, Đổi tên, Xoá, Thuộc tính.
 
 **Thuộc tính (giống GeoGebra)**: dùng công cụ **Chọn** bấm vào một hình (hoặc chuột phải vào hình) để mở bảng Thuộc tính:
 - Danh sách mọi đối tượng theo nhóm (điểm, đoạn thẳng, đường thẳng, tia, đường gấp khúc, đường tròn, cung / quạt, đa giác, số đo, thanh trượt, chữ) để chọn nhanh, kể cả hình đang ẩn.
@@ -67,7 +73,8 @@ Hai hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink):
 | Esc | Huỷ thao tác dựng hình đang dở |
 | Page Up / Page Down | Trang trước / sau |
 | F11 | Toàn màn hình |
-| Delete | Xoá nét / mô hình đang chọn |
+| Delete | Xoá các đối tượng đang chọn |
+| Ctrl+A | Chọn tất cả trên trang |
 
 ## Dành cho người phát triển
 
@@ -76,6 +83,6 @@ npm install
 npm start          # chạy thử
 ```
 
-Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab), `src/bieutuong.js` (biểu tượng màu, con trỏ bút chì), `src/thu-vien/` (pdf.js 3.11 của Mozilla, giấy phép Apache 2.0).
+Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab), `src/bieutuong.js` (biểu tượng màu, con trỏ bút chì), `src/thu-vien/` (pdf.js 3.11 của Mozilla, giấy phép Apache 2.0; font Latin Modern Roman của GUST, giấy phép GUST Font License).
 
 **Phát hành bản mới**: tăng `version` trong `package.json` (ví dụ `0.1.1`) rồi đẩy lên nhánh `main`. GitHub Actions đóng gói trên máy Windows, tạo bản phát hành `v0.1.1` và đăng tệp cài đặt lên Releases. Đẩy lên `main` mà không đổi `version` thì chỉ đóng gói thử.

@@ -271,6 +271,8 @@ GI.hinh = (function () {
     if (v.loai === 'doan') t = Math.max(0, Math.min(1, t)); else if (v.loai === 'tia') t = Math.max(0, t);
     return t;
   }
+  // Các đối tượng mà o được dựng từ (cha trực tiếp)
+  function cha(o) { return TRUONG_REF.map(function (k) { return o[k]; }).concat(o.ds || []).filter(function (r) { return typeof r === 'string'; }); }
   // Tất cả đối tượng phụ thuộc (trực tiếp hoặc gián tiếp) vào id
   function phuThuoc(ds, id) {
     var bo = {}; bo[id] = 1; var doi = true;
@@ -284,5 +286,5 @@ GI.hinh = (function () {
     }
     return bo;
   }
-  return { tinh: tinh, catNhau: catNhau, khoangCach: khoangCach, thamSo: thamSo, phuThuoc: phuThuoc, LA_DIEM: LA_DIEM, LA_THANG: LA_THANG, LA_TRON: LA_TRON, LA_CUNG: LA_CUNG, LA_CONIC: LA_CONIC, kc: kc, DV: DV };
+  return { cha: cha, tinh: tinh, catNhau: catNhau, khoangCach: khoangCach, thamSo: thamSo, phuThuoc: phuThuoc, LA_DIEM: LA_DIEM, LA_THANG: LA_THANG, LA_TRON: LA_TRON, LA_CUNG: LA_CUNG, LA_CONIC: LA_CONIC, kc: kc, DV: DV };
 })();
