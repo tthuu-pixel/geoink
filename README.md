@@ -54,6 +54,8 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
+**Hai nút TeX** (cạnh nút Dụng cụ học tập): nút *Nhập mã TeX* mở hộp dán mã TikZ để dựng hình; nút *Xuất mã TeX* — bấm nút rồi kéo khung quét quanh hình (hoặc chọn sẵn hình rồi bấm) để lấy mã TikZ thuần theo khung 4 bước: điểm dựng giữ cách dựng bằng `calc` / `intersection of` (trung điểm, chân đường cao, trọng tâm, trực tâm, giao điểm, điểm trên đường tròn, phép quay…), các đoạn ghép thành chuỗi dài nhất (`--cycle` khi khép kín), đường tròn khai báo bán kính bằng `declare function`, góc / góc vuông / gạch đánh dấu gộp trong `\foreach`, nhãn điểm theo góc. Có nút sao chép mã.
+
 **Nhập hình từ mã TikZ** (menu ☰ → *Nhập hình từ mã TikZ…*, hoặc dán thẳng lên bảng bằng Ctrl+V): đọc TikZ thuần theo khung 4 bước — `\def`, `declare function`, `\foreach` (cả lồng nhau), `\path … coordinate`, `\coordinate`, phép dựng `calc` (trung điểm, tỉ lệ, hình chiếu `$(B)!(A)!(C)$`, phép quay `$(O)!1!90:(B)$`, khoảng cách `!1cm!`, tổng hiệu toạ độ), `intersection of`, `name path` + `name intersections` (có `sort by`), `let … veclen`, đường tròn, cung `arc`, nét đứt, mũi tên, `pic {angle}` / `pic {right angle}` (gộp nhiều cung, nhãn trong ngoặc kép), gạch đánh dấu góc, nhãn `node`, và `\foreach` xuất hiện điểm `(\d) circle(1pt) + (\g:9pt) node {$\d$}`. Mỗi điểm giữ nguyên cách dựng nên kéo điểm gốc thì hình đổi theo; điểm tự do nằm trên đường tròn đã vẽ thì chỉ chạy trên đường tròn đó. Hình tự co vừa khung nhìn.
 
 **Chọn nhiều, menu chuột phải** (công cụ Chọn – mũi tên ở hàng viết tay, phím T):

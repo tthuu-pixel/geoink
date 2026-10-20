@@ -364,3 +364,5 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #tikz-loi { font-weight: 500; font-size: 13px; max-height: 120px; overflow: auto; }
 #tikz-loi b { color: #B45309; }
 #hop-tikz code { background: #F1F5F9; padding: 0 4px; border-radius: 4px; font-size: 12.5px; }
+#xuat-tex-ma { width: 100%; box-sizing: border-box; font: 13px/1.45 Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; resize: vertical; background: #F8FAFC; white-space: pre; }
+#hop-xuat-tex code { background: #F1F5F9; padding: 0 4px; border-radius: 4px; font-size: 12.5px; }

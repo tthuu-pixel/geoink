@@ -70,7 +70,7 @@
     xuong: '<path d="M7.5 10l4.5 4.5 4.5-4.5"/>',
     toanManHinh: '<path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/>',
   };
-  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
+  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1, nhapTex: 1, xuatTex: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
   function bieuTuong(k, hang2) {
     if (!hang2 && BT_MAU[k] && GI.bieuTuong) return GI.bieuTuong(k);
     if (!hang2 && BT_NET[k]) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + BT_NET[k] + '</svg>';
@@ -1230,7 +1230,8 @@
       ghiLichSu(); trang().net.push(netDang); netDang = null; nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, cvN.width, cvN.height); canVe(); return;
     }
     if (dangKeo && dangKeo.loai === 'trang') cv.style.cursor = conTroCC();
-    if (dangKeo && dangKeo.loai === 'khung') { var dsK = chonTrongKhung(dangKeo.a, dangKeo.b); if (dangKeo.them) dsK.forEach(function (x) { if (!trongNhom(x)) nhom.push(x); }); else nhom = dsK; capNhatChon(false); canVe(); }
+    if (dangKeo && dangKeo.loai === 'khung') { var dsK = chonTrongKhung(dangKeo.a, dangKeo.b); if (dangKeo.them) dsK.forEach(function (x) { if (!trongNhom(x)) nhom.push(x); }); else nhom = dsK; capNhatChon(false); canVe();
+      if (choXuatTex) { choXuatTex = false; capNhatGoiY(); var idsK = nhom.filter(function (x) { return x.h; }).map(function (x) { return x.h; }); if (idsK.length) xuatTexChon(idsK); else thongBao('Không có hình nào trong khung'); } }
     if (dangKeo && dangKeo.loai === 'laser') laser.forEach(function (l) { l.ketThuc = true; });
     dangKeo = null; veNhap();
   }
@@ -1415,6 +1416,13 @@
     themTrang: function () { ghiLichSu(); tl.trang.splice(tl.so + 1, 0, trangMoi(trang().nen)); tl.so++; sauKhiDoiTrang(); thongBao('Đã thêm trang ' + (tl.so + 1)); },
     truc: function () { ghiLichSu(); trang().truc = !trang().truc; if (trang().truc) { V.x = -W / 2 / V.s; V.y = -Hh / 2 / V.s; } capNhatNutBat(); canVe(); },
     soDo: function () { hienSo = !hienSo; capNhatNutBat(); canVe(); },
+    nhapTex: function () { LENH.nhapTikz(); },
+    xuatTex: function () {
+      var ids = nhom.filter(function (x) { return x.h; }).map(function (x) { return x.h; });
+      if (ids.length) return xuatTexChon(ids);
+      choXuatTex = true; chonCongCu('chon');
+      var el = $('#goi-y'); el.innerHTML = '<b>Xuất mã TeX:</b> kéo khung quanh hình cần xuất (Esc để huỷ)'; el.classList.remove('an');
+    },
     nhapTikz: function () { $('#menu').classList.add('an'); $('#tikz-loi').innerHTML = ''; $('#hop-tikz').classList.remove('an'); setTimeout(function () { $('#tikz-ma').focus(); }, 30); },
     toanManHinh: function () { if (MT) MT.toanManHinh(); else if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); },
     thuNho: function () { thuPhong(1 / 1.25); }, phongTo: function () { thuPhong(1.25); },
@@ -2378,6 +2386,18 @@
     thongBao('Đã dựng hình từ mã TikZ' + (mo ? ': ' + mo : '') + (kq.canhBao.length ? ' · ' + kq.canhBao.length + ' chỗ bỏ qua' : ''));
     return kq;
   }
+  var choXuatTex = false;
+  function xuatTexChon(ids) {
+    var ma = null; try { ma = GI.xuatTex.xuat(trang().hinh, ids, giaTri); } catch (e) { return thongBao('Không xuất được mã: ' + (e.message || e)); }
+    if (!ma) return thongBao('Chưa có hình nào trong vùng chọn để xuất mã');
+    $('#xuat-tex-ma').value = ma; $('#hop-xuat-tex').classList.remove('an'); $('#xuat-tex-ma').scrollTop = 0;
+  }
+  $('#xuat-tex-chep').onclick = function () {
+    var ta = $('#xuat-tex-ma'), ma = ta.value;
+    function xong() { thongBao('Đã sao chép mã TikZ'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ma).then(xong, function () { ta.select(); document.execCommand('copy'); xong(); });
+    else { ta.select(); document.execCommand('copy'); xong(); }
+  };
   function escHtml(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   $('#tikz-dung').onclick = function () {
     var kq = nhapTikz($('#tikz-ma').value);
@@ -2410,7 +2430,7 @@
       else if (k === 'a') { e.preventDefault(); chonTatCa(); }
       return;
     }
-    if (e.key === 'Escape') { dongMenuPhai(); nhom = []; dongThuocTinh(); choChon = []; $$('.hop').forEach(function (h) { h.classList.add('an'); }); capNhatGoiY(); canVe(); }
+    if (e.key === 'Escape') { choXuatTex = false; dongMenuPhai(); nhom = []; dongThuocTinh(); choChon = []; $$('.hop').forEach(function (h) { h.classList.add('an'); }); capNhatGoiY(); canVe(); }
     else if (e.key === 'PageDown') LENH.trangSau(); else if (e.key === 'PageUp') LENH.trangTruoc();
     else if (e.key === 'F11') { e.preventDefault(); LENH.toanManHinh(); }
     else if ((e.key === 'Delete' || e.key === 'Backspace') && (nhom.length || chonId)) { if (!nhom.length) nhom = [{ h: chonId }]; xoaNhom(); }
