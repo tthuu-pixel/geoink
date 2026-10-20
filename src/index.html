@@ -8,42 +8,33 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header id="thanh-tren">
-  <div class="thuong-hieu"><img src="icon.png" alt=""><span>GeoInk</span><small id="ten-tep">Bảng mới</small></div>
-  <div class="nhom">
-    <button class="nut" data-lenh="moi" title="Bảng mới (Ctrl+N)"><i data-bt="moi"></i><span>Mới</span></button>
-    <button class="nut" data-lenh="mo" title="Mở bảng (Ctrl+O)"><i data-bt="mo"></i><span>Mở</span></button>
-    <button class="nut" data-lenh="luu" title="Lưu (Ctrl+S)"><i data-bt="luu"></i><span>Lưu</span></button>
-    <button class="nut" data-lenh="xuatAnh" title="Xuất trang ra ảnh PNG"><i data-bt="anh"></i><span>Xuất ảnh</span></button>
-  </div>
-  <div class="nhom">
-    <button class="nut" data-lenh="hoanTac" title="Hoàn tác (Ctrl+Z)"><i data-bt="hoanTac"></i><span>Hoàn tác</span></button>
-    <button class="nut" data-lenh="lamLai" title="Làm lại (Ctrl+Y)"><i data-bt="lamLai"></i><span>Làm lại</span></button>
-    <button class="nut" data-lenh="xoaTrang" title="Xoá hết nội dung trang này"><i data-bt="xoaTrang"></i><span>Xoá trang</span></button>
-  </div>
-  <div class="nhom trang">
-    <button class="nut nho" data-lenh="trangTruoc" title="Trang trước (Page Up)"><i data-bt="truoc"></i></button>
-    <span id="so-trang">1 / 1</span>
-    <button class="nut nho" data-lenh="trangSau" title="Trang sau (Page Down)"><i data-bt="sau"></i></button>
-    <button class="nut" data-lenh="themTrang" title="Thêm trang mới"><i data-bt="themTrang"></i><span>Thêm trang</span></button>
-  </div>
-  <div class="nhom">
-    <label class="chon-nen" title="Nền trang"><i data-bt="nen"></i>
-      <select id="nen">
-        <option value="trang">Nền trắng</option>
-        <option value="oVuong">Ô vuông</option>
-        <option value="oLy">Ô ly</option>
-        <option value="bangXanh">Bảng xanh</option>
-        <option value="den">Nền đen</option>
-      </select>
-    </label>
-    <button class="nut" data-lenh="truc" title="Bật/tắt hệ trục toạ độ"><i data-bt="truc"></i><span>Hệ trục</span></button>
-    <button class="nut" data-lenh="soDo" id="nut-so-do" title="Bật/tắt số đo trên hình"><i data-bt="soDo"></i><span>Số đo</span></button>
-    <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i><span>Toàn màn hình</span></button>
-  </div>
+<!-- Hàng 1: viết tay (kiểu Scrble Ink) -->
+<header id="hang-viet" class="hang">
+  <button class="nut" id="nut-menu" title="Menu"><i data-bt="menu"></i></button>
+  <span class="ke"></span>
+  <button class="nut" data-lenh="mo" title="Mở bảng (Ctrl+O)"><i data-bt="mo"></i></button>
+  <button class="nut" data-lenh="luu" title="Lưu (Ctrl+S)"><i data-bt="luu"></i></button>
+  <button class="nut" data-lenh="hoanTac" title="Hoàn tác (Ctrl+Z)"><i data-bt="hoanTac"></i></button>
+  <button class="nut" data-lenh="lamLai" title="Làm lại (Ctrl+Y)"><i data-bt="lamLai"></i></button>
+  <span class="ke"></span>
+  <button class="nut" data-cc="but" title="Bút (P)"><i data-bt="but"></i></button>
+  <button class="nut" data-cc="tay" title="Tẩy (E)"><i data-bt="tay"></i></button>
+  <button class="nut" data-cc="dq" title="Bút dạ quang (H)"><i data-bt="dq"></i></button>
+  <button class="nut" data-cc="thang" title="Nét thẳng"><i data-bt="thang"></i></button>
+  <button class="nut" data-cc="laser" title="Bút chỉ (L)"><i data-bt="laser"></i></button>
+  <div class="khay" id="khay-mau" title="Màu bút"></div>
+  <div class="khay" id="khay-co" title="Độ dày nét"></div>
+  <div class="khay" id="khay-dq" title="Màu dạ quang"></div>
+  <span class="ke"></span>
+  <button class="nut" data-cc="chon" title="Chọn và kéo (V)"><i data-bt="chon"></i></button>
+  <button class="nut" data-cc="keo" title="Kéo trang"><i data-bt="keo"></i></button>
+  <div class="gian"></div>
+  <span id="thong-tin" title="Bấm để về 100%">1 / 1 · 100%</span>
+  <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i></button>
 </header>
 
-<aside id="cong-cu"></aside>
+<!-- Hàng 2: dựng hình, đo, đồ thị (kiểu GeoGebra) -->
+<nav id="hang-hinh" class="hang"></nav>
 
 <main id="bang">
   <canvas id="ve"></canvas>
@@ -52,10 +43,30 @@
   <div id="tuy-chon-but" class="an"></div>
   <div id="thu-phong">
     <button class="nut nho" data-lenh="thuNho" title="Thu nhỏ"><i data-bt="thuNho"></i></button>
-    <button class="nut nho chu" data-lenh="vuaKhung" id="ty-le" title="Về 100%">100%</button>
     <button class="nut nho" data-lenh="phongTo" title="Phóng to"><i data-bt="phongTo"></i></button>
   </div>
 </main>
+
+<footer id="tab-trang"></footer>
+
+<!-- Menu ☰ -->
+<div id="menu" class="an" role="menu">
+  <button data-lenh="moi"><i data-bt="moi"></i>Bảng mới<kbd>Ctrl+N</kbd></button>
+  <button data-lenh="mo"><i data-bt="mo"></i>Mở…<kbd>Ctrl+O</kbd></button>
+  <button data-lenh="luu"><i data-bt="luu"></i>Lưu<kbd>Ctrl+S</kbd></button>
+  <button data-lenh="luuThanh"><i data-bt="luu"></i>Lưu thành tệp khác…<kbd>Ctrl+⇧+S</kbd></button>
+  <button data-lenh="xuatAnh"><i data-bt="anh"></i>Xuất trang ra ảnh PNG</button>
+  <hr>
+  <div class="tieu-de-menu">Nền trang</div>
+  <div class="nen-menu" id="nen-menu"></div>
+  <hr>
+  <button data-lenh="themTrang"><i data-bt="themTrang"></i>Thêm trang</button>
+  <button data-lenh="xoaTrang"><i data-bt="xoaTrang"></i>Xoá hết nội dung trang này</button>
+  <button data-lenh="xoaTrangNay"><i data-bt="xoa"></i>Xoá trang này</button>
+  <hr>
+  <button data-lenh="toanManHinh"><i data-bt="toanManHinh"></i>Toàn màn hình<kbd>F11</kbd></button>
+  <div class="phien-ban" id="phien-ban">GeoInk</div>
+</div>
 
 <div id="hop-ham-so" class="hop an" role="dialog" aria-label="Vẽ đồ thị hàm số">
   <div class="hop-noi-dung">
@@ -67,7 +78,7 @@
       <button data-vd="-1/2x^2 + 2">−½x² + 2</button><button data-vd="1/x">1/x</button><button data-vd="sqrt(x)">√x</button><button data-vd="|x|">|x|</button>
     </div>
     <p class="ghi-chu">Viết <b>x^2</b> cho x², <b>1/2x</b> cho ½x, <b>sqrt(x)</b> cho √x. Có thể dùng sin, cos, tan, |x|.</p>
-    <div class="hanh-dong"><button class="nut" data-dong>Huỷ</button><button class="nut chinh" id="nut-ve-ham">Vẽ đồ thị</button></div>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="nut-ve-ham">Vẽ đồ thị</button></div>
   </div>
 </div>
 
@@ -77,7 +88,7 @@
     <p class="ghi-chu">Bấm một mô hình để đặt lên bảng. Trên bảng, bấm <b>“Mở mô hình GeoLab”</b> để mở mô hình tương tác (cần có mạng).</p>
     <div class="loc" id="loc-mo-hinh"></div>
     <div class="luoi-mo-hinh" id="luoi-mo-hinh"></div>
-    <div class="hanh-dong"><button class="nut" data-dong>Đóng</button></div>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Đóng</button></div>
   </div>
 </div>
 

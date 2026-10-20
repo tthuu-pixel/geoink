@@ -10,14 +10,21 @@ Bảng viết tay cho giáo viên Toán trên Windows: viết bằng bút như S
 
 Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“Mở mô hình GeoLab”** mới cần mạng để mở trang GeoLab.
 
-## Chức năng (bản 0.1)
+## Giao diện
+
+Hai hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink):
+- **Hàng 1 – viết tay:** menu ☰ (bảng mới, mở, lưu, xuất ảnh, nền trang, thêm/xoá trang), mở, lưu, hoàn tác, làm lại, bút, tẩy, dạ quang, nét thẳng, bút chỉ, các chấm màu bút, độ dày, màu dạ quang, chọn, kéo trang.
+- **Hàng 2 – hình học (kiểu GeoGebra):** điểm, đoạn, đường thẳng, tia, đường tròn, trung điểm, vuông góc, song song, giao điểm, đa giác, độ dài, góc, hàm số, mô hình GeoLab, xoá hình; bên phải là nút bật/tắt số đo và hệ trục.
+
+## Chức năng (bản 0.2)
 
 **Viết**
 - Bút có lực nhấn (nét to nhỏ theo tay), bút dạ quang, bảng màu và độ dày.
 - Tẩy (rê qua nét để xoá), bút chỉ (nét đỏ tự mờ).
 - Chọn và kéo nét vẽ, kéo trang, phóng to/thu nhỏ (lăn chuột, hai ngón tay trên màn hình cảm ứng).
 - Khi đã dùng bút cảm ứng, chạm bằng ngón tay sẽ dời trang chứ không vẽ (tránh vẽ nhầm bằng lòng bàn tay).
-- Nhiều trang; nền trắng, ô vuông, ô ly, bảng xanh, nền đen.
+- Nhiều trang (tab ở đáy); nền giấy kẻ dòng, trắng, ô vuông, ô ly, bảng xanh, nền đen.
+- Nét thẳng: kéo để kẻ, gần nằm ngang / thẳng đứng / chéo 45° tự thẳng.
 - Hoàn tác / làm lại, lưu và mở tệp `.geoink`, xuất trang ra ảnh PNG.
 
 **Dựng hình (thao tác như GeoGebra)**: chọn công cụ rồi bấm lên bảng.
@@ -38,7 +45,7 @@ Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“M
 | Ctrl+Z / Ctrl+Y | Hoàn tác / làm lại |
 | Ctrl+S, Ctrl+Shift+S | Lưu, lưu thành tệp khác |
 | Ctrl+O, Ctrl+N | Mở, bảng mới |
-| P, H, E, V, L | Bút, dạ quang, tẩy, chọn, bút chỉ |
+| P, H, E, T, V, L | Bút, dạ quang, tẩy, nét thẳng, chọn, bút chỉ |
 | Esc | Huỷ thao tác dựng hình đang dở |
 | Page Up / Page Down | Trang trước / sau |
 | F11 | Toàn màn hình |
