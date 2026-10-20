@@ -1026,6 +1026,7 @@
       function dong(gt) { h.classList.add('an'); h.querySelector('.chinh').onclick = null; h.querySelector('[data-huy]').onclick = null; o2.onkeydown = null; xong(gt); }
       function dongY() {
         if (o.chu) return dong(ta.value);
+        if (o.van) return dong(String(ip.value));   // nhập chữ một dòng (đổi tên…)
         var so = parseFloat(String(ip.value).replace(',', '.').replace('−', '-'));
         if (!isFinite(so)) { h.querySelector('.loi').textContent = 'Hãy nhập một số'; return; }
         dong(so);
@@ -1238,8 +1239,22 @@
   cv.addEventListener('pointerup', thaTay);
   cv.addEventListener('pointercancel', function (e) { huyNetDang(); thaTay(e); });
   cv.addEventListener('pointerleave', function () { conTro = null; if (cc === 'tay' && !dangKeo) veNhap(); });
-  cv.addEventListener('dblclick', function (e) {   // bấm đúp vào chữ / công thức để sửa
-    var p = toaDo(e), M = veTG(p.x, p.y), o = timChuTruot(M); if (!o) return;
+  // Đổi tên điểm, đường…: tên nào cũng được (chữ thường, chữ in, số), trùng tên cũng được
+  function doiTenHinh(o) {
+    if (!o) return;
+    hoi({ tieuDe: 'Đổi tên ' + tenLoai(o).toLowerCase(), nhan: 'Tên mới', macDinh: o.ten || '', van: true }).then(function (ten) {
+      if (ten == null) return; ten = String(ten).trim(); if (!ten || ten === o.ten) return;
+      ghiLichSu(); o.ten = ten; o.hienTen = true; daSua = true; capNhatTieuDe(); if (chonId) veThuocTinh(); canVe();
+    });
+  }
+  cv.addEventListener('dblclick', function (e) {   // bấm đúp: vào tên điểm / đường → đổi tên; vào chữ / công thức → sửa
+    var p = toaDo(e), M = veTG(p.x, p.y);
+    if (cc === 'chon' || cc === 'keo') {
+      var tenR = timTen(M); if (tenR && tenR.o) { dangKeo = null; return doiTenHinh(tenR.o); }
+    }
+    var o = timChuTruot(M);
+    if (!o && cc === 'chon') { var h = timDiem(M) || timDoiTuong(M); if (h && coTen(h)) return doiTenHinh(h); }
+    if (!o) return;
     if (o.loai === 'chu') moSoanChu(o, false); else if (o.loai === 'congThuc') moHopCongThuc(o);
   });
   cv.addEventListener('contextmenu', function (e) {   // chuột phải vào hình → menu nhanh
@@ -1635,7 +1650,6 @@
       var oTen = document.createElement('input'); oTen.className = 'tt-o'; oTen.value = o.ten || ''; oTen.placeholder = o.loai === 'hamSo' ? '(không cần tên)' : '';
       oTen.onchange = function () {
         var ten = oTen.value.trim(); if (ten === (o.ten || '')) return;
-        if (ten && trang().hinh.some(function (x) { return x !== o && x.ten === ten; })) { thongBao('Tên “' + ten + '” đã có, hãy chọn tên khác'); oTen.value = o.ten || ''; return; }
         doi('ten', function (x) { x.ten = ten || undefined; if (ten && x.hienTen == null && !laDiemO(x)) x.hienTen = true; }); veThuocTinh();
       };
       oTen.onkeydown = function (e) { if (e.key === 'Enter') oTen.blur(); };
@@ -2337,12 +2351,7 @@
         if (k === 'hien') { var hien = ds(function (o) { return !o.an; }) !== 1; ghiLichSu(); hs.forEach(function (o) { o.an = hien ? undefined : true; }); if (!hien) nhom = nhom.filter(function (q) { return !q.h; }); capNhatChon(false); }
         else if (k === 'ten') { var coT2 = hs.filter(coTen), bat = !coT2.every(hienTenCua); ghiLichSu(); coT2.forEach(function (o) { o.hienTen = bat; if (bat && !o.ten && o.loai !== 'hamSo' && o.loai !== 'khoi') o.ten = laDiemO(o) ? tenDiemMoi() : tenDuongMoi(); }); }
         else if (k === 'doiTen') {
-          var o = hs[0];
-          hoi({ tieuDe: 'Đổi tên ' + tenLoai(o).toLowerCase(), nhan: 'Tên mới', macDinh: o.ten || '' }).then(function (ten) {
-            ten = String(ten || '').trim(); if (!ten || ten === o.ten) return;
-            if (trang().hinh.some(function (x) { return x !== o && x.ten === ten; })) return thongBao('Tên “' + ten + '” đã có, hãy chọn tên khác');
-            ghiLichSu(); o.ten = ten; if (o.hienTen == null && !laDiemO(o)) o.hienTen = true; if (chonId) veThuocTinh(); canVe();
-          });
+          doiTenHinh(hs[0]);
         }
         else if (k === 'soGoc') { var gs = hs.filter(function (o) { return o.loai === 'goc'; }), batSo = !gs.every(function (o) { return !o.anSo; }); ghiLichSu(); gs.forEach(function (o) { o.anSo = batSo ? undefined : true; }); if (batSo && !hienSo) { hienSo = true; capNhatNutBat(); } }
         else if (k === 'datLaiTen') { ghiLichSu(); hs.forEach(function (o) { delete o.nhan; }); }
