@@ -88,7 +88,7 @@ window.GI = window.GI || {};
   // ----- Hàng 2: biểu tượng kiểu GeoGebra, vẽ trên lưới 32 × 32 cho nét -----
   var X = '#2F6FD8', XV = '#0E2A5C', K = '#22272E', R = '#E0352B', RT = 'rgba(224,53,43,.22)', NAU = '#8A4B2A', NAUT = '#EDBFA6', XAM = '#8D97A5';
   var FONT = "Arial,'Liberation Sans',Helvetica,sans-serif";
-  function D(x, y, mau, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + (r || 3.4) + '" fill="' + (mau || X) + '" stroke="' + XV + '" stroke-width="1.3"/>'; }
+  function D(x, y, mau, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + (r || 2.7) + '" fill="' + (mau || X) + '" stroke="' + XV + '" stroke-width="1.2"/>'; }
   function L(x1, y1, x2, y2, mau, w, dash) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
   function P(dd, mau, w, to, dash) { return '<path d="' + dd + '" fill="' + (to || 'none') + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '" stroke-linecap="round" stroke-linejoin="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
   function C(cx, cy, r, mau, w, to) { return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + (to || 'none') + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '"/>'; }
@@ -97,7 +97,7 @@ window.GI = window.GI || {};
   function to24(k) { return '<g transform="scale(1.3333)">' + B[k] + '</g>'; }
   var B32 = {
     chon: '<path d="M8 4v21.5l5.4-4.9 3.9 8 3.4-1.6-3.9-7.9h7.3z" fill="#fff" stroke="' + K + '" stroke-width="2" stroke-linejoin="round"/>',
-    diem: D(11, 21, X, 4.2) + T(16.5, 14.5, 'A', X, 14),
+    diem: D(11, 21, X, 3.3) + T(16.5, 14.5, 'A', X, 14),
     diemTren: P('M5 25L13 6l14 8-6 13z', K, 2, '#F6E3D8') + D(9, 15.5),
     ganDiem: P('M4 27C11 23 20 13 28 5', K, 2.2) + D(10, 22.6) + P('M14 20.5l6 3', XAM, 1.6, null, '2 2.4') + D(23, 25, R),
     giao: L(4, 8, 28, 24) + L(4, 26, 28, 6) + D(16, 16, R),
@@ -107,7 +107,7 @@ window.GI = window.GI || {};
     doanCoDinh: L(6, 25, 26, 7, K, 2.4) + D(6, 25) + D(26, 7, R) + T(5, 14, 'a', R, 13),
     tia: L(6, 25, 30, 4) + D(6, 25) + D(17, 15.4),
     gapKhuc: P('M4 24L11 8l9 16 8-15', K, 2.2) + D(4, 24) + D(11, 8) + D(20, 24) + D(28, 9),
-    vuongGoc: L(2, 23, 30, 23) + L(14, 3, 14, 30, R, 2.4) + P('M14 17.5h5.5V23', K, 1.5) + D(14, 9),
+    vuongGoc: L(2, 23, 30, 23) + L(14, 3, 14, 30, R, 2.4) + P('M14 16.5h6.5V23', R, 1.8) + D(14, 9),
     songSong: L(2, 24, 30, 16) + L(2, 13, 30, 5, R, 2.4) + D(10, 10.7),
     trungTruc: L(5, 22, 27, 10) + L(10, 4.5, 22, 27.5, R, 2.4) + D(5, 22) + D(27, 10),
     phanGiac: L(5, 26, 29, 26) + L(5, 26, 17, 4) + L(5, 26, 29, 11.8, R, 2.4) + D(5, 26) + D(17, 4) + D(27, 26),
@@ -129,7 +129,7 @@ window.GI = window.GI || {};
     dienTich: P('M4 27l6-12 7 5 11-15v22z', '#1D4ED8', 2, '#A9C9F7') + T(4, 11, 'S', '#1D4ED8', 13),
     dxTruc: L(7, 3, 25, 29) + L(8, 19, 21.6, 9.6, XAM, 1.4, '2 2.2') + D(8, 19) + D(21.6, 9.6, R),
     dxTam: L(6, 24, 26, 8, XAM, 1.4, '2 2.2') + D(6, 24) + D(16, 16, '#3A3F47') + D(26, 8, R),
-    nghichDao: C(12, 20, 9.5, K, 2) + L(12, 20, 26, 4, XAM, 1.3, '2 2') + D(12, 20, '#3A3F47', 2.6) + D(16.5, 14.9) + D(26, 4, R),
+    nghichDao: C(12, 20, 9.5, K, 2) + L(12, 20, 26, 4, XAM, 1.3, '2 2') + D(12, 20, '#3A3F47', 2.1) + D(16.5, 14.9) + D(26, 4, R),
     quay: L(8, 24, 28, 24, XAM, 1.4, '2 2') + L(8, 24, 19.5, 7.6, XAM, 1.4, '2 2') + P('M20 24A12 12 0 0 0 15.4 14.6', R, 2) + muiTen(14.9, 14.2, -145, R) + D(8, 24, '#3A3F47') + D(28, 24) + D(19.5, 7.6, R),
     tinhTien: P('M3 28h9l-5-8z', NAU, 1.8, NAUT) + P('M18 15h9l-5-8z', R, 1.8, RT) + L(9, 21, 19.5, 13.3, K, 1.8) + muiTen(21, 12.2, -36, K),
     viTu: L(4, 28, 29, 5, XAM, 1.4, '2.2 2.2') + D(4, 28, '#3A3F47') + D(13, 19.7) + D(26, 7.8, R) + T(19, 28, 'k', K, 14),
@@ -143,9 +143,11 @@ window.GI = window.GI || {};
   };
   B32.moHinh = to24('moHinh');
   GI.BIEU_TUONG_CC = B;
+  // biểu tượng hàng GeoGebra: nét mảnh (0,7 lần), khung nhìn sát hơn để hình to hơn
+  function svg32(k) { return '<svg viewBox="1 1 30 30" xmlns="http://www.w3.org/2000/svg">' + B32[k].replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + (+w * 0.7).toFixed(2) + '"'; }) + '</svg>'; }
   GI.bieuTuong = function (k, hang2) {
-    if (hang2 && B32[k]) return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' + B32[k] + '</svg>';
-    if (B32[k] && !B[k]) return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' + B32[k] + '</svg>';
+    if (hang2 && B32[k]) return svg32(k);
+    if (B32[k] && !B[k]) return svg32(k);
     return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + (B[k] || '') + '</svg>';
   };
 

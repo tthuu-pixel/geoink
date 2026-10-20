@@ -34,7 +34,7 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 **Dựng hình (thao tác như GeoGebra)**: chọn công cụ rồi bấm lên bảng.
 - **Điểm:** điểm mới, điểm thuộc đối tượng, dán / huỷ dán điểm, giao điểm của 2 đối tượng, trung điểm hoặc tâm.
 - **Đường:** đường thẳng qua 2 điểm, đoạn thẳng, đoạn thẳng với độ dài cố định, tia, đường gấp khúc.
-- **Đường đặc biệt:** đường vuông góc, song song, trung trực, phân giác.
+- **Đường đặc biệt:** đường vuông góc (tự vẽ dấu góc vuông ở chân đường, tắt được trong Thuộc tính → Kiểu), song song, trung trực, phân giác.
 - **Đa giác:** đa giác, đa giác đều.
 - **Đường tròn:** tâm và 1 điểm, tâm và bán kính, compa, qua 3 điểm, hình bán nguyệt, cung tròn (tâm + 2 điểm, qua 3 điểm), hình quạt (tâm + 2 điểm, qua 3 điểm).
 - **Đường conic:** elip (2 tiêu điểm + 1 điểm), hypebol (2 tiêu điểm + 1 điểm), parabol (tiêu điểm + đường chuẩn).

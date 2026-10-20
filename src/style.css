@@ -210,7 +210,7 @@ i { font-style: normal; }
 /* ---------- Hàng 2: nhóm công cụ kiểu GeoGebra ---------- */
 #hang-hinh { gap: 5px; }
 .nhom-cc { position: relative; width: 60px; height: 60px; flex: none; border: 1px solid #B9C0CB; border-radius: 3px; background: linear-gradient(#FFFFFF, #F4F5F7); cursor: pointer; padding: 0; display: grid; place-items: center; }
-.nhom-cc i { width: 42px; height: 42px; display: block; } .nhom-cc i svg { width: 100%; height: 100%; }
+.nhom-cc i { width: 50px; height: 50px; display: block; } .nhom-cc i svg { width: 100%; height: 100%; }
 .nhom-cc:hover { background: #F3F6FB; }
 .nhom-cc.bat { border: 3px solid #1F3A93; background: #fff; box-shadow: inset 0 0 0 1px #fff, 0 0 0 1px #B9C0CB; }
 .nhom-cc .tam-giac { position: absolute; right: 1px; bottom: 1px; width: 16px; height: 14px; display: grid; place-items: center; }
@@ -222,7 +222,7 @@ i { font-style: normal; }
 #xo-nhom button i svg { width: 38px; height: 38px; }
 #xo-nhom hr { border: 0; border-top: 1px solid #E2E8F0; margin: 4px 0; }
 #hang-hinh .nut-don { width: 60px; height: 60px; flex: none; border: 1px solid #B9C0CB; border-radius: 3px; background: linear-gradient(#FFFFFF, #F4F5F7); cursor: pointer; padding: 0; display: grid; place-items: center; }
-#hang-hinh .nut-don i { width: 42px; height: 42px; display: block; } #hang-hinh .nut-don i svg { width: 100%; height: 100%; }
+#hang-hinh .nut-don i { width: 50px; height: 50px; display: block; } #hang-hinh .nut-don i svg { width: 100%; height: 100%; }
 #hang-hinh .nut-don:hover { background: #F3F6FB; }
 #hang-hinh .nut-don.bat { border: 2px solid #2563EB; background: #EAF1FF; }
 

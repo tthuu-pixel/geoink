@@ -494,6 +494,17 @@
     var mauChinh = mauNet(), mauSang = '#F97316', mauChu = kieuNen().toi ? '#F8FAFC' : '#16213A';
     function sang(o) { return toSang && toSang[o.id]; }
     function hien(o) { return !o.an; }
+    // dấu góc vuông ở chân đường vuông góc (giao với đường gốc)
+    function veKyHieuVuong(o, v) {
+      var D = gt[o.d], A = gt[o.a]; if (!D || D.k !== 'thang' || !A) return;
+      var u = { x: D.q.x - D.p.x, y: D.q.y - D.p.y }, L = Math.hypot(u.x, u.y); if (L < 1e-9) return; u = { x: u.x / L, y: u.y / L };
+      var tF = (A.x - D.p.x) * u.x + (A.y - D.p.y) * u.y, F = { x: D.p.x + u.x * tF, y: D.p.y + u.y * tF };
+      var n = { x: -u.y, y: u.x }; if ((A.x - F.x) * n.x + (A.y - F.y) * n.y < -1e-6) n = { x: -n.x, y: -n.y };
+      if (D.loai === 'doan' || D.loai === 'tia') { var tM = D.loai === 'doan' ? L / 2 : L; if (tF > tM) u = { x: -u.x, y: -u.y }; }   // quay dấu vào phía có đường gốc
+      var k = 13 * px;
+      c.save(); c.setLineDash([]); c.beginPath(); c.moveTo(F.x + u.x * k, F.y + u.y * k); c.lineTo(F.x + u.x * k + n.x * k, F.y + u.y * k + n.y * k); c.lineTo(F.x + n.x * k, F.y + n.y * k);
+      c.strokeStyle = o.mau || mauChinh; c.lineWidth = 1.6 * px; c.lineJoin = 'miter'; c.stroke(); c.restore();
+    }
     function keThang(v, o) {
       var u = { x: v.q.x - v.p.x, y: v.q.y - v.p.y }, L = Math.hypot(u.x, u.y); u = { x: u.x / L, y: u.y / L };
       var R = Math.hypot(vn.x1 - vn.x0, vn.y1 - vn.y0) * 2, A, B;
@@ -543,7 +554,7 @@
     // đường thẳng, đoạn, tia, đường tròn
     t.hinh.forEach(function (o) {
       var v = gt[o.id]; if (!v || !hien(o)) return;
-      if (v.k === 'thang') keThang(v, o);
+      if (v.k === 'thang') { keThang(v, o); if (o.loai === 'vuongGoc' && o.kyHieuVuong !== false) veKyHieuVuong(o, v); }
       else if (v.k === 'tron') {
         var wT = datNet(c, o, px, sang(o), 2.6, mauChinh); c.beginPath(); c.arc(v.c.x, v.c.y, v.r, 0, Math.PI * 2); keNet(c, sang(o), wT, px);
         if (o.ten && hienTenCua(o)) { var a = -Math.PI / 4; veTen(c, o.ten, v.c.x + Math.cos(a) * v.r + 6 * px, v.c.y + Math.sin(a) * v.r - 4 * px, px, o.mau || mauChu); }
@@ -1483,6 +1494,7 @@
         noi.appendChild(dong('Độ dày nét:', thanhTruot(1, 12, 0.5, o.rong || (o.loai === 'hamSo' ? 3 : 2.6), function (v) { doi('rong', function (x) { x.rong = v; }); })));
         noi.appendChild(dong('Kiểu nét:', hopXo(Object.keys(KIEU_NET).map(function (k) { return { gt: k, ten: KIEU_NET[k].ten, html: svgNet(k) }; }), o.kieuNet || 'lien', function (v) { doi('kieuNet', function (x) { x.kieuNet = v === 'lien' ? undefined : v; }); })));
       }
+      if (o.loai === 'vuongGoc') noi.appendChild(oTich('Kí hiệu vuông góc ở chân đường', o.kyHieuVuong !== false, function (v) { doi('kyHieuVuong', function (x) { if (x.loai === 'vuongGoc') x.kyHieuVuong = v ? undefined : false; }); }));
       if (laDoan) {
         var mt = document.createElement('div'); mt.className = 'tt-hang';
         mt.appendChild(oTich('Mũi tên ở đầu (' + tenHay(o.a) + ')', !!o.muiDau, function (v) { doi('muiDau', function (x) { x.muiDau = v || undefined; }); }));
