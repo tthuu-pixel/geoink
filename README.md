@@ -53,4 +53,4 @@ npm start          # chạy thử
 
 Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab).
 
-**Phát hành bản mới**: tăng `version` trong `package.json`, rồi đẩy tag cùng số, ví dụ `git tag v0.1.1 && git push origin v0.1.1`. GitHub Actions sẽ đóng gói trên máy Windows và đăng tệp cài đặt lên Releases.
+**Phát hành bản mới**: tăng `version` trong `package.json` (ví dụ `0.1.1`) rồi đẩy lên nhánh `main`. GitHub Actions đóng gói trên máy Windows, tạo bản phát hành `v0.1.1` và đăng tệp cài đặt lên Releases. Đẩy lên `main` mà không đổi `version` thì chỉ đóng gói thử.

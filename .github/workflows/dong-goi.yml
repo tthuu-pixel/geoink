@@ -1,15 +1,20 @@
 # Đóng gói GeoInk cho Windows (file cài đặt trực tuyến) và phát hành lên GitHub Releases.
-#  - Đẩy tag dạng v0.1.0 (trùng "version" trong package.json) → đóng gói và phát hành.
-#  - Chạy tay (Actions → Đóng gói GeoInk → Run workflow) → chỉ đóng gói thử, tải ở mục Artifacts.
+# Mỗi lần đẩy lên nhánh main (hoặc chạy tay ở tab Actions): đóng gói trên máy Windows.
+# Nếu phiên bản trong package.json chưa có bản phát hành, electron-builder tạo bản phát hành
+# mới (tag v<phiên bản>) và đăng file cài đặt. Phiên bản đã phát hành thì chỉ đóng gói thử.
 name: Đóng gói GeoInk
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: dong-goi
+  cancel-in-progress: false
 
 jobs:
   windows:
@@ -22,13 +27,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Đóng gói và phát hành
-        if: startsWith(github.ref, 'refs/tags/v')
         run: npx electron-builder --win --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Đóng gói thử
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        run: npx electron-builder --win --publish never
       - uses: actions/upload-artifact@v4
         with:
           name: GeoInk-windows
