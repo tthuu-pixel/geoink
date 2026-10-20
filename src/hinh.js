@@ -17,7 +17,7 @@
 window.GI = window.GI || {};
 GI.hinh = (function () {
   var DV = 40;   // 1 cm = 40 đơn vị thế giới
-  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1, trongTam: 1, trucTam: 1, chanCao: 1 };
+  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1, trongTam: 1, trucTam: 1, chanCao: 1, diemTZ: 1 };
   var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1, tiepTuyenChung: 1 };
   var LA_TRON = { tron: 1, tronBanKinh: 1, compa: 1, tron3: 1 };
   var LA_CUNG = { banNguyet: 1, cungTam: 1, cung3: 1, quatTam: 1, quat3: 1 };
@@ -155,6 +155,12 @@ GI.hinh = (function () {
           var khoaBien = Object.keys(bien).join(',');
           if (!o._f || o._bt !== o.bt || o._kb !== khoaBien) { try { var r = GI.bieuThuc.doc(o.bt, Object.keys(bien)); o._f = r.f; o._ve = r.ve; o._bt = o.bt; o._kb = khoaBien; } catch (e) { return null; } }
           var fh = o._f; return { k: 'ham', f: function (x) { return fh(x, bien); }, ve: o._ve };
+        }
+        case 'diemTZ': case 'nhanTZ': {   // điểm / nhãn dựng từ mã TikZ (biểu thức theo toạ độ TikZ, gốc là điểm o.goc)
+          var G = diem(o.goc); if (!G || !GI.tikz) return null; var Dk = DV * (o.kt || 1);
+          var Pz = GI.tikz.tinh(o.bt, function (id) { var Q = diem(id); return Q ? { x: (Q.x - G.x) / Dk, y: -(Q.y - G.y) / Dk } : null; });
+          if (!Pz || !isFinite(Pz.x) || !isFinite(Pz.y)) return null;
+          return { k: o.loai === 'diemTZ' ? 'diem' : 'nhanTZ', x: G.x + Pz.x * Dk, y: G.y - Pz.y * Dk };
         }
         case 'trongTam': { var Ag = diem(o.a), Bg = diem(o.b), Cg = diem(o.c); return Ag && Bg && Cg ? { k: 'diem', x: (Ag.x + Bg.x + Cg.x) / 3, y: (Ag.y + Bg.y + Cg.y) / 3 } : null; }
         case 'trucTam': {   // H = A + B + C − 2O (O: tâm đường tròn ngoại tiếp)

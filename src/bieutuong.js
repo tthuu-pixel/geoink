@@ -35,6 +35,7 @@ window.GI = window.GI || {};
     phongTo: tron(11, 11, 7, DEN, 2) + p('M8 11h6M11 8v6M21 21l-5-5', DEN, 2),
     moi: '<path d="M6 2.5h8.5L19 7v14.5H6z" fill="#fff" stroke="#2563EB" stroke-width="1.6" stroke-linejoin="round"/>' + p('M12.5 10.5v7M9 14h7', LA, 2.2),
     themTrang: '<path d="M6 2.5h8.5L19 7v14.5H6z" fill="#fff" stroke="#2563EB" stroke-width="1.6" stroke-linejoin="round"/>' + p('M12.5 10.5v7M9 14h7', LA, 2.2),
+    tikz: '<rect x="2.5" y="4" width="19" height="16" rx="2.5" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/><path d="M8 9l-3 3 3 3M16 9l3 3-3 3" fill="none" stroke="#4F46E5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8.5l-2 7" stroke="#DB2777" stroke-width="1.6" stroke-linecap="round"/>',
     anh: '<rect x="3" y="4.5" width="18" height="15" rx="2" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.5"/><circle cx="8.5" cy="9.5" r="2" fill="#F59E0B"/><path d="M3.5 18l5.5-5.5 4 4 3-3 4.5 4.5" fill="#86EFAC" stroke="#16A34A" stroke-width="1.4" stroke-linejoin="round"/>',
     xoaTrang: p('M4 7h16M10 11v6M14 11v6', DO, 1.8) + p('M6 7l1 13h10l1-13M9 7V4h6v3', DO, 1.8),
     caiDat: tron(12, 12, 3, '#fff', 2) + p('M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1', '#fff', 2),
