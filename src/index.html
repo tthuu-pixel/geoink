@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoInk</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="thanh-tren">
+  <div class="thuong-hieu"><img src="icon.png" alt=""><span>GeoInk</span><small id="ten-tep">Bảng mới</small></div>
+  <div class="nhom">
+    <button class="nut" data-lenh="moi" title="Bảng mới (Ctrl+N)"><i data-bt="moi"></i><span>Mới</span></button>
+    <button class="nut" data-lenh="mo" title="Mở bảng (Ctrl+O)"><i data-bt="mo"></i><span>Mở</span></button>
+    <button class="nut" data-lenh="luu" title="Lưu (Ctrl+S)"><i data-bt="luu"></i><span>Lưu</span></button>
+    <button class="nut" data-lenh="xuatAnh" title="Xuất trang ra ảnh PNG"><i data-bt="anh"></i><span>Xuất ảnh</span></button>
+  </div>
+  <div class="nhom">
+    <button class="nut" data-lenh="hoanTac" title="Hoàn tác (Ctrl+Z)"><i data-bt="hoanTac"></i><span>Hoàn tác</span></button>
+    <button class="nut" data-lenh="lamLai" title="Làm lại (Ctrl+Y)"><i data-bt="lamLai"></i><span>Làm lại</span></button>
+    <button class="nut" data-lenh="xoaTrang" title="Xoá hết nội dung trang này"><i data-bt="xoaTrang"></i><span>Xoá trang</span></button>
+  </div>
+  <div class="nhom trang">
+    <button class="nut nho" data-lenh="trangTruoc" title="Trang trước (Page Up)"><i data-bt="truoc"></i></button>
+    <span id="so-trang">1 / 1</span>
+    <button class="nut nho" data-lenh="trangSau" title="Trang sau (Page Down)"><i data-bt="sau"></i></button>
+    <button class="nut" data-lenh="themTrang" title="Thêm trang mới"><i data-bt="themTrang"></i><span>Thêm trang</span></button>
+  </div>
+  <div class="nhom">
+    <label class="chon-nen" title="Nền trang"><i data-bt="nen"></i>
+      <select id="nen">
+        <option value="trang">Nền trắng</option>
+        <option value="oVuong">Ô vuông</option>
+        <option value="oLy">Ô ly</option>
+        <option value="bangXanh">Bảng xanh</option>
+        <option value="den">Nền đen</option>
+      </select>
+    </label>
+    <button class="nut" data-lenh="truc" title="Bật/tắt hệ trục toạ độ"><i data-bt="truc"></i><span>Hệ trục</span></button>
+    <button class="nut" data-lenh="soDo" id="nut-so-do" title="Bật/tắt số đo trên hình"><i data-bt="soDo"></i><span>Số đo</span></button>
+    <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i><span>Toàn màn hình</span></button>
+  </div>
+</header>
+
+<aside id="cong-cu"></aside>
+
+<main id="bang">
+  <canvas id="ve"></canvas>
+  <canvas id="nhap"></canvas>
+  <div id="goi-y" class="an"></div>
+  <div id="tuy-chon-but" class="an"></div>
+  <div id="thu-phong">
+    <button class="nut nho" data-lenh="thuNho" title="Thu nhỏ"><i data-bt="thuNho"></i></button>
+    <button class="nut nho chu" data-lenh="vuaKhung" id="ty-le" title="Về 100%">100%</button>
+    <button class="nut nho" data-lenh="phongTo" title="Phóng to"><i data-bt="phongTo"></i></button>
+  </div>
+</main>
+
+<div id="hop-ham-so" class="hop an" role="dialog" aria-label="Vẽ đồ thị hàm số">
+  <div class="hop-noi-dung">
+    <h2>Vẽ đồ thị hàm số</h2>
+    <label class="o-ham">y = <input id="o-ham" autocomplete="off" spellcheck="false" placeholder="2x + 1"></label>
+    <div id="loi-ham" class="loi"></div>
+    <div class="vi-du">Ví dụ:
+      <button data-vd="2x + 1">2x + 1</button><button data-vd="-x + 3">−x + 3</button><button data-vd="x^2">x²</button>
+      <button data-vd="-1/2x^2 + 2">−½x² + 2</button><button data-vd="1/x">1/x</button><button data-vd="sqrt(x)">√x</button><button data-vd="|x|">|x|</button>
+    </div>
+    <p class="ghi-chu">Viết <b>x^2</b> cho x², <b>1/2x</b> cho ½x, <b>sqrt(x)</b> cho √x. Có thể dùng sin, cos, tan, |x|.</p>
+    <div class="hanh-dong"><button class="nut" data-dong>Huỷ</button><button class="nut chinh" id="nut-ve-ham">Vẽ đồ thị</button></div>
+  </div>
+</div>
+
+<div id="hop-mo-hinh" class="hop an" role="dialog" aria-label="Chèn mô hình GeoLab">
+  <div class="hop-noi-dung rong">
+    <h2>Chèn mô hình GeoLab</h2>
+    <p class="ghi-chu">Bấm một mô hình để đặt lên bảng. Trên bảng, bấm <b>“Mở mô hình GeoLab”</b> để mở mô hình tương tác (cần có mạng).</p>
+    <div class="loc" id="loc-mo-hinh"></div>
+    <div class="luoi-mo-hinh" id="luoi-mo-hinh"></div>
+    <div class="hanh-dong"><button class="nut" data-dong>Đóng</button></div>
+  </div>
+</div>
+
+<div id="thong-bao" class="an"></div>
+
+<script src="mohinh.js"></script>
+<script src="bieuthuc.js"></script>
+<script src="hinh.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

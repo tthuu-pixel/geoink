@@ -1,0 +1,41 @@
+{
+  "name": "geoink",
+  "productName": "GeoInk",
+  "version": "0.1.0",
+  "description": "GeoInk – bảng viết tay cho giáo viên Toán: viết bằng bút, dựng hình, đo đạc, đồ thị hàm số, liên kết mô hình GeoLab.",
+  "main": "main.js",
+  "author": "Nhóm nghiên cứu khoa học trường TH-THCS An Lạc",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never",
+    "release": "electron-builder --win --publish always"
+  },
+  "devDependencies": {
+    "electron": "35.7.5",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "vn.geolab.geoink",
+    "productName": "GeoInk",
+    "copyright": "Nhóm nghiên cứu khoa học trường TH-THCS An Lạc",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "preload.js", "src/**/*", "package.json"],
+    "fileAssociations": [{ "ext": "geoink", "name": "Bảng GeoInk", "description": "Bảng GeoInk" }],
+    "win": {
+      "target": [{ "target": "nsis-web", "arch": ["x64"] }],
+      "icon": "build/icon.ico"
+    },
+    "nsisWeb": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "GeoInk",
+      "artifactName": "GeoInk-Setup-${version}.${ext}"
+    },
+    "publish": [{ "provider": "github", "owner": "tthuu-pixel", "repo": "geoink", "releaseType": "release" }]
+  }
+}
