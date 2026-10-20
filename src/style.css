@@ -267,3 +267,30 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 
 /* cụm menu phía trên thu nhỏ theo --tl (zoom thu cả kích thước lẫn vị trí của hàng) */
 #hang-dau, #hang-viet, #hang-hinh { zoom: var(--tl); }
+
+/* ---------- Khung soạn văn bản (ABC) ---------- */
+#soan-chu { position: absolute; z-index: 25; }
+#soan-chu .sc-thanh { position: absolute; left: 0; bottom: 100%; margin-bottom: 8px; display: flex; align-items: center; gap: 2px; padding: 4px 6px; background: #fff; border: 1px solid var(--vien); border-radius: 12px; box-shadow: var(--bong); white-space: nowrap; }
+#soan-chu .sc-thanh button { width: 34px; height: 34px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; font: 17px var(--phong); color: #27272A; display: grid; place-items: center; padding: 0; }
+#soan-chu .sc-thanh button:hover { background: #F1F2F4; }
+#soan-chu .sc-thanh button.bat { background: #F6E7E7; color: var(--nhan); }
+#soan-chu .sc-thanh .ke { margin: 6px 4px; }
+#soan-chu .sc-thanh select { height: 32px; border: 1px solid var(--vien); border-radius: 8px; padding: 0 6px; font: 14px var(--phong); background: #fff; }
+#soan-chu .sc-keo { cursor: move; color: #94A3B8; font-size: 18px; padding: 0 4px; user-select: none; }
+#soan-chu .sc-mau { position: relative; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer; border-radius: 8px; font: 700 17px var(--phong); }
+#soan-chu .sc-mau:hover { background: #F1F2F4; }
+#soan-chu .sc-mau span { border-bottom: 4px solid var(--m, #111827); line-height: 1; padding: 0 2px 1px; }
+#soan-chu .sc-mau input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+#soan-chu .sc-xong { width: auto !important; padding: 0 12px !important; gap: 6px; color: var(--nhan) !important; font-weight: 700 !important; display: flex !important; }
+#soan-chu .sc-noi { min-width: 160px; min-height: 1.4em; padding: 2px 4px; outline: 2px dashed #F97316; outline-offset: 3px; background: rgba(255,255,255,.85); user-select: text; white-space: pre-wrap; overflow-wrap: break-word; resize: horizontal; overflow: hidden; line-height: 1.38; }
+#soan-chu .sc-noi ul, #soan-chu .sc-noi ol { margin: 0; padding-left: 1.4em; }
+/* ---------- Hộp chèn công thức ---------- */
+.ct-o math-field { display: block; width: 100%; min-height: 64px; font-size: 30px; padding: 6px 10px; border: 2px solid #F59E0B; border-radius: 10px; }
+.ct-nhan { display: block; margin: 12px 0 4px; font-weight: 700; color: var(--chu-phu); }
+#ct-latex { width: 100%; font: 15px Consolas, "Courier New", monospace; padding: 8px 10px; border: 1px solid var(--vien); border-radius: 10px; user-select: text; resize: vertical; }
+.ct-tuy-chon { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin: 12px 0 4px; }
+.ct-tuy-chon label { display: flex; align-items: center; gap: 8px; }
+.ct-tuy-chon input[type=color] { width: 44px; height: 28px; border: 1px solid var(--vien); border-radius: 6px; padding: 1px; background: #fff; }
+.ct-xem { min-height: 30px; margin-top: 8px; color: #DC2626; font-size: 14px; }
+#hop-cong-thuc { place-items: start center; padding-top: 2vh; }
+#hop-cong-thuc .hop-noi-dung { max-height: 52vh; overflow: auto; }

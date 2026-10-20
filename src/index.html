@@ -31,6 +31,8 @@
   <div class="khay" id="khay-mau" title="Màu bút"></div>
   <div class="khay" id="khay-co" title="Độ dày nét"></div>
   <div class="khay" id="khay-dq" title="Màu dạ quang"></div>
+  <span class="ke"></span>
+  <button class="nut" data-lenh="congThuc" title="Chèn công thức"><i data-bt="congThuc"></i></button>
   <div class="gian"></div>
   <span class="ke"></span>
   <button class="nut" data-cc="chon" title="Chọn (V)"><i data-bt="chon"></i></button>
@@ -87,6 +89,22 @@
   </div>
 </div>
 
+<div id="hop-cong-thuc" class="hop an" role="dialog" aria-label="Chèn công thức">
+  <div class="hop-noi-dung rong">
+    <h2>Chèn công thức</h2>
+    <div class="ct-o" id="ct-o"></div>
+    <label class="ct-nhan">LaTeX</label>
+    <textarea id="ct-latex" rows="2" spellcheck="false"></textarea>
+    <div class="ct-tuy-chon">
+      <label>Màu <input type="color" id="ct-mau" value="#111827"></label>
+      <label>Cỡ <input type="range" id="ct-co" min="16" max="120" step="2" value="40"><b id="ct-co-so">40</b></label>
+      <label class="ct-tich"><input type="checkbox" id="ct-lon" checked> Kiểu hiển thị lớn</label>
+    </div>
+    <div class="ct-xem" id="ct-xem"></div>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="ct-chen">Chèn</button></div>
+  </div>
+</div>
+
 <div id="hop-nhap" class="hop an" role="dialog">
   <div class="hop-noi-dung">
     <h2>Nhập</h2>
@@ -103,6 +121,8 @@
 <script src="bieutuong.js"></script>
 <script src="mohinh.js"></script>
 <script src="bieuthuc.js"></script>
+<script src="vanban.js"></script>
+<script src="congthuc.js"></script>
 <script src="khoi.js"></script>
 <script src="hinh.js"></script>
 <script src="app.js"></script>

@@ -211,6 +211,7 @@ GI.hinh = (function () {
         case 'bienHinh': return bienHinh(o, lay(o.nguon));
         case 'thanhTruot': return { k: 'truot', x: o.x, y: o.y };
         case 'chu': return { k: 'chu', x: o.x, y: o.y };
+        case 'congThuc': return { k: 'chu', x: o.x, y: o.y };
         case 'khoi': return GI.khoi ? GI.khoi.tinh(o) : null;
         case 'tiepTuyenChung': {   // tiếp tuyến chung ngoài của hai đường tròn (k = 0, 1)
           var T1 = lay(o.o1), T2 = lay(o.o2); if (!T1 || !T2 || T1.k !== 'tron' || T2.k !== 'tron') return null;

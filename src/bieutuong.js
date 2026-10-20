@@ -42,6 +42,12 @@ window.GI = window.GI || {};
     xoaX: p('M6 6l12 12M18 6L6 18', 'currentColor', 2.2),
     soDo: p('M3 18l6-11 6 11z', DEN, 1.6, '#FEE2E2') + chu(13.5, 10, '60°', DO, 7.5),
     truc: n(4, 20, 4, 3, DEN, 1.6) + n(4, 20, 21, 20, DEN, 1.6) + p('M2.3 5L4 3l1.7 2M19 18.3l2 1.7-2 1.7', DEN, 1.4) + p('M6 17c4-1 6-10 13-12', DO, 1.8),
+    congThuc: '<rect x="2" y="2" width="20" height="20" rx="5" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.3"/><path d="M15.5 6.5H7.5l4.6 5.5-4.6 5.5h8" fill="none" stroke="#5B21B6" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><text x="15.6" y="10.2" font-family="Arial" font-weight="700" font-size="5.6" fill="#EA580C">n</text>',
+    mayTinh: '<rect x="4.5" y="1.5" width="15" height="21" rx="2.6" fill="#334155"/><rect x="6.5" y="3.6" width="11" height="5" rx="1" fill="#BBF7D0"/><path d="M8 6.2h5" stroke="#166534" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<circle cx="8" cy="11.8" r="1.15" fill="#F8FAFC"/><circle cx="12" cy="11.8" r="1.15" fill="#F8FAFC"/><circle cx="16" cy="11.8" r="1.15" fill="#F59E0B"/><circle cx="8" cy="15.3" r="1.15" fill="#F8FAFC"/><circle cx="12" cy="15.3" r="1.15" fill="#F8FAFC"/><circle cx="16" cy="15.3" r="1.15" fill="#F59E0B"/><circle cx="8" cy="18.8" r="1.15" fill="#F8FAFC"/><circle cx="12" cy="18.8" r="1.15" fill="#F8FAFC"/><rect x="14.9" y="17.7" width="2.2" height="2.2" rx=".6" fill="#22C55E"/>',
+    dungCu: '<path d="M2.5 16.5a9.5 9.5 0 0 1 19 0z" fill="#FDE68A" fill-opacity=".9" stroke="#B45309" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.6 16.5a6.4 6.4 0 0 1 12.8 0" fill="none" stroke="#B45309" stroke-width=".8"/>' +
+      '<path d="M12 7v2.2M7.3 8.3l1 1.8M16.7 8.3l-1 1.8M4.2 12l1.9.9M19.8 12l-1.9.9" stroke="#92400E" stroke-width=".9" stroke-linecap="round"/><path d="M12 16.5l4.6-6.4" stroke="#DC2626" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.3" fill="#DC2626"/>' +
+      '<rect x="2" y="18.6" width="20" height="3.6" rx=".8" fill="#93C5FD" stroke="#1D4ED8" stroke-width=".9"/><path d="M5 18.6v1.6M8 18.6v1M11 18.6v1.6M14 18.6v1M17 18.6v1.6M20 18.6v1" stroke="#1D4ED8" stroke-width=".7"/>',
     // ----- hàng 2: hình học -----
     diem: d(9, 14) + chu(13, 10, 'A', VIEN, 10),
     diemTren: '<path d="M3 17L10 5l11 7-6 9z" fill="#F5D0C5" stroke="#9A3412" stroke-width="1.4" stroke-linejoin="round"/>' + d(11, 13) + chu(13.5, 11, 'A', VIEN, 8),
