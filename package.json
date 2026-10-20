@@ -27,6 +27,7 @@
     "files": [
       "main.js",
       "preload.js",
+      "preload-cat.js",
       "src/**/*",
       "package.json"
     ],
