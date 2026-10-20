@@ -54,6 +54,8 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
+**Đăng nhập bằng tài khoản GeoLab**: mở GeoInk sẽ gặp trang đăng nhập; dùng chính tài khoản được cấp trên nckh-geolab.com (cùng máy chủ tài khoản). Tick *Ghi nhớ đăng nhập* thì lần sau mở thẳng vào bảng (mất mạng vẫn dùng được; phiên hết hạn thì đăng nhập lại). Tên người dùng ở góc trên: *Mở GeoLab (đã đăng nhập)*, *Đăng xuất*. Mọi liên kết sang GeoLab (kể cả nút mở mô hình) mang theo phiên nên vào thẳng, không phải đăng nhập lại.
+
 **Tự cập nhật**: mỗi lần mở, GeoInk (bản đã cài) tự kiểm tra bản mới trên GitHub Releases. Có bản mới thì hiện thẻ thông báo ở góc dưới và nút xanh **Cập nhật** trên thanh trên cùng; bấm *Cập nhật* để tải về, tải xong tự cài và mở lại (nếu bảng chưa lưu thì hỏi lưu trước). Có thể kiểm tra tay ở menu ☰ → *Kiểm tra cập nhật*.
 
 **Hai nút TeX** (cạnh nút Dụng cụ học tập): nút *Nhập mã TeX* mở hộp dán mã TikZ để dựng hình; nút *Xuất mã TeX* — bấm nút rồi kéo khung quét quanh hình (hoặc chọn sẵn hình rồi bấm) để lấy mã TikZ thuần theo khung 4 bước: điểm dựng giữ cách dựng bằng `calc` / `intersection of` (trung điểm, chân đường cao, trọng tâm, trực tâm, giao điểm, điểm trên đường tròn, phép quay…), các đoạn ghép thành chuỗi dài nhất (`--cycle` khi khép kín), đường tròn khai báo bán kính bằng `declare function`, góc / góc vuông / gạch đánh dấu gộp trong `\foreach`, nhãn điểm theo góc. Có nút sao chép mã.

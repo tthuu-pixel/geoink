@@ -1059,7 +1059,7 @@
   function moLinkMoHinh(m) {
     var d = GI.MO_HINH.filter(function (x) { return x.ma === m.ma; })[0]; if (!d) return;
     thongBao('Đang mở “' + d.ten + '” trên GeoLab…');
-    if (MT) MT.moLink(d.url); else window.open(d.url, '_blank', 'noopener');
+    GI.taiKhoan.moTrang(d.url);   // mang theo phiên GeoLab nếu đã đăng nhập
   }
 
   /* =====================================================================
@@ -2452,6 +2452,7 @@
     $('#hop-tikz').classList.add('an');
   };
   document.addEventListener('paste', function (e) {
+    if (document.body.classList.contains('chua-dang-nhap')) return;
     var el = e.target; if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable || el.tagName === 'MATH-FIELD')) return;
     var ma = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
     if (!/\\(draw|path|coordinate|begin\{tikzpicture\})/.test(ma)) return;
@@ -2462,6 +2463,7 @@
   $$('.hop').forEach(function (h) { h.addEventListener('pointerdown', function (e) { if (e.target === h) h.classList.add('an'); }); });
 
   window.addEventListener('keydown', function (e) {
+    if (document.body.classList.contains('chua-dang-nhap')) return;   // đang ở trang đăng nhập
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable || e.target.tagName === 'MATH-FIELD') { if (e.key === 'Escape') $$('.hop').forEach(function (h) { h.classList.add('an'); }); return; }
     var k = e.key.toLowerCase();
     if (e.ctrlKey || e.metaKey) {
@@ -2488,6 +2490,7 @@
   window.addEventListener('resize', doiKichThuoc);
   doiKichThuoc();
   chonCongCu('but'); sauKhiDoiTrang(); requestAnimationFrame(vong);
+  GI.taiKhoan.batDau();
   if (MT) {
     MT.tepKhoiDong().then(function (d) { if (d) napTep(d); });
     MT.khiMoTep(function (d) { if (hoiBoThayDoi()) napTep(d); });

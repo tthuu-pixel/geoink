@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld('mayTinh', {
   khiMoTep: (f) => ipcRenderer.on('mo-tep', (e, d) => f(d)),
   khiHoiDong: (f) => ipcRenderer.on('hoi-dong', () => f()),
   dongThat: () => ipcRenderer.send('dong-that'),
+  // tài khoản GeoLab
+  taiKhoan: (hd, duLieu) => ipcRenderer.invoke('tai-khoan', { hd, duLieu }),
   // tự cập nhật
   khiCapNhat: (f) => ipcRenderer.on('cap-nhat', (e, d) => f(d)),
   kiemTraCapNhat: () => ipcRenderer.invoke('cap-nhat-kiem-tra'),

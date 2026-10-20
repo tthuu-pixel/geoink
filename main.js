@@ -1,5 +1,5 @@
 // GeoInk – tiến trình chính (cửa sổ, hộp thoại lưu/mở, mở link GeoLab)
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, net } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -105,3 +105,17 @@ ipcMain.handle('xuat-anh', async (e, { duLieu, ten }) => {
 ipcMain.handle('mo-link', (e, url) => { if (/^https?:\/\//.test(url)) shell.openExternal(url); return true; });
 ipcMain.handle('toan-man-hinh', () => { if (cuaSo) cuaSo.setFullScreen(!cuaSo.isFullScreen()); return cuaSo ? cuaSo.isFullScreen() : false; });
 ipcMain.handle('phien-ban', () => app.getVersion());
+
+// ----- Tài khoản GeoLab (dùng chung với trang nckh-geolab.com) -----
+// Gọi cùng máy chủ Apps Script mà trang GeoLab dùng: { hd: 'dangNhap' | 'kiemTra' | 'dangXuat', token, ... }
+const GEOLAB_API = 'https://script.google.com/macros/s/AKfycbyDF-5Rkt6jlgPU1SoAExgp3gzU7hmgel7WP8cMqKc0YclwLS-eGdHNXCyhlzcwYu72RQ/exec';
+ipcMain.handle('tai-khoan', async (e, { hd, duLieu }) => {
+  if (!/^(dangNhap|kiemTra|dangXuat|doiMatKhau)$/.test(hd)) return { ok: false, loi: 'Yêu cầu không hợp lệ.' };
+  try {
+    const r = await net.fetch(GEOLAB_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ hd }, duLieu || {})), redirect: 'follow' });
+    const t = await r.text();
+    try { return JSON.parse(t); } catch (err) { return { ok: false, mang: true, loi: 'Máy chủ trả lời không hợp lệ. Thử lại sau.' }; }
+  } catch (err) {
+    return { ok: false, mang: true, loi: 'Không kết nối được máy chủ GeoLab. Kiểm tra mạng rồi thử lại.' };
+  }
+});
