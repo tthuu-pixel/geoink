@@ -55,7 +55,29 @@
     moHinh: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12L4 7.5M12 12v9"/>',
   };
   function svg(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (BT[k] || '') + '</svg>'; }
-  function bieuTuong(k, hang2) { return GI.bieuTuong && (GI.BIEU_TUONG_CC[k] || hang2) ? GI.bieuTuong(k, hang2) : svg(k); }
+  // Biểu tượng nét mảnh một màu (kiểu Scrble Ink) cho hai hàng trên và menu
+  var BT_NET = {
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    mo: '<rect x="4" y="4.5" width="3.2" height="15" rx=".6"/><rect x="8.6" y="4.5" width="3.2" height="15" rx=".6"/><path d="M13.6 6.1l3-.8 3.9 14.5-3 .8z"/>',
+    luu: '<path d="M5.5 4.5h10.5l2.5 2.5v12.5h-13z"/><path d="M8.5 4.5v4.5h6v-4.5M8.5 19.5v-5.5h7v5.5"/>',
+    hoanTac: '<path d="M9 6.5L5 10.5l4 4"/><path d="M5 10.5h9.5a4.5 4.5 0 0 1 0 9H11"/>',
+    lamLai: '<path d="M15 6.5l4 4-4 4"/><path d="M19 10.5H9.5a4.5 4.5 0 0 0 0 9H13"/>',
+    pdf: '<path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4"/><path d="M12.5 10.5v6.5M9.8 14.5l2.7 2.7 2.7-2.7"/>',
+    themTrang: '<path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4"/>',
+    moi: '<path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4M12.5 11v6M9.5 14h6"/>',
+    but: '<path d="M10.5 3.5h3v10l-1.5 5-1.5-5z"/><path d="M10.5 13.5h3M12 18.5v2"/>',
+    tay: '<path d="M5.5 15.5l8.5-8.5 5 5-7 7H9.5z"/><path d="M9.8 11.2l5 5M8 19.5h11"/>',
+    dq: '<path d="M7.5 14.5l8.5-8.5 2.5 2.5-8.5 8.5H7.5z"/><path d="M14 8l2.5 2.5"/><path d="M5 20.5h14" stroke-dasharray="2.2 2"/>',
+    chon: '<rect x="4.5" y="4.5" width="15" height="15" rx="2" stroke-dasharray="3 2.4"/>',
+    keo: '<path d="M8 13V5.6a1.4 1.4 0 0 1 2.8 0V11M10.8 10.6V4.4a1.4 1.4 0 0 1 2.8 0v6.2M13.6 10.8V5.6a1.4 1.4 0 0 1 2.8 0v5.2M16.4 11.2V8.2a1.4 1.4 0 0 1 2.8 0v6.3c0 4-2.8 7-6.6 7-2.9 0-4.4-1.4-5.8-3.6L4.9 14.4a1.5 1.5 0 0 1 2.5-1.6L8 13.6"/>',
+    xuong: '<path d="M7.5 10l4.5 4.5 4.5-4.5"/>',
+    toanManHinh: '<path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/>',
+  };
+  function bieuTuong(k, hang2) {
+    if (!hang2 && BT_NET[k]) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + BT_NET[k] + '</svg>';
+    if (!hang2 && BT[k]) return svg(k);
+    return GI.bieuTuong ? GI.bieuTuong(k, hang2) : svg(k);
+  }
   function btHang2(k) { return bieuTuong(k === 'keo' ? 'diChuyen' : k, true); }
   function ganBieuTuong(goc) { (goc || document).querySelectorAll('i[data-bt]').forEach(function (i) { i.innerHTML = bieuTuong(i.dataset.bt); }); }
 
@@ -130,7 +152,7 @@
   var nhomHien = NHOM_HINH.map(function (n) { return n[0][0]; }); nhomHien[1] = 'doan';   // công cụ đang hiện trên mỗi ô nhóm
   function tenCongCu(k) { if (k === 'chon') return 'Chọn, di chuyển'; var t = null; NHOM_HINH.forEach(function (n) { n.forEach(function (x) { if (x[0] === k) t = x[1]; }); }); return t; }
   var GOI_Y = {
-    chon: 'Kéo hình để di chuyển · kéo chỗ trống để chọn bằng khung · giữ Ctrl để chọn nhiều · chuột phải để mở menu',
+    chon: 'Kéo hình để di chuyển · kéo chỗ trống để chọn khung · Ctrl: chọn nhiều · chuột phải: menu',
     but: '', dq: '', tay: 'Rê tẩy qua nét vẽ để xoá', laser: 'Bút chỉ: nét đỏ tự mờ đi', keo: 'Kéo để dời trang · lăn chuột để phóng to, thu nhỏ',
     diem: 'Bấm để đặt điểm (bấm lên đường thẳng, đường tròn để đặt điểm trên đó)',
     doan: ['Chọn điểm đầu', 'Chọn điểm cuối'], duong: ['Chọn điểm thứ nhất', 'Chọn điểm thứ hai'], tia: ['Chọn gốc của tia', 'Chọn điểm tia đi qua'],
@@ -155,8 +177,8 @@
     }).join('') + '<span class="ke"></span>' +
       '<button class="nut-don" data-cc="moHinh" title="Chèn mô hình GeoLab"><i>' + btHang2('moHinh') + '</i></button>' +
       '<div class="gian"></div>' +
-      '<button class="nut" data-lenh="soDo" id="nut-so-do" title="Ẩn / hiện số đo"><i data-bt="soDo"></i>Số đo</button>' +
-      '<button class="nut" data-lenh="truc" title="Bật / tắt hệ trục toạ độ"><i data-bt="truc"></i>Hệ trục</button>';
+      '<button class="nut" data-lenh="soDo" id="nut-so-do" title="Ẩn / hiện số đo"><i>' + GI.bieuTuong('soDo') + '</i>Số đo</button>' +
+      '<button class="nut" data-lenh="truc" title="Bật / tắt hệ trục toạ độ"><i>' + GI.bieuTuong('truc') + '</i>Hệ trục</button>';
     ganBieuTuong();
     $$('[data-cc]').forEach(function (b) { b.onclick = function () { chonCongCu(b.dataset.cc); }; });
     $$('.nhom-cc').forEach(function (b) {

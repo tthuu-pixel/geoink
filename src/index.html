@@ -8,29 +8,33 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- Hàng 1: viết tay (kiểu Scrble Ink) -->
-<header id="hang-viet" class="hang">
+<!-- Hàng trên: tệp, hoàn tác, trang -->
+<header id="hang-dau" class="hang">
   <button class="nut" id="nut-menu" title="Menu"><i data-bt="menu"></i></button>
-  <span class="ke"></span>
   <button class="nut" data-lenh="mo" title="Mở bảng (Ctrl+O)"><i data-bt="mo"></i></button>
   <button class="nut" data-lenh="luu" title="Lưu (Ctrl+S)"><i data-bt="luu"></i></button>
   <button class="nut" data-lenh="hoanTac" title="Hoàn tác (Ctrl+Z)"><i data-bt="hoanTac"></i></button>
   <button class="nut" data-lenh="lamLai" title="Làm lại (Ctrl+Y)"><i data-bt="lamLai"></i></button>
-  <span class="ke"></span>
   <button class="nut" data-lenh="nhapPdf" title="Nhập tệp PDF"><i data-bt="pdf"></i></button>
-  <span class="ke"></span>
+  <button class="nut" data-lenh="themTrang" title="Thêm trang"><i data-bt="themTrang"></i></button>
+  <div class="gian"></div>
+  <span id="thong-tin" title="Bấm để về 100%">1 / 1 · 100%</span>
+  <div class="gian"></div>
+  <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i></button>
+</header>
+
+<!-- Hàng viết tay (kiểu Scrble Ink) -->
+<header id="hang-viet" class="hang">
+  <div class="cap"><button class="nut" data-cc="but" title="Bút (P)"><i data-bt="but"></i></button><button class="mui-xo" data-xo="but" title="Độ dày, màu bút"><i data-bt="xuong"></i></button></div>
   <div class="cap"><button class="nut" data-cc="tay" title="Tẩy (E)"><i data-bt="tay"></i></button><button class="mui-xo" data-xo="tay" title="Cỡ tẩy"><i data-bt="xuong"></i></button></div>
   <div class="cap"><button class="nut" data-cc="dq" title="Bút dạ quang (H)"><i data-bt="dq"></i></button><button class="mui-xo" data-xo="dq" title="Độ dày, màu dạ quang"><i data-bt="xuong"></i></button></div>
   <div class="khay" id="khay-mau" title="Màu bút"></div>
   <div class="khay" id="khay-co" title="Độ dày nét"></div>
   <div class="khay" id="khay-dq" title="Màu dạ quang"></div>
-  <span class="ke"></span>
-  <button class="nut" data-cc="chon" title="Chọn và kéo (V)"><i data-bt="chon"></i></button>
-  <button class="nut" data-cc="keo" title="Kéo trang"><i data-bt="keo"></i></button>
-  <div class="cap"><button class="nut" data-cc="but" title="Bút chì (P)"><i data-bt="but"></i></button><button class="mui-xo" data-xo="but" title="Độ dày, màu bút"><i data-bt="xuong"></i></button></div>
   <div class="gian"></div>
-  <span id="thong-tin" title="Bấm để về 100%">1 / 1 · 100%</span>
-  <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i></button>
+  <span class="ke"></span>
+  <button class="nut" data-cc="chon" title="Chọn (V)"><i data-bt="chon"></i></button>
+  <button class="nut" data-cc="keo" title="Kéo trang"><i data-bt="keo"></i></button>
 </header>
 
 <!-- Hàng 2: dựng hình, đo, đồ thị (kiểu GeoGebra) -->

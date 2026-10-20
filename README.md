@@ -12,13 +12,14 @@ Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“M
 
 ## Giao diện
 
-Hai hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink):
-- **Hàng 1 – viết tay:** menu ☰ (bảng mới, mở, lưu, nhập PDF, xuất ảnh, nền trang, thêm/xoá trang), mở, lưu, hoàn tác, làm lại, nhập PDF, tẩy, dạ quang, các chấm màu bút, độ dày, màu dạ quang, rồi chọn – kéo trang – **bút chì** (chọn bút chì thì con trỏ chuột thành cây bút chì). Mũi tên ⌄ cạnh bút, tẩy, dạ quang để chỉnh độ dày, màu.
-- **Hàng 2 – hình học (sắp xếp như GeoGebra):** điểm · đường · đường đặc biệt · đa giác · đường tròn · đường conic · góc và đo · biến hình · thanh trượt · di chuyển hình vẽ · chữ ABC, rồi mô hình GeoLab. Mỗi ô có tam giác ▽ ở góc; bấm lại vào ô đang chọn để mở danh sách công cụ cùng nhóm. Bên phải là nút bật/tắt số đo và hệ trục.
+Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu tượng nét mảnh; công cụ đang dùng hiện trong ô đỏ sẫm):
+- **Hàng trên:** menu ☰ (bảng mới, mở, lưu, nhập PDF, xuất ảnh, nền trang, thêm/xoá trang), mở, lưu, hoàn tác, làm lại, nhập PDF, thêm trang; giữa là số trang và mức phóng; bên phải là toàn màn hình.
+- **Hàng viết tay:** bút, tẩy, bút dạ quang (mũi tên ⌄ để chỉnh độ dày, màu), các chấm màu bút, độ dày, màu dạ quang; bên phải là chọn và bàn tay kéo trang.
+- **Hàng hình học (sắp xếp như GeoGebra):** điểm · đường · đường đặc biệt · đa giác · đường tròn · đường conic · góc và đo · biến hình · thanh trượt · di chuyển hình vẽ · chữ ABC, rồi mô hình GeoLab. Mỗi ô có tam giác ▽ ở góc; bấm lại vào ô đang chọn để mở danh sách công cụ cùng nhóm. Bên phải là nút bật/tắt số đo và hệ trục.
 - Chữ trong phần mềm dùng font Arial giống GeoGebra; tên điểm, tên đường trên bảng dùng font LaTeX (Latin Modern, chữ đứng).
 - **Cột trái:** vùng trắng riêng, hiện các trang nhỏ của tệp PDF. Kéo tay nắm ở mép phải cột để mở rộng / thu hẹp, bấm vào tay nắm để đóng / mở cột.
 
-## Chức năng (bản 0.7)
+## Chức năng (bản 0.8)
 
 **Viết**
 - Bút có lực nhấn (nét to nhỏ theo tay), nét được làm mượt; bút dạ quang; chỉnh độ dày bằng thanh kéo (có xem trước nét), bảng màu.
@@ -43,7 +44,7 @@ Hai hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink):
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
-**Chọn nhiều, menu chuột phải** (công cụ Chọn – mũi tên ở hàng 1, phím V):
+**Chọn nhiều, menu chuột phải** (công cụ Chọn – ô vuông nét đứt ở hàng viết tay, phím V):
 - Giữ **Ctrl** và bấm để thêm / bớt từng đối tượng (điểm, đường, đường tròn, đa giác, chữ, nét viết tay, mô hình).
 - Kéo chỗ trống để **chọn bằng khung**; **Ctrl+A** chọn tất cả.
 - Kéo một hình đang chọn: cả nhóm di chuyển theo. **Delete** xoá cả nhóm. Đổi màu, kiểu trong bảng Thuộc tính áp dụng cho cả nhóm.
