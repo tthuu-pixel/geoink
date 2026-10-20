@@ -152,7 +152,14 @@
   var BAT_DAU_MAU = NHOM_HINH.length;
   NHOM_HINH.push(
     [['k_hop', 'Hình hộp chữ nhật'], ['k_lapPhuong', 'Hình lập phương'], ['k_lang3', 'Lăng trụ đứng tam giác'], ['k_lang4', 'Lăng trụ đứng tứ giác'], '-',
-      ['k_chop3', 'Hình chóp tam giác đều'], ['k_chop4', 'Hình chóp tứ giác đều'], '-', ['k_tru', 'Hình trụ'], ['k_non', 'Hình nón'], ['k_cau', 'Hình cầu']]
+      ['k_chop3', 'Hình chóp tam giác đều'], ['k_chop4', 'Hình chóp tứ giác đều'], '-', ['k_tru', 'Hình trụ'], ['k_non', 'Hình nón'], ['k_cau', 'Hình cầu']],
+    [['m_noiTiep', 'Tam giác nội tiếp đường tròn'], ['m_catHaiCanh', 'Đường tròn cắt hai cạnh tam giác'], '-', ['m_duongKinh', 'Đường tròn đường kính'], ['m_veDuongKinh', 'Vẽ đường kính'], '-',
+      ['m_tiepTuyen1', 'Tiếp tuyến từ điểm ngoài (1 tiếp tuyến)'], ['m_tiepTuyen2', 'Tiếp tuyến từ điểm ngoài (2 tiếp tuyến)'], ['m_tiepTuyenChung', 'Tiếp tuyến chung ngoài']],
+    [['p_tamGiac', 'Tam giác'], ['p_tamGiacCan', 'Tam giác cân'], ['p_tamGiacDeu', 'Tam giác đều'], ['p_tamGiacVuong', 'Tam giác vuông'], '-',
+      ['p_hcn', 'Hình chữ nhật'], ['p_hv', 'Hình vuông'], ['p_hbh', 'Hình bình hành'], ['p_thoi', 'Hình thoi'], '-',
+      ['p_thang', 'Hình thang'], ['p_thangCan', 'Hình thang cân'], ['p_thangVuong', 'Hình thang vuông'], ['p_lucGiac', 'Lục giác đều']],
+    [['d_trungTuyen', 'Đường trung tuyến – Trọng tâm'], ['d_duongCao', 'Đường cao – Trực tâm'], ['d_phanGiac', 'Đường phân giác – Tâm đường tròn nội tiếp'],
+      ['d_trungTruc', 'Đường trung trực – Tâm đường tròn ngoại tiếp'], '-', ['d_trungBinh', 'Đường trung bình của tam giác']]
   );
   function laMau(k) { return /^[kmpd]_/.test(k); }
   var nhomHien = NHOM_HINH.map(function (n) { return n[0][0]; }); nhomHien[1] = 'doan';   // công cụ đang hiện trên mỗi ô nhóm
@@ -713,6 +720,7 @@
     t.moHinh.forEach(function (m) { veTheMoHinh(ctx, m, trongNhom({ m: m })); });
     t.net.forEach(function (n) { veNet(ctx, n); });
     nhom.forEach(function (x) { if (!x.n) return; ctx.save(); ctx.setLineDash([6 / s, 5 / s]); ctx.strokeStyle = '#2451C7'; ctx.lineWidth = 1.5 / s; var bb = khungNet(x.n); ctx.strokeRect(bb.x0 - 6 / s, bb.y0 - 6 / s, bb.x1 - bb.x0 + 12 / s, bb.y1 - bb.y0 + 12 / s); ctx.restore(); });
+    var gMau = mauDangChon(); if (gMau && cc === 'chon') { var kM = khungMau(gMau); if (kM) veNutXoay(ctx, viTriNutXoay(kM), 1 / s); }
     if (dangKeo && dangKeo.loai === 'khung') {   // khung chọn
       var ka = dangKeo.a, kb = dangKeo.b; ctx.save(); ctx.fillStyle = 'rgba(37,99,235,.08)'; ctx.strokeStyle = '#2563EB'; ctx.lineWidth = 1.2 / s; ctx.setLineDash([5 / s, 4 / s]);
       ctx.fillRect(Math.min(ka.x, kb.x), Math.min(ka.y, kb.y), Math.abs(kb.x - ka.x), Math.abs(kb.y - ka.y)); ctx.strokeRect(Math.min(ka.x, kb.x), Math.min(ka.y, kb.y), Math.abs(kb.x - ka.x), Math.abs(kb.y - ka.y)); ctx.restore();
@@ -1047,7 +1055,7 @@
     if (cc === 'laser') { laser.push({ x: M.x, y: M.y, t: performance.now(), moi: true }); dangKeo = { loai: 'laser' }; chayLaser(); return; }
     if (cc === 'chon' && !(e.ctrlKey || e.metaKey)) {
       var tk = timTayNam(M);
-      if (tk) { dangKeo = tk; if (!trongNhom({ h: tk.o.id })) { nhom = [{ h: tk.o.id }]; capNhatChon(false); } canVe(); return; }
+      if (tk) { dangKeo = tk; if (tk.o && !trongNhom({ h: tk.o.id })) { nhom = [{ h: tk.o.id }]; capNhatChon(false); } canVe(); return; }
     }
     if (cc === 'chon') {
       var ten0 = !(e.ctrlKey || e.metaKey) && !timDiem(M) && timTen(M);
@@ -1796,8 +1804,154 @@
       thongBao('Đã chèn ' + GI.khoi.TEN[o.dang].toLowerCase() + ' · kéo điểm có vòng tròn để đổi kích thước, nút ↻ để xoay');
       return;
     }
-    if (window.chenMauPhang) return window.chenMauPhang(k, tam);
+    chenMauPhang(k, tam);
   }
+  // Dựng mẫu bằng các đối tượng hình học thường (kéo đỉnh hình vẫn giữ đúng tính chất)
+  function boDung(tam) {
+    var gid = 'g' + (demId++) + Date.now().toString(36).slice(-3), dung = {}, ds = [];
+    trang().hinh.forEach(function (o) { if (o.ten) dung[o.ten] = 1; });
+    function ten(t) { if (t && !dung[t]) { dung[t] = 1; return t; } var m = tenDiemMoi(); dung[m] = 1; return m; }
+    function them(o, tienTo) { o.id = idMoi(tienTo || 'h'); o.nhomMau = gid; themHinh(o); ds.push(o.id); return o.id; }
+    var B = {
+      gid: gid, ds: ds,
+      diem: function (t, x, y) { return them({ loai: 'diem', x: tam.x + x, y: tam.y + y, ten: ten(t) }, 'd'); },
+      tren: function (duong, t, x, y) { return them({ loai: 'diemTren', tren: duong, t: H.thamSo(giaTri[duong], { x: tam.x + x, y: tam.y + y }), ten: ten(t) }, 'd'); },
+      dt: function (loai, thamSo, t) { var o = Object.assign({ loai: loai }, thamSo); if (t !== undefined) o.ten = t === null ? undefined : ten(t); return them(o, H.LA_DIEM[loai] ? 'd' : 'h'); },
+      doan: function (a, b, an) { var id = them({ loai: 'doan', a: a, b: b }); if (an) timTheoId(id).an = true; return id; },
+      an: function (id) { timTheoId(id).an = true; return id; },
+      // giao điểm khác điểm 'tranh' (khi một giao điểm đã là đỉnh có sẵn)
+      giao: function (o1, o2, t, tranh, khiChon) {
+        var c2 = H.catNhau(giaTri[o1], giaTri[o2]), k = 0;
+        if (c2.length > 1) { var T = tranh && giaTri[tranh]; if (T) k = H.kc(c2[0], T) > H.kc(c2[1], T) ? 0 : 1; else if (khiChon) k = khiChon(c2); }
+        return them({ loai: 'giao', o1: o1, o2: o2, k: k, ten: t === null ? undefined : ten(t) }, 'd');
+      },
+      vuong: function (a, o, b) { return them({ loai: 'gocVuong', a: a, o: o, b: b }); },
+    };
+    return B;
+  }
+  function chenMauPhang(k, tam) {
+    ghiLichSu(); var B = boDung(tam), D = B.diem, dt = B.dt, doan = B.doan, R = 110;
+    function cuc(goc, r) { return [Math.cos(goc * Math.PI / 180) * (r || R), Math.sin(goc * Math.PI / 180) * (r || R)]; }
+    function tamGiacTuDo(dx, dy) { var A = D('A', -30 + (dx || 0), -110 + (dy || 0)), Bp = D('B', -130 + (dx || 0), 80 + (dy || 0)), C = D('C', 140 + (dx || 0), 80 + (dy || 0)); doan(A, Bp); doan(Bp, C); doan(C, A); return [A, Bp, C]; }
+    switch (k) {
+      /* ----- Đường tròn ----- */
+      case 'm_noiTiep': {
+        var O = D('O', 0, 0), pA = cuc(-100), A = D('A', pA[0], pA[1]), tr = dt('tron', { o: O, a: A });
+        var pB = cuc(150), Bp = B.tren(tr, 'B', pB[0], pB[1]), pC = cuc(30), C = B.tren(tr, 'C', pC[0], pC[1]);
+        doan(A, Bp); doan(Bp, C); doan(C, A); break;
+      }
+      case 'm_catHaiCanh': {
+        var Bc = D('B', -120, 40), Cc = D('C', 120, 40), Oc = dt('trungDiem', { a: Bc, b: Cc }, 'O'), trc = dt('tron', { o: Oc, a: Bc });
+        var Ac = D('A', -40, -150), sAB = doan(Ac, Bc), sAC = doan(Ac, Cc); doan(Bc, Cc);
+        B.giao(sAB, trc, 'D', Bc); B.giao(sAC, trc, 'E', Cc); break;
+      }
+      case 'm_duongKinh': { var Ad = D('A', -110, 0), Bd = D('B', 110, 0), Od = dt('trungDiem', { a: Ad, b: Bd }, 'O'); dt('tron', { o: Od, a: Ad }); doan(Ad, Bd); break; }
+      case 'm_veDuongKinh': { var Ov = D('O', 0, 0), Av = D('A', -100, -45), trv = dt('tron', { o: Ov, a: Av }), Bv = dt('bienHinh', { kieu: 'dxTam', nguon: Av, tam: Ov }, 'B'); doan(Av, Bv); break; }
+      case 'm_tiepTuyen1': case 'm_tiepTuyen2': {
+        var Ot = D('O', -90, 0), pR = cuc(130, R), Rt = D('A', -90 + pR[0], pR[1]), trt = dt('tron', { o: Ot, a: Rt }), Mt = D('M', 170, 0);
+        var sOM = doan(Ot, Mt), It = B.an(dt('trungDiem', { a: Ot, b: Mt }, null)), phu = B.an(dt('tron', { o: It, a: Ot }));
+        B.giao(sOM, trt, 'K', null, function (c2) { return c2[0].x > c2[1].x ? 0 : 1; });
+        var soT = k === 'm_tiepTuyen2' ? 2 : 1;
+        for (var i = 0; i < soT; i++) {
+          var T = B.giao(trt, phu, i ? 'C' : 'B', null, function (c2) { return (i === 0) === (c2[0].y < c2[1].y) ? 0 : 1; });
+          doan(Ot, T); doan(Mt, T); B.vuong(Ot, T, Mt);
+        }
+        break;
+      }
+      case 'm_tiepTuyenChung': {
+        var O1 = D('O', -120, 10), A1 = D('A', -120 + 95 * Math.cos(2.4), 10 + 95 * Math.sin(2.4)), C1 = dt('tron', { o: O1, a: A1 });
+        var O2 = D("O'", 110, 25), A2 = D('B', 110 + 55 * Math.cos(0.6), 25 + 55 * Math.sin(0.6)), C2 = dt('tron', { o: O2, a: A2 });
+        var tt = dt('tiepTuyenChung', { o1: C1, o2: C2, k: 0 }), Tp = dt('dauDoan', { d: tt, i: 0 }, 'M'), Tq = dt('dauDoan', { d: tt, i: 1 }, 'N');
+        doan(O1, Tp); doan(O2, Tq); B.vuong(O1, Tp, Tq); B.vuong(O2, Tq, Tp); doan(O1, O2); break;
+      }
+      /* ----- Hình phẳng ----- */
+      case 'p_tamGiac': { var tg = [D('A', -30, -110), D('B', -130, 80), D('C', 140, 80)]; dt('daGiac', { ds: tg }); break; }
+      case 'p_tamGiacCan': {
+        var Bn = D('B', -110, 80), Cn = D('C', 110, 80), tt2 = B.an(dt('trungTruc', { a: Bn, b: Cn })), An = B.tren(tt2, 'A', 0, -120);
+        dt('daGiac', { ds: [An, Bn, Cn] }); break;
+      }
+      case 'p_tamGiacDeu': { var Be = D('B', -110, 70), Ce = D('C', 110, 70), Ae = dt('bienHinh', { kieu: 'quay', nguon: Ce, tam: Be, goc: 60 }, 'A'); dt('daGiac', { ds: [Ae, Be, Ce] }); break; }
+      case 'p_tamGiacVuong': {
+        var Aq = D('A', -110, 80), Bq = D('B', 130, 80), dq = B.an(dt('duong', { a: Aq, b: Bq })), vg = B.an(dt('vuongGoc', { d: dq, a: Aq, kyHieuVuong: false })), Cq = B.tren(vg, 'C', -110, -100);
+        dt('daGiac', { ds: [Aq, Bq, Cq] }); B.vuong(Bq, Aq, Cq); break;
+      }
+      case 'p_hcn': case 'p_hv': case 'p_hbh': case 'p_thoi': {
+        var A4 = D('A', -120, 70), B4 = D('B', 120, 70), D4;
+        if (k === 'p_hcn') { var d4 = B.an(dt('duong', { a: A4, b: B4 })), v4 = B.an(dt('vuongGoc', { d: d4, a: A4, kyHieuVuong: false })); D4 = B.tren(v4, 'D', -120, -60); }
+        else if (k === 'p_hv') D4 = dt('bienHinh', { kieu: 'quay', nguon: B4, tam: A4, goc: 90 }, 'D');
+        else if (k === 'p_hbh') D4 = D('D', -60, -70);
+        else { var t4 = B.an(dt('tron', { o: A4, a: B4 })); D4 = B.tren(t4, 'D', -120 + 240 * Math.cos(-1.1), 70 + 240 * Math.sin(-1.1)); }
+        var C4 = dt('bienHinh', { kieu: 'tinhTien', nguon: D4, v1: A4, v2: B4 }, 'C');
+        dt('daGiac', { ds: [A4, B4, C4, D4] }); if (k === 'p_hcn' || k === 'p_hv') B.vuong(B4, A4, D4); break;
+      }
+      case 'p_thang': case 'p_thangCan': case 'p_thangVuong': {
+        var At = D('A', -140, 70), Bt = D('B', 140, 70), Dt, Ct;
+        if (k === 'p_thangCan') { Dt = D('D', -70, -60); var tr5 = B.an(dt('trungTruc', { a: At, b: Bt })); Ct = dt('bienHinh', { kieu: 'dxTruc', nguon: Dt, truc: tr5 }, 'C'); }
+        else {
+          if (k === 'p_thangVuong') { var d5 = B.an(dt('duong', { a: At, b: Bt })), v5 = B.an(dt('vuongGoc', { d: d5, a: At, kyHieuVuong: false })); Dt = B.tren(v5, 'D', -140, -60); }
+          else Dt = D('D', -70, -60);
+          var ab = B.an(dt('duong', { a: At, b: Bt })), ss = B.an(dt('songSong', { d: ab, a: Dt })); Ct = B.tren(ss, 'C', 60, -60);
+        }
+        dt('daGiac', { ds: [At, Bt, Ct, Dt] }); if (k === 'p_thangVuong') { B.vuong(Bt, At, Dt); B.vuong(At, Dt, Ct); } break;
+      }
+      case 'p_lucGiac': {
+        var A6 = D('A', -55, 95), B6 = D('B', 55, 95), dg = dt('daGiacDeu', { a: A6, b: B6, n: 6 });
+        for (var j = 2; j < 6; j++) dt('dinhDG', { dg: dg, i: j }, String.fromCharCode(65 + j)); break;
+      }
+      /* ----- Đường đặc biệt trong tam giác ----- */
+      case 'd_trungTuyen': {
+        var t1 = tamGiacTuDo(), M1 = dt('trungDiem', { a: t1[1], b: t1[2] }, 'M'), N1 = dt('trungDiem', { a: t1[0], b: t1[2] }, 'N'), P1 = dt('trungDiem', { a: t1[0], b: t1[1] }, 'P');
+        var m1 = doan(t1[0], M1), n1 = doan(t1[1], N1); doan(t1[2], P1); B.giao(m1, n1, 'G'); break;
+      }
+      case 'd_duongCao': {
+        var t2 = tamGiacTuDo(), cao = [];
+        [[0, 1, 2, 'H'], [1, 0, 2, 'K'], [2, 0, 1, 'I']].forEach(function (q) {
+          var canh = B.an(dt('duong', { a: t2[q[1]], b: t2[q[2]] })), vg2 = B.an(dt('vuongGoc', { d: canh, a: t2[q[0]], kyHieuVuong: false }));
+          var chan = B.giao(vg2, canh, q[3]); doan(t2[q[0]], chan); B.vuong(t2[q[0]], chan, t2[q[2]]); cao.push(vg2);
+        });
+        B.giao(cao[0], cao[1], 'O'); break;
+      }
+      case 'd_phanGiac': {
+        var t3 = tamGiacTuDo(), pg = [];
+        [[0, 1, 2, 'D'], [1, 0, 2, 'E'], [2, 0, 1, 'F']].forEach(function (q) {
+          var l = B.an(dt('phanGiac', { a: t3[q[1]], o: t3[q[0]], b: t3[q[2]] })), canh = B.an(dt('duong', { a: t3[q[1]], b: t3[q[2]] }));
+          doan(t3[q[0]], B.giao(l, canh, q[3])); pg.push(l);
+        });
+        var Ip = B.giao(pg[0], pg[1], 'I'), bc = B.an(dt('duong', { a: t3[1], b: t3[2] })), vgI = B.an(dt('vuongGoc', { d: bc, a: Ip, kyHieuVuong: false }));
+        var chanI = B.an(B.giao(vgI, bc, null)); dt('tron', { o: Ip, a: chanI }); break;
+      }
+      case 'd_trungTruc': {
+        var t4b = tamGiacTuDo(), tt3 = B.an(dt('trungTruc', { a: t4b[1], b: t4b[2] })), tt4 = B.an(dt('trungTruc', { a: t4b[0], b: t4b[2] }));
+        var Ot2 = B.giao(tt3, tt4, 'O');
+        [[1, 2, 'M'], [0, 2, 'N'], [0, 1, 'P']].forEach(function (q) { var Mq = dt('trungDiem', { a: t4b[q[0]], b: t4b[q[1]] }, q[2]); doan(Ot2, Mq); B.vuong(Ot2, Mq, t4b[q[1]]); });
+        dt('tron', { o: Ot2, a: t4b[0] }); break;
+      }
+      case 'd_trungBinh': { var t5 = tamGiacTuDo(), Mb = dt('trungDiem', { a: t5[0], b: t5[1] }, 'M'), Nb = dt('trungDiem', { a: t5[0], b: t5[2] }, 'N'); doan(Mb, Nb); break; }
+    }
+    // chọn sẵn hình chính (để hiện nút xoay); kéo đỉnh vẫn đổi hình như thường
+    var chinh = B.ds.filter(function (id) { var o = timTheoId(id); return o && !o.an && !laDiemO(o) && o.loai !== 'gocVuong'; });
+    var uuTien = chinh.filter(function (id) { var v = giaTri[id]; return v && (v.k === 'daGiac' || v.k === 'tron'); });
+    chonCongCu('chon'); nhom = (uuTien.length ? uuTien : chinh).slice(0, 1).map(function (id) { return { h: id }; }); capNhatChon(false);
+    thongBao('Đã chèn ' + tenCongCu(k).toLowerCase() + ' · kéo đỉnh để đổi hình, nút ↻ để xoay');
+  }
+  // Nút xoay của mẫu hình phẳng: quay mọi điểm tự do của mẫu quanh tâm khung
+  function khungMau(gid) {
+    var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    trang().hinh.forEach(function (o) { if (o.nhomMau !== gid || o.an) return; var v = giaTri[o.id]; if (!v) return; diemDaiDien(o, v).forEach(function (P) { b.x0 = Math.min(b.x0, P.x); b.y0 = Math.min(b.y0, P.y); b.x1 = Math.max(b.x1, P.x); b.y1 = Math.max(b.y1, P.y); }); });
+    return isFinite(b.x0) ? b : null;
+  }
+  function mauDangChon() { var g = null; nhom.forEach(function (x) { var o = x.h && timTheoId(x.h); if (o && o.nhomMau) g = o.nhomMau; }); return g; }
+  function timNutXoayMau(M) {
+    var g = mauDangChon(); if (!g) return null; var k = khungMau(g); if (!k) return null; var P = viTriNutXoay(k);
+    if (Math.hypot(M.x - P.x, M.y - P.y) > 15 / V.s) return null;
+    var tam = { x: (k.x0 + k.x1) / 2, y: (k.y0 + k.y1) / 2 }, ds = trang().hinh.filter(function (o) { return o.nhomMau === g && (o.loai === 'diem' || (o.loai === 'diemTren' && giaTri[o.tren] && giaTri[o.tren].k === 'tron')); });
+    return { loai: 'xoayMau', tam: tam, goc0: Math.atan2(M.y - tam.y, M.x - tam.x), dau: ds.map(function (o) { return { o: o, x: o.x, y: o.y, t: o.t }; }) };
+  }
+  function keoNutXoayMau(k, M) {
+    var a = Math.atan2(M.y - k.tam.y, M.x - k.tam.x) - k.goc0, ca = Math.cos(a), sa = Math.sin(a);
+    k.dau.forEach(function (d) { if (d.o.loai === 'diem') { var x = d.x - k.tam.x, y = d.y - k.tam.y; d.o.x = k.tam.x + x * ca - y * sa; d.o.y = k.tam.y + x * sa + y * ca; } else d.o.t = d.t + a; });
+  }
+  window.timNutXoayMau = timNutXoayMau; window.keoNutXoayMau = keoNutXoayMau;
   /* =====================================================================
      CHỌN NHIỀU (Ctrl, khung chọn, Ctrl+A) và MENU CHUỘT PHẢI
      ===================================================================== */
@@ -1974,5 +2128,5 @@
   } else {
     window.addEventListener('beforeunload', function (e) { if (daSua) { e.preventDefault(); e.returnValue = ''; } });
   }
-  window.GeoInk = { tl: function () { return tl; }, nhom: function () { return nhom.map(function (x) { return x.h || (x.n ? 'net' : 'mh'); }); }, V: function () { return V; }, chonCongCu: chonCongCu, lenh: LENH, giaTri: function () { return giaTri; } };   // để kiểm thử
+  window.GeoInk = { tl: function () { return tl; }, nhom: function () { return nhom.map(function (x) { return x.h || (x.n ? 'net' : 'mh'); }); }, V: function () { return V; }, chonCongCu: chonCongCu, chenMau: chenMau, lenh: LENH, giaTri: function () { return giaTri; } };   // để kiểm thử
 })();

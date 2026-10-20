@@ -17,8 +17,8 @@
 window.GI = window.GI || {};
 GI.hinh = (function () {
   var DV = 40;   // 1 cm = 40 đơn vị thế giới
-  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1 };
-  var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1 };
+  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1 };
+  var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1, tiepTuyenChung: 1 };
   var LA_TRON = { tron: 1, tronBanKinh: 1, compa: 1, tron3: 1 };
   var LA_CUNG = { banNguyet: 1, cungTam: 1, cung3: 1, quatTam: 1, quat3: 1 };
   var LA_CONIC = { elip: 1, hypebol: 1, parabol: 1 };
@@ -212,6 +212,13 @@ GI.hinh = (function () {
         case 'thanhTruot': return { k: 'truot', x: o.x, y: o.y };
         case 'chu': return { k: 'chu', x: o.x, y: o.y };
         case 'khoi': return GI.khoi ? GI.khoi.tinh(o) : null;
+        case 'tiepTuyenChung': {   // tiếp tuyến chung ngoài của hai đường tròn (k = 0, 1)
+          var T1 = lay(o.o1), T2 = lay(o.o2); if (!T1 || !T2 || T1.k !== 'tron' || T2.k !== 'tron') return null;
+          var dx = T2.c.x - T1.c.x, dy = T2.c.y - T1.c.y, dd = Math.hypot(dx, dy); if (dd <= Math.abs(T1.r - T2.r) + 1e-6) return null;
+          var th = Math.atan2(dy, dx), ph = Math.acos((T1.r - T2.r) / dd) * (o.k ? -1 : 1), nx = Math.cos(th + ph), ny = Math.sin(th + ph);
+          return { k: 'thang', loai: 'doan', p: { x: T1.c.x + T1.r * nx, y: T1.c.y + T1.r * ny }, q: { x: T2.c.x + T2.r * nx, y: T2.c.y + T2.r * ny } };
+        }
+        case 'dauDoan': { var Sd = lay(o.d); return Sd && Sd.k === 'thang' ? { k: 'diem', x: (o.i ? Sd.q : Sd.p).x, y: (o.i ? Sd.q : Sd.p).y } : null; }
         case 'elip': case 'hypebol': {
           var F1 = diem(o.a), F2 = diem(o.b), Pc = diem(o.c); if (!F1 || !F2 || !Pc) return null;
           var cc = kc(F1, F2) / 2, d1 = kc(Pc, F1), d2 = kc(Pc, F2), Mc = { x: (F1.x + F2.x) / 2, y: (F1.y + F2.y) / 2 }, th = Math.atan2(F2.y - F1.y, F2.x - F1.x);
