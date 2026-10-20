@@ -17,7 +17,7 @@
 window.GI = window.GI || {};
 GI.hinh = (function () {
   var DV = 40;   // 1 cm = 40 đơn vị thế giới
-  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1 };
+  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1, trongTam: 1, trucTam: 1, chanCao: 1, diemTZ: 1 };
   var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1, tiepTuyenChung: 1 };
   var LA_TRON = { tron: 1, tronBanKinh: 1, compa: 1, tron3: 1 };
   var LA_CUNG = { banNguyet: 1, cungTam: 1, cung3: 1, quatTam: 1, quat3: 1 };
@@ -155,6 +155,21 @@ GI.hinh = (function () {
           var khoaBien = Object.keys(bien).join(',');
           if (!o._f || o._bt !== o.bt || o._kb !== khoaBien) { try { var r = GI.bieuThuc.doc(o.bt, Object.keys(bien)); o._f = r.f; o._ve = r.ve; o._bt = o.bt; o._kb = khoaBien; } catch (e) { return null; } }
           var fh = o._f; return { k: 'ham', f: function (x) { return fh(x, bien); }, ve: o._ve };
+        }
+        case 'diemTZ': case 'nhanTZ': {   // điểm / nhãn dựng từ mã TikZ (biểu thức theo toạ độ TikZ, gốc là điểm o.goc)
+          var G = diem(o.goc); if (!G || !GI.tikz) return null; var Dk = DV * (o.kt || 1);
+          var Pz = GI.tikz.tinh(o.bt, function (id) { var Q = diem(id); return Q ? { x: (Q.x - G.x) / Dk, y: -(Q.y - G.y) / Dk } : null; });
+          if (!Pz || !isFinite(Pz.x) || !isFinite(Pz.y)) return null;
+          return { k: o.loai === 'diemTZ' ? 'diem' : 'nhanTZ', x: G.x + Pz.x * Dk, y: G.y - Pz.y * Dk };
+        }
+        case 'trongTam': { var Ag = diem(o.a), Bg = diem(o.b), Cg = diem(o.c); return Ag && Bg && Cg ? { k: 'diem', x: (Ag.x + Bg.x + Cg.x) / 3, y: (Ag.y + Bg.y + Cg.y) / 3 } : null; }
+        case 'trucTam': {   // H = A + B + C − 2O (O: tâm đường tròn ngoại tiếp)
+          var Ah = diem(o.a), Bh = diem(o.b), Ch = diem(o.c); if (!Ah || !Bh || !Ch) return null; var Th = tamNgoaiTiep(Ah, Bh, Ch); if (!Th) return null;
+          return { k: 'diem', x: Ah.x + Bh.x + Ch.x - 2 * Th.c.x, y: Ah.y + Bh.y + Ch.y - 2 * Th.c.y };
+        }
+        case 'chanCao': {   // chân đường cao kẻ từ a xuống đường thẳng bc
+          var Af = diem(o.a), Bf = diem(o.b), Cf = diem(o.c); if (!Af || !Bf || !Cf) return null; var ux = Cf.x - Bf.x, uy = Cf.y - Bf.y, L2 = ux * ux + uy * uy; if (L2 < 1e-12) return null;
+          var tf = ((Af.x - Bf.x) * ux + (Af.y - Bf.y) * uy) / L2; return { k: 'diem', x: Bf.x + ux * tf, y: Bf.y + uy * tf, t: tf };
         }
         case 'tam': { var Tt = lay(o.d); return Tt && (Tt.k === 'tron' || Tt.k === 'cung') ? { k: 'diem', x: Tt.c.x, y: Tt.c.y } : null; }
         case 'diemCach': { var Ac = diem(o.a); return Ac ? { k: 'diem', x: Ac.x + o.l * DV * Math.cos(o.t || 0), y: Ac.y + o.l * DV * Math.sin(o.t || 0) } : null; }

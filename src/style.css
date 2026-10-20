@@ -358,3 +358,9 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #may-tinh .mt-s { left: 1px; color: #FBBF24; } #may-tinh .mt-a { right: 1px; color: #FCA5A5; }
 #may-tinh .mt-ps { font-size: 9px; line-height: .8; display: inline-block; border-bottom: 0; }
 #may-tinh sup, #may-tinh sub { font-size: 70%; }
+/* Nhập hình từ mã TikZ */
+#tikz-ma { width: 100%; box-sizing: border-box; font: 13px/1.45 Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; resize: vertical; tab-size: 2; }
+#tikz-ma:focus { outline: 2px solid #93C5FD; border-color: #60A5FA; }
+#tikz-loi { font-weight: 500; font-size: 13px; max-height: 120px; overflow: auto; }
+#tikz-loi b { color: #B45309; }
+#hop-tikz code { background: #F1F5F9; padding: 0 4px; border-radius: 4px; font-size: 12.5px; }

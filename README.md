@@ -37,7 +37,7 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 
 **Dụng cụ học tập**: thước kẻ 20 cm, thước đo độ, ê-ke 30°–60° và 45°, thước parabol, compa — đúng tỉ lệ thật, kéo để dời, nút ↻ để xoay (hiện số độ). Viết bút sát mép dụng cụ thì nét bám theo mép. Compa: kéo đầu kim để dời, kéo đầu bút để chỉnh bán kính, kéo núm trên để quay vẽ cung. Phím R cất dụng cụ.
 
-**Mẫu hình** (cạnh nút GeoLab): hình không gian (hộp chữ nhật, lập phương, lăng trụ đứng, chóp đều, trụ, nón, cầu — kéo điểm có vòng tròn để đổi kích thước theo đúng hướng, nút ↻ để xoay), đường tròn (nội tiếp, đường kính, tiếp tuyến…), hình phẳng (tam giác, tứ giác đặc biệt, lục giác đều), đường đặc biệt trong tam giác (trung tuyến, đường cao, phân giác, trung trực, đường trung bình). Kéo đỉnh thì hình vẫn giữ đúng tính chất.
+**Mẫu hình** (cạnh nút GeoLab, bấm nút rồi bấm lên bảng: hình hiện đúng chỗ bấm): hình không gian (hộp chữ nhật, lập phương, lăng trụ đứng, chóp đều, trụ, nón, cầu — kéo điểm có vòng tròn để đổi kích thước theo đúng hướng, nút ↻ để xoay), đường tròn (nội tiếp, đường kính, tiếp tuyến…), hình phẳng (tam giác, tứ giác đặc biệt, lục giác đều), đường đặc biệt trong tam giác (phân giác, trung trực, đường trung bình). Nhóm này còn có công cụ dựng trên tam giác có sẵn: đường trung tuyến, đường cao (bấm đỉnh rồi 2 đầu cạnh đối diện; đường cao tự có kí hiệu góc vuông và nét đứt kéo dài cạnh khi chân nằm ngoài), trọng tâm, trực tâm (bấm 3 đỉnh). Kéo đỉnh thì hình vẫn giữ đúng tính chất.
 
 **Nhập tệp PDF**: bấm nút PDF (hoặc menu ☰ → Nhập tệp PDF…). Các trang PDF xếp từ trên xuống trên bảng, cột trái hiện trang nhỏ (bấm để đến trang đó). Viết, vẽ, dựng hình thẳng lên trang; lăn chuột để cuộn, Ctrl + lăn chuột để phóng to. Tệp PDF được lưu kèm trong tệp `.geoink`. Xuất ảnh PNG sẽ xuất trang PDF đang xem.
 
@@ -48,13 +48,15 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - **Đa giác:** đa giác, đa giác đều.
 - **Đường tròn:** tâm và 1 điểm, tâm và bán kính, compa, qua 3 điểm, hình bán nguyệt, cung tròn (tâm + 2 điểm, qua 3 điểm), hình quạt (tâm + 2 điểm, qua 3 điểm).
 - **Đường conic:** elip (2 tiêu điểm + 1 điểm), hypebol (2 tiêu điểm + 1 điểm), parabol (tiêu điểm + đường chuẩn).
-- **Góc, đo:** góc, góc với độ lớn cho trước, kí hiệu góc vuông (bấm 3 điểm), khoảng cách / độ dài, diện tích.
+- **Góc, đo:** góc 1/2/3 nét cung, góc 1/2 nét cung có gạch (không tô màu; bật/tắt số đo từng góc bằng chuột phải hoặc Thuộc tính), góc với độ lớn cho trước, kí hiệu góc vuông (bấm 3 điểm), khoảng cách / độ dài, diện tích.
 - **Biến hình:** đối xứng qua đường thẳng, qua điểm, đối xứng điểm qua đường tròn, phép quay, tịnh tiến, vị tự.
 - **Thanh trượt**, **chèn chữ**, di chuyển hình vẽ (kéo trang), xoá đối tượng.
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
-**Chọn nhiều, menu chuột phải** (công cụ Chọn – mũi tên ở hàng viết tay, phím V):
+**Nhập hình từ mã TikZ** (menu ☰ → *Nhập hình từ mã TikZ…*, hoặc dán thẳng lên bảng bằng Ctrl+V): đọc TikZ thuần theo khung 4 bước — `\def`, `declare function`, `\foreach` (cả lồng nhau), `\path … coordinate`, `\coordinate`, phép dựng `calc` (trung điểm, tỉ lệ, hình chiếu `$(B)!(A)!(C)$`, phép quay `$(O)!1!90:(B)$`, khoảng cách `!1cm!`, tổng hiệu toạ độ), `intersection of`, `name path` + `name intersections` (có `sort by`), `let … veclen`, đường tròn, cung `arc`, nét đứt, mũi tên, `pic {angle}` / `pic {right angle}` (gộp nhiều cung, nhãn trong ngoặc kép), gạch đánh dấu góc, nhãn `node`, và `\foreach` xuất hiện điểm `(\d) circle(1pt) + (\g:9pt) node {$\d$}`. Mỗi điểm giữ nguyên cách dựng nên kéo điểm gốc thì hình đổi theo; điểm tự do nằm trên đường tròn đã vẽ thì chỉ chạy trên đường tròn đó. Hình tự co vừa khung nhìn.
+
+**Chọn nhiều, menu chuột phải** (công cụ Chọn – mũi tên ở hàng viết tay, phím T):
 - Giữ **Ctrl** và bấm để thêm / bớt từng đối tượng (điểm, đường, đường tròn, đa giác, chữ, nét viết tay, mô hình).
 - Kéo chỗ trống để **chọn bằng khung**; **Ctrl+A** chọn tất cả.
 - Kéo một hình đang chọn: cả nhóm di chuyển theo. **Delete** xoá cả nhóm. Đổi màu, kiểu trong bảng Thuộc tính áp dụng cho cả nhóm.
@@ -82,7 +84,7 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 | Ctrl+Z / Ctrl+Y | Hoàn tác / làm lại |
 | Ctrl+S, Ctrl+Shift+S | Lưu, lưu thành tệp khác |
 | Ctrl+O, Ctrl+N | Mở, bảng mới |
-| P, H, E, V | Bút, dạ quang, tẩy, chọn |
+| P, T, H, E | Bút, mũi tên (chọn), bàn tay (kéo trang), tẩy |
 | Esc | Huỷ thao tác dựng hình đang dở |
 | Page Up / Page Down | Trang trước / sau |
 | F11 | Toàn màn hình |

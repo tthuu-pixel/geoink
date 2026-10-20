@@ -27,7 +27,7 @@
 <header id="hang-viet" class="hang">
   <div class="cap"><button class="nut" data-cc="but" title="Bút (P)"><i data-bt="but"></i></button><button class="mui-xo" data-xo="but" title="Độ dày, màu bút"><i data-bt="xuong"></i></button></div>
   <div class="cap"><button class="nut" data-cc="tay" title="Tẩy (E)"><i data-bt="tay"></i></button><button class="mui-xo" data-xo="tay" title="Cỡ tẩy"><i data-bt="xuong"></i></button></div>
-  <div class="cap"><button class="nut" data-cc="dq" title="Bút dạ quang (H)"><i data-bt="dq"></i></button><button class="mui-xo" data-xo="dq" title="Độ dày, màu dạ quang"><i data-bt="xuong"></i></button></div>
+  <div class="cap"><button class="nut" data-cc="dq" title="Bút dạ quang"><i data-bt="dq"></i></button><button class="mui-xo" data-xo="dq" title="Độ dày, màu dạ quang"><i data-bt="xuong"></i></button></div>
   <div class="khay" id="khay-mau" title="Màu bút"></div>
   <div class="khay" id="khay-co" title="Độ dày nét"></div>
   <div class="khay" id="khay-dq" title="Màu dạ quang"></div>
@@ -37,8 +37,8 @@
   <button class="nut" data-lenh="dungCu" title="Dụng cụ học tập"><i data-bt="dungCu"></i></button>
   <div class="gian"></div>
   <span class="ke"></span>
-  <button class="nut" data-cc="chon" title="Chọn (V)"><i data-bt="chon"></i></button>
-  <button class="nut" data-cc="keo" title="Kéo trang"><i data-bt="keo"></i></button>
+  <button class="nut" data-cc="chon" title="Chọn (T)"><i data-bt="chon"></i></button>
+  <button class="nut" data-cc="keo" title="Bàn tay – kéo trang (H)"><i data-bt="keo"></i></button>
 </header>
 
 <!-- Hàng 2: dựng hình, đo, đồ thị (kiểu GeoGebra) -->
@@ -69,6 +69,7 @@
   <button data-lenh="luuThanh"><i data-bt="luu"></i>Lưu thành tệp khác…<kbd>Ctrl+⇧+S</kbd></button>
   <button data-lenh="nhapPdf"><i data-bt="pdf"></i>Nhập tệp PDF…</button>
   <button data-lenh="xuatAnh"><i data-bt="anh"></i>Xuất trang ra ảnh PNG</button>
+  <button data-lenh="nhapTikz"><i data-bt="tikz"></i>Nhập hình từ mã TikZ…</button>
   <hr>
   <div class="tieu-de-menu">Nền trang</div>
   <div class="nen-menu" id="nen-menu"></div>
@@ -107,6 +108,22 @@
   </div>
 </div>
 
+<div id="hop-tikz" class="hop an" role="dialog" aria-label="Nhập hình từ mã TikZ">
+  <div class="hop-noi-dung rong">
+    <h2>Nhập hình từ mã TikZ</h2>
+    <p class="ghi-chu">Dán mã <b>TikZ thuần</b> (cả khối <code>\begin{tikzpicture}…\end{tikzpicture}</code>). Điểm dựng bằng <code>calc</code>, <code>intersection of</code>, <code>name intersections</code> vẫn giữ cách dựng: kéo điểm gốc thì hình đổi theo. Mẹo: dán thẳng lên bảng bằng Ctrl+V cũng được.</p>
+    <textarea id="tikz-ma" spellcheck="false" rows="14" placeholder="\begin{tikzpicture}[scale=1, font=\footnotesize, declare function={r=3;}]
+\path (0,0) coordinate (O) (110:r) coordinate (A) (210:r) coordinate (B) (-30:r) coordinate (C)
+      ($(B)!(A)!(C)$) coordinate (H);
+\draw (A)--(B)--(C)--cycle (O) circle(r) (A)--(H);
+\foreach \x/\y/\z in {A/H/C} \path pic[draw=black, angle radius=6] {right angle = \x--\y--\z};
+\foreach \d/\g in {A/100, B/-135, C/-30, H/-90} \path[draw, fill=white] (\d) circle(1pt) + (\g:9pt) node {$\d$};
+\end{tikzpicture}"></textarea>
+    <div class="loi" id="tikz-loi"></div>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="tikz-dung">Dựng hình</button></div>
+  </div>
+</div>
+
 <div id="hop-nhap" class="hop an" role="dialog">
   <div class="hop-noi-dung">
     <h2>Nhập</h2>
@@ -129,6 +146,7 @@
 <script src="maytinh-loi.js"></script>
 <script src="maytinh.js"></script>
 <script src="khoi.js"></script>
+<script src="tikz.js"></script>
 <script src="hinh.js"></script>
 <script src="app.js"></script>
 </body>
