@@ -193,8 +193,23 @@ window.GI = window.GI || {};
   GI.BIEU_TUONG_CC = B;
   // biểu tượng hàng GeoGebra: nét mảnh (0,7 lần), khung nhìn sát hơn để hình to hơn
   function svg32(k) { return '<svg viewBox="1 1 30 30" xmlns="http://www.w3.org/2000/svg">' + B32[k].replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + (+w * 0.7).toFixed(2) + '"'; }) + '</svg>'; }
+  // Icon mẫu hình kiểu logo GeoLab: ô vuông bo góc tô một màu, hình vẽ nét trắng
+  var MAU_NHOM = { k: '#7C3AED', m: '#0D9488', p: '#EA580C', d: '#DB2777' };
+  function iconMau(k) {
+    var mau = MAU_NHOM[k.charAt(0)], g = B32[k]
+      .replace(/<circle([^>]*?)fill="(?!none)[^"]*"([^>]*?)stroke="[^"]*"([^>]*?)stroke-width="[^"]*"/g, '<circle$1fill="#fff"$2stroke="none"$3stroke-width="0"')
+      .replace(/stroke="#[0-9A-Fa-f]{3,6}"/g, 'stroke="#fff"')
+      .replace(/fill="(#EDBFA6|#F6E3D8|#A9C9F7|rgba\(224,53,43,\.22\))"/g, 'fill="#fff" fill-opacity=".2"')
+      .replace(/stroke-dasharray="([^"]*)"/g, 'stroke-dasharray="$1" stroke-opacity=".8"')
+      .replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + Math.max(0.9, +w * 0.85).toFixed(2) + '"'; })
+      .replace(/<text([^>]*?)fill="[^"]*"/g, '<text$1fill="#fff"')
+      .replace(/(<circle[^>]*?)r="([\d.]+)"([^>]*?fill="#fff")/g, function (m, a1, r, a2) { return a1 + 'r="' + Math.min(+r, 1.6) + '"' + a2; });
+    return '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="38" height="38" rx="10" fill="' + mau + '"/>' +
+      '<g transform="translate(5.6 5.6) scale(0.9)">' + g + '</g></svg>';
+  }
   GI.bieuTuong = function (k, hang2) {
     if (k === 'moHinh' && hang2) return LOGO_GEOLAB;
+    if (/^[kmpd]_/.test(k) && B32[k]) return iconMau(k);
     if (hang2 && B32[k]) return svg32(k);
     if (B32[k] && !B[k]) return svg32(k);
     return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + (B[k] || '') + '</svg>';
