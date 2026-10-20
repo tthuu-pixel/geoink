@@ -211,6 +211,7 @@ GI.hinh = (function () {
         case 'bienHinh': return bienHinh(o, lay(o.nguon));
         case 'thanhTruot': return { k: 'truot', x: o.x, y: o.y };
         case 'chu': return { k: 'chu', x: o.x, y: o.y };
+        case 'khoi': return GI.khoi ? GI.khoi.tinh(o) : null;
         case 'elip': case 'hypebol': {
           var F1 = diem(o.a), F2 = diem(o.b), Pc = diem(o.c); if (!F1 || !F2 || !Pc) return null;
           var cc = kc(F1, F2) / 2, d1 = kc(Pc, F1), d2 = kc(Pc, F2), Mc = { x: (F1.x + F2.x) / 2, y: (F1.y + F2.y) / 2 }, th = Math.atan2(F2.y - F1.y, F2.x - F1.x);
@@ -252,6 +253,7 @@ GI.hinh = (function () {
     }
     if (v.k === 'tron') return Math.abs(kc(M, v.c) - v.r);
     if (v.k === 'daGiac' || v.k === 'gapKhuc') { var m = Infinity, n = v.ds.length - (v.k === 'gapKhuc' ? 1 : 0); for (var i = 0; i < n; i++) m = Math.min(m, khoangCach({ k: 'thang', loai: 'doan', p: v.ds[i], q: v.ds[(i + 1) % v.ds.length] }, M)); return m; }
+    if (v.k === 'khoi') return GI.khoi.khoangCach(v, M);
     if (v.k === 'cong') {
       var mc = Infinity; v.nhanh.forEach(function (ds) { for (var j = 0; j + 1 < ds.length; j++) mc = Math.min(mc, khoangCach({ k: 'thang', loai: 'doan', p: ds[j], q: ds[j + 1] }, M)); });
       return mc;

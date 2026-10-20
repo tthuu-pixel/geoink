@@ -141,11 +141,30 @@ window.GI = window.GI || {};
     parabol: P('M4 4Q16 40 28 4', K, 2.2) + L(3, 29, 29, 29, R, 2) + D(16, 13),
     xoa: '<g transform="rotate(-35 16 16)"><rect x="5" y="10.5" width="22" height="11" rx="2.2" fill="#F9A8D4" stroke="#BE185D" stroke-width="1.6"/><rect x="5" y="10.5" width="8.5" height="11" rx="2.2" fill="#fff" stroke="#BE185D" stroke-width="1.6"/></g>' + L(15, 28.5, 28, 28.5, XAM, 1.6),
   };
+  // ----- Nhóm hình không gian (nét liền: cạnh thấy, nét đứt: cạnh khuất) -----
+  function NL(dd) { return P(dd, K, 1.9); }
+  function ND(dd) { return P(dd, K, 1.5, null, '2.4 2'); }
+  function d2(x, y) { return D(x, y, X, 2.2); }
+  B32.k_hop = NL('M4 13h17v14H4zM4 13l7-6h17l-7 6M28 7v14l-7 6') + ND('M4 27l7-6h17M11 21V7') + d2(4, 27) + d2(21, 27) + d2(4, 13);
+  B32.k_lapPhuong = NL('M5 11h15v16H5zM5 11l6-6h16l-7 6M27 5v16l-7 6') + ND('M5 27l6-6h16M11 21V5') + d2(5, 27) + d2(20, 27);
+  B32.k_lang3 = NL('M5 9v17M24 9v17M15 13v17M5 9L15 13 24 9zM5 26l10 4 9-4') + ND('M5 26h19') + d2(5, 26) + d2(15, 30) + d2(24, 26);
+  B32.k_lang4 = NL('M4 12h16v16H4zM4 12l7-6h17l-8 6M28 6v16l-8 6') + ND('M4 28l7-6h17M11 22V6') + d2(4, 28) + d2(20, 28);
+  B32.k_chop3 = NL('M16 4L4 25M16 4l12 21M16 4l-2 25M4 25l10 4 14-4') + ND('M4 25h24') + d2(16, 4) + d2(4, 25) + d2(14, 29) + d2(28, 25);
+  B32.k_chop4 = NL('M15 3L3 26M15 3l5 23M15 3l13 15M3 26h17l8-8') + ND('M3 26l8-8h17M15 3l-4 15') + d2(15, 3) + d2(3, 26) + d2(20, 26);
+  B32.k_tru = '<ellipse cx="16" cy="8" rx="10" ry="3.6" fill="none" stroke="' + K + '" stroke-width="1.9"/>' + NL('M6 8v17M26 8v17M6 25a10 3.6 0 0 0 20 0') + ND('M6 25a10 3.6 0 0 1 20 0M16 8v17h10') + d2(16, 8) + d2(16, 25);
+  B32.k_non = NL('M16 4L5 24M16 4l11 20M5 24a11 4 0 0 0 22 0') + ND('M5 24a11 4 0 0 1 22 0M16 4v20h11') + d2(16, 4) + d2(16, 24);
+  B32.k_cau = C(16, 16, 12, K, 1.9) + NL('M4 16a12 4 0 0 0 24 0') + ND('M4 16a12 4 0 0 1 24 0M16 16h12') + d2(16, 16);
+  // Logo GeoLab (giống trang web nckh-geolab.com)
+  var LOGO_GEOLAB = '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="38" height="38" rx="10" fill="#2451C7"/>' +
+    '<path d="M11 15 L22 10 L30 15 L30 27 L19 31 L11 27 Z" fill="#fff" fill-opacity=".16" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M11 15 L19 19 L30 15 M19 19 L19 31" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<path d="M22 10 L22 22 L11 27 M22 22 L30 27" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="2 2" opacity=".75"/></svg>';
   B32.moHinh = to24('moHinh');
   GI.BIEU_TUONG_CC = B;
   // biểu tượng hàng GeoGebra: nét mảnh (0,7 lần), khung nhìn sát hơn để hình to hơn
   function svg32(k) { return '<svg viewBox="1 1 30 30" xmlns="http://www.w3.org/2000/svg">' + B32[k].replace(/stroke-width="([\d.]+)"/g, function (m, w) { return 'stroke-width="' + (+w * 0.7).toFixed(2) + '"'; }) + '</svg>'; }
   GI.bieuTuong = function (k, hang2) {
+    if (k === 'moHinh' && hang2) return LOGO_GEOLAB;
     if (hang2 && B32[k]) return svg32(k);
     if (B32[k] && !B[k]) return svg32(k);
     return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + (B[k] || '') + '</svg>';
