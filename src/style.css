@@ -254,3 +254,9 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #menu-phai hr { border: 0; border-top: 1px solid #E2E8F0; margin: 4px 0; }
 #menu-phai .do { color: #DC2626; }
 .tt-nhieu { margin: 0 0 10px; padding: 6px 10px; border-radius: 6px; background: #EFF6FF; color: #1E40AF; font-size: 13.5px; }
+
+/* bút chì (to), mũi tên, bàn tay có màu ở hàng viết tay */
+#hang-viet [data-cc="but"] i { width: 40px; height: 40px; }
+#hang-viet [data-cc="but"] { width: 52px; }
+#hang-viet [data-cc="chon"] i, #hang-viet [data-cc="keo"] i { width: 32px; height: 32px; }
+#hang-dau #thong-tin { max-width: none; overflow: visible; }
