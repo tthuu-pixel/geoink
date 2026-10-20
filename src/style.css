@@ -259,4 +259,6 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #hang-viet [data-cc="but"] i { width: 40px; height: 40px; }
 #hang-viet [data-cc="but"] { width: 52px; }
 #hang-viet [data-cc="chon"] i, #hang-viet [data-cc="keo"] i { width: 32px; height: 32px; }
+#hang-viet [data-cc="dq"] i { width: 36px; height: 36px; }
+#hang-viet [data-cc="dq"] { width: 50px; }
 #hang-dau #thong-tin { max-width: none; overflow: visible; }

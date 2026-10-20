@@ -14,7 +14,7 @@ Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“M
 
 Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu tượng nét mảnh; công cụ đang dùng hiện trong ô đỏ sẫm):
 - **Hàng trên:** menu ☰ (bảng mới, mở, lưu, nhập PDF, xuất ảnh, nền trang, thêm/xoá trang), mở, lưu, hoàn tác, làm lại, nhập PDF, thêm trang; giữa là số trang và mức phóng; bên phải là toàn màn hình.
-- **Hàng viết tay:** bút chì (có màu), tẩy, bút dạ quang (mũi tên ⌄ để chỉnh độ dày, màu), các chấm màu bút, độ dày, màu dạ quang; bên phải là mũi tên chọn và bàn tay kéo trang.
+- **Hàng viết tay:** bút chì (có màu), tẩy, bút dạ quang (có màu) (mũi tên ⌄ để chỉnh độ dày, màu), các chấm màu bút, độ dày, màu dạ quang; bên phải là mũi tên chọn và bàn tay kéo trang.
 - **Hàng hình học (sắp xếp như GeoGebra):** điểm · đường · đường đặc biệt · đa giác · đường tròn · đường conic · góc và đo · biến hình · thanh trượt · di chuyển hình vẽ · chữ ABC, rồi mô hình GeoLab. Mỗi ô có tam giác ▽ ở góc; bấm lại vào ô đang chọn để mở danh sách công cụ cùng nhóm. Bên phải là nút bật/tắt số đo và hệ trục.
 - Chữ trong phần mềm dùng font Arial giống GeoGebra; tên điểm, tên đường trên bảng dùng font LaTeX (Latin Modern, chữ đứng).
 - **Cột trái:** vùng trắng riêng, hiện các trang nhỏ của tệp PDF. Kéo tay nắm ở mép phải cột để mở rộng / thu hẹp, bấm vào tay nắm để đóng / mở cột.

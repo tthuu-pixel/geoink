@@ -70,7 +70,7 @@
     xuong: '<path d="M7.5 10l4.5 4.5 4.5-4.5"/>',
     toanManHinh: '<path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/>',
   };
-  var BT_MAU = { but: 1, chon: 1, keo: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
+  var BT_MAU = { but: 1, dq: 1, chon: 1, keo: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
   function bieuTuong(k, hang2) {
     if (!hang2 && BT_MAU[k] && GI.bieuTuong) return GI.bieuTuong(k);
     if (!hang2 && BT_NET[k]) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + BT_NET[k] + '</svg>';

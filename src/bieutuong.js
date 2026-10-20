@@ -27,7 +27,7 @@ window.GI = window.GI || {};
     pdf: '<path d="M6 2.5h8.5L19 7v14.5H6z" fill="#fff" stroke="#DC2626" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 2.5V7H19" fill="#FECACA" stroke="#DC2626" stroke-width="1.6" stroke-linejoin="round"/><rect x="3" y="11" width="13" height="7" rx="1.6" fill="#DC2626"/><text x="9.5" y="16.6" text-anchor="middle" font-family="Segoe UI,Arial" font-weight="800" font-size="5.6" fill="#fff">PDF</text>',
     but: BUT_CHI,
     tay: '<g transform="rotate(-40 12 12)"><rect x="4" y="8" width="16" height="9" rx="2" fill="#F9A8D4"/><rect x="4" y="8" width="7" height="9" rx="2" fill="#fff" stroke="#DB2777" stroke-width="1.2"/><rect x="4" y="8" width="16" height="9" rx="2" fill="none" stroke="#DB2777" stroke-width="1.4"/></g>',
-    dq: '<g transform="rotate(40 12 12)"><rect x="9" y="1.5" width="6" height="11" rx="1.5" fill="#FACC15" stroke="#A16207" stroke-width="1"/><rect x="9" y="12" width="6" height="3.5" fill="#64748B"/><path d="M9.6 15.5h4.8l-1 4.6h-2.8z" fill="#FDE047" stroke="#A16207" stroke-width="1"/></g><path d="M3 21.5h12" stroke="#FDE047" stroke-width="3" stroke-linecap="round" opacity=".9"/>',
+    dq: '<g transform="rotate(40 12 12)"><rect x="9" y="1.2" width="6" height="11.5" rx="1.6" fill="#FACC15" stroke="#A16207" stroke-width="1"/><rect x="9" y="5" width="6" height="2" fill="#FDE68A"/><rect x="9" y="12.2" width="6" height="3.4" rx=".5" fill="#475569"/><path d="M9.7 15.6h4.6l-.9 4.3h-2.8z" fill="#FDE047" stroke="#A16207" stroke-width="1"/><path d="M10.6 19.9h2.8v1.1h-2.8z" fill="#EAB308"/></g><path d="M2.5 21.8h12.5" stroke="#FDE047" stroke-width="3.2" stroke-linecap="round"/>',
     chon: '<path d="M5.5 3.5L18 11.6l-5.7 1.5 3.4 6-2.4 1.4-3.4-6-4.4 4z" fill="#fff" stroke="#111827" stroke-width="1.6" stroke-linejoin="round"/>',
     keo: '<path d="M8 13V5.6a1.4 1.4 0 0 1 2.8 0V11M10.8 10.6V4.4a1.4 1.4 0 0 1 2.8 0v6.2M13.6 10.8V5.6a1.4 1.4 0 0 1 2.8 0v5.2M16.4 11.2V8.2a1.4 1.4 0 0 1 2.8 0v6.3c0 4-2.8 7-6.6 7-2.9 0-4.4-1.4-5.8-3.6L4.9 14.4a1.5 1.5 0 0 1 2.5-1.6L8 13.6" fill="#FDE7C8" stroke="#9A5B1F" stroke-width="1.4" stroke-linejoin="round"/>',
     toanManHinh: p('M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', DEN, 2),
@@ -169,7 +169,7 @@ window.GI = window.GI || {};
   }
   // bút chì: đầu ngòi ở góc dưới trái
   taoConTro('but', '<g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g>', 48, 5, 42, 'crosshair');
-  taoConTro('dq', '<g transform="translate(1 -1)">' + B.dq.replace(/<path d="M3 21.5h12".*$/, '') + '</g>', 32, 7, 26, 'crosshair');
+  taoConTro('dq', '<g transform="translate(1 -1)">' + B.dq.replace(/<path d="M2\.5 21\.8.*$/, '') + '</g>', 32, 7, 26, 'crosshair');
   // chữ thập đen viền trắng (dễ thấy trên nền trắng lẫn nền tối)
   var THAP = '<path d="M12 2v8M12 14v8M2 12h8M14 12h8" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M12 2.5v7.5M12 14v7.5M2.5 12h7.5M14 12h7.5" stroke="#111827" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1.3" fill="#111827" stroke="#fff" stroke-width=".8"/>';
   taoConTro('thap', THAP, 24, 12, 12, 'crosshair');

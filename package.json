@@ -1,7 +1,7 @@
 {
   "name": "geoink",
   "productName": "GeoInk",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "GeoInk – bảng viết tay cho giáo viên Toán: viết bằng bút, dựng hình, đo đạc, đồ thị hàm số, liên kết mô hình GeoLab.",
   "main": "main.js",
   "author": "Nhóm nghiên cứu khoa học trường TH-THCS An Lạc",
