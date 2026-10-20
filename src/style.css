@@ -301,3 +301,60 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #menu-dc button:hover { background: #F3F4F6; }
 #menu-dc button.bat { background: #F6E7E7; color: #6B1515; }
 #menu-dc button:last-child { border-top: 1px solid #F1F2F4; border-radius: 0 0 10px 10px; }
+
+/* ---------- Máy tính khoa học ---------- */
+#may-tinh { position: fixed; right: 24px; top: 70px; z-index: 44; width: 372px; padding: 12px 14px 16px; border-radius: 30px 30px 40px 40px;
+  background: linear-gradient(170deg, #34425E 0%, #1F2A40 55%, #182134 100%); box-shadow: 0 18px 40px rgba(15,23,42,.45), inset 0 1px 0 rgba(255,255,255,.12); font-family: Arial, sans-serif; user-select: none; }
+#may-tinh .mt-dau { display: flex; align-items: center; gap: 8px; padding: 0 4px 8px; cursor: move; }
+#may-tinh .mt-ten { color: #E2E8F0; font-weight: 700; font-size: 12px; letter-spacing: .12em; }
+#may-tinh .mt-phu { color: #94A3B8; font-size: 10px; letter-spacing: .1em; }
+#may-tinh .mt-dong { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
+#may-tinh .mt-lcd { height: 218px; border-radius: 12px; border: 6px solid #0F172A; background: linear-gradient(#DDE7D4, #CBD8C0); box-shadow: inset 0 3px 8px rgba(0,0,0,.25); padding: 4px 8px; display: flex; flex-direction: column; overflow: hidden; }
+#may-tinh .mt-tt { display: flex; gap: 6px; font: 700 10px Arial; color: rgba(17,24,39,.18); height: 14px; flex: none; }
+#may-tinh .mt-tt .bat { color: #111827; }
+#may-tinh .mt-tt .mt-cd { margin-left: auto; color: #334155; font-weight: 600; }
+#may-tinh .mt-man { flex: 1; position: relative; overflow: hidden; color: #111827; display: flex; flex-direction: column; }
+#may-tinh math-field { background: transparent; border: 0; outline: none; color: #111827; --caret-color: #111827; --selection-background-color: rgba(30,41,59,.18); --placeholder-color: #475569; }
+#may-tinh math-field::part(virtual-keyboard-toggle), #may-tinh math-field::part(menu-toggle) { display: none; }
+#may-tinh .mt-nhap { font-size: 24px; min-height: 64px; width: 100%; }
+#may-tinh .mt-nhap-nho { font-size: 20px; min-height: 40px; border-top: 1px dashed rgba(17,24,39,.35); }
+#may-tinh .mt-kq { margin-top: auto; text-align: right; min-height: 46px; }
+#may-tinh .mt-ket { font-size: 30px; display: inline-block; text-align: right; }
+#may-tinh .mt-tinh { pointer-events: none; }
+#may-tinh .mt-loi { font: 700 16px Arial; color: #7F1D1D; text-align: left; padding: 6px 0; }
+#may-tinh .mt-tb { position: absolute; left: 0; right: 0; bottom: 0; background: #111827; color: #ECFDF5; font: 12px Arial; padding: 4px 6px; border-radius: 4px; }
+#may-tinh .mt-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding-top: 4px; }
+#may-tinh .mt-mn { display: flex; align-items: center; gap: 6px; font: 13px Arial; padding: 4px; border-radius: 6px; }
+#may-tinh .mt-mn.chon { background: #111827; color: #ECFDF5; }
+#may-tinh .mt-mn-i { width: 34px; height: 26px; border-radius: 6px; background: #334155; color: #F8FAFC; display: grid; place-items: center; font: 12px Georgia, serif; }
+#may-tinh .mt-tieu-de { font: 700 13px Arial; padding: 2px 0 4px; border-bottom: 1px solid rgba(17,24,39,.25); }
+#may-tinh .mt-ds div { font: 15px Arial; padding: 4px 6px; border-radius: 6px; }
+#may-tinh .mt-ds div.chon { background: #111827; color: #ECFDF5; }
+#may-tinh .mt-luoi-cuon { flex: 1; overflow: auto; min-height: 0; }
+#may-tinh .mt-luoi { border-collapse: collapse; font: 14px Arial; margin-top: 4px; }
+#may-tinh .mt-luoi th { font-weight: 600; padding: 1px 6px; color: #334155; text-align: center; }
+#may-tinh .mt-luoi td { border: 1px solid rgba(17,24,39,.35); min-width: 54px; height: 24px; padding: 0 6px; text-align: right; background: rgba(255,255,255,.25); }
+#may-tinh .mt-luoi td.chon { background: #111827; color: #ECFDF5; }
+#may-tinh .mt-bang td { min-width: 70px; }
+#may-tinh .mt-bt { font-family: Georgia, serif; font-style: italic; }
+#may-tinh .mt-goi-y { font: 10.5px Arial; color: #475569; padding-top: 2px; flex: none; }
+#may-tinh .mt-kq-ds { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 4px; }
+#may-tinh .mt-kq-dong math-field { font-size: 19px; }
+#may-tinh .mt-vo { font: 600 14px Arial; padding: 4px 0; }
+#may-tinh .mt-ban-tren { display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px 7px; margin-top: 14px; }
+#may-tinh .mt-ban-so { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px 8px; margin-top: 14px; }
+#may-tinh .mt-k { position: relative; height: 38px; border: 0; border-radius: 10px; cursor: pointer; display: grid; place-items: center; padding: 0; font-family: Arial, sans-serif;
+  background: linear-gradient(#F8FAFC, #D9DEE6); color: #111827; box-shadow: 0 3px 0 #8B95A7, 0 4px 6px rgba(0,0,0,.35); margin-top: 10px; }
+#may-tinh .mt-k:active { transform: translateY(2px); box-shadow: 0 1px 0 #8B95A7; }
+#may-tinh .mt-k b { font-size: 19px; font-weight: 600; }
+#may-tinh .mt-k.nho { height: 30px; border-radius: 8px; background: linear-gradient(#4B5568, #2E3647); color: #F1F5F9; box-shadow: 0 2px 0 #0F172A, 0 3px 5px rgba(0,0,0,.4); }
+#may-tinh .mt-k.nho b { font-size: 13px; font-weight: 600; }
+#may-tinh .mt-k.mt-shift b { color: #FBBF24; font-size: 11px; } #may-tinh .mt-k.mt-alpha b { color: #FCA5A5; font-size: 11px; }
+#may-tinh .mt-k.mt-cn2 b { font-size: 11px; } #may-tinh .mt-k.mt-dh { background: linear-gradient(#64748B, #475569); }
+#may-tinh .mt-k.mt-xoa { background: linear-gradient(#FB923C, #EA580C); color: #fff; box-shadow: 0 3px 0 #9A3412, 0 4px 6px rgba(0,0,0,.35); }
+#may-tinh .mt-k.mt-xoa b { font-size: 15px; }
+#may-tinh .mt-k.mt-bang { background: linear-gradient(#60A5FA, #2563EB); color: #fff; box-shadow: 0 3px 0 #1E3A8A, 0 4px 6px rgba(0,0,0,.35); }
+#may-tinh .mt-s, #may-tinh .mt-a { position: absolute; top: -14px; font-size: 10px; font-weight: 700; white-space: nowrap; line-height: 1; }
+#may-tinh .mt-s { left: 1px; color: #FBBF24; } #may-tinh .mt-a { right: 1px; color: #FCA5A5; }
+#may-tinh .mt-ps { font-size: 9px; line-height: .8; display: inline-block; border-bottom: 0; }
+#may-tinh sup, #may-tinh sub { font-size: 70%; }

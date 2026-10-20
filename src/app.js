@@ -1355,7 +1355,7 @@
   }
 
   var LENH = {
-    moi: moi, mo: mo, nhapPdf: nhapPdf, congThuc: function () { moHopCongThuc(null); }, dungCu: function () { moMenuDungCu($('[data-lenh="dungCu"]')); }, luu: function () { luu(false); }, luuThanh: function () { luu(true); }, xuatAnh: xuatAnh, hoanTac: hoanTac, lamLai: lamLai,
+    moi: moi, mo: mo, nhapPdf: nhapPdf, congThuc: function () { moHopCongThuc(null); }, dungCu: function () { moMenuDungCu($('[data-lenh="dungCu"]')); }, mayTinh: function () { GI.mayTinh.batTat(); }, luu: function () { luu(false); }, luuThanh: function () { luu(true); }, xuatAnh: xuatAnh, hoanTac: hoanTac, lamLai: lamLai,
     xoaTrangNay: function () {
       if (tl.trang.length < 2) return LENH.xoaTrang();
       if (!window.confirm('Xoá trang ' + (tl.so + 1) + '?')) return;
