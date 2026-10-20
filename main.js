@@ -32,7 +32,30 @@ function taoCuaSo() {
   });
   ipcMain.removeAllListeners('dong-that');
   ipcMain.on('dong-that', () => { choDong = true; cuaSo.close(); });
+  ipcMain.removeAllListeners('cap-nhat-cai');
+  ipcMain.on('cap-nhat-cai', () => { choDong = true; setImmediate(() => autoUpdater.quitAndInstall(true, true)); });
+  cuaSo.webContents.once('did-finish-load', () => setTimeout(() => kiemTraCapNhat(false), 4000));
 }
+
+// ----- Tự cập nhật (bản mới phát hành trên GitHub Releases) -----
+// Có bản mới: báo giao diện hiện nút "Cập nhật"; người dùng bấm thì tải về, tải xong cài và mở lại app.
+const { autoUpdater } = require('electron-updater');
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+let dangKiemTra = false, banMoi = null;
+function guiCapNhat(loai, duLieu) { if (cuaSo && !cuaSo.isDestroyed()) cuaSo.webContents.send('cap-nhat', Object.assign({ loai }, duLieu || {})); }
+autoUpdater.on('update-available', (i) => { banMoi = i; guiCapNhat('co', { phienBan: i.version, ghiChu: typeof i.releaseNotes === 'string' ? i.releaseNotes : '' }); });
+autoUpdater.on('update-not-available', () => guiCapNhat('khong'));
+autoUpdater.on('download-progress', (p) => guiCapNhat('tien', { phanTram: Math.round(p.percent || 0) }));
+autoUpdater.on('update-downloaded', (i) => guiCapNhat('xong', { phienBan: i.version }));
+autoUpdater.on('error', (e) => guiCapNhat('loi', { loi: String((e && e.message) || e).split('\n')[0] }));
+function kiemTraCapNhat(tay) {
+  if (!app.isPackaged) { if (tay) guiCapNhat('loi', { loi: 'Chỉ kiểm tra được ở bản đã cài đặt' }); return; }
+  if (dangKiemTra) return; dangKiemTra = true;
+  autoUpdater.checkForUpdates().catch((e) => { if (tay) guiCapNhat('loi', { loi: String((e && e.message) || e).split('\n')[0] }); }).finally(() => { dangKiemTra = false; });
+}
+ipcMain.handle('cap-nhat-kiem-tra', () => { kiemTraCapNhat(true); return true; });
+ipcMain.handle('cap-nhat-tai', () => autoUpdater.downloadUpdate().then(() => true, (e) => { guiCapNhat('loi', { loi: String((e && e.message) || e).split('\n')[0] }); return false; }));
 
 // Chỉ chạy một cửa sổ; mở tệp .geoink khi đã chạy thì đưa vào cửa sổ hiện có
 if (!app.requestSingleInstanceLock()) app.quit();

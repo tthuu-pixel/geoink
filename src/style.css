@@ -366,3 +366,23 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #hop-tikz code { background: #F1F5F9; padding: 0 4px; border-radius: 4px; font-size: 12.5px; }
 #xuat-tex-ma { width: 100%; box-sizing: border-box; font: 13px/1.45 Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; resize: vertical; background: #F8FAFC; white-space: pre; }
 #hop-xuat-tex code { background: #F1F5F9; padding: 0 4px; border-radius: 4px; font-size: 12.5px; }
+/* Tự cập nhật */
+.nut-cap-nhat { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 6px; margin-right: 6px; border: 0; border-radius: 15px; background: #16A34A; color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; box-shadow: 0 2px 8px rgba(22,163,74,.35); animation: nhapNhay 2.4s ease-in-out infinite; }
+.nut-cap-nhat i svg { width: 20px; height: 20px; display: block; }
+.nut-cap-nhat i circle { fill: #fff; } .nut-cap-nhat i path { stroke: #16A34A; }
+.nut-cap-nhat:hover { background: #15803D; }
+.nut-cap-nhat.an { display: none; }
+@keyframes nhapNhay { 0%, 100% { box-shadow: 0 2px 8px rgba(22,163,74,.35); } 50% { box-shadow: 0 2px 16px rgba(22,163,74,.75); } }
+#the-cap-nhat { position: fixed; right: 18px; bottom: 18px; z-index: 60; width: 360px; max-width: calc(100vw - 36px); background: #fff; border-radius: 14px; box-shadow: 0 12px 40px rgba(15,23,42,.25); border: 1px solid #E2E8F0; padding: 14px 16px 14px; font-family: Arial, sans-serif; }
+#the-cap-nhat.an { display: none; }
+.tcn-dau { display: flex; align-items: center; gap: 8px; }
+.tcn-dau i svg { width: 24px; height: 24px; display: block; }
+.tcn-dau b { flex: 1; font-size: 15px; color: #0F172A; }
+.tcn-dong { border: 0; background: none; font-size: 20px; line-height: 1; color: #64748B; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.tcn-dong:hover { background: #F1F5F9; }
+#tcn-noi-dung { margin: 8px 0 10px; font-size: 13.5px; line-height: 1.45; color: #334155; }
+.tcn-thanh { height: 8px; border-radius: 4px; background: #E2E8F0; overflow: hidden; margin-bottom: 10px; }
+.tcn-thanh.an { display: none; }
+.tcn-thanh span { display: block; height: 100%; width: 0; background: #16A34A; transition: width .3s; }
+.tcn-nut { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.tcn-nut:empty { display: none; }

@@ -1417,6 +1417,7 @@
     truc: function () { ghiLichSu(); trang().truc = !trang().truc; if (trang().truc) { V.x = -W / 2 / V.s; V.y = -Hh / 2 / V.s; } capNhatNutBat(); canVe(); },
     soDo: function () { hienSo = !hienSo; capNhatNutBat(); canVe(); },
     nhapTex: function () { LENH.nhapTikz(); },
+    kiemTraCapNhat: function () { $('#menu').classList.add('an'); if (!MT || !MT.kiemTraCapNhat) return thongBao('Chỉ kiểm tra cập nhật được trong app đã cài'); capNhat.tay = true; thongBao('Đang kiểm tra bản mới…'); MT.kiemTraCapNhat(); },
     xuatTex: function () {
       var ids = nhom.filter(function (x) { return x.h; }).map(function (x) { return x.h; });
       if (ids.length) return xuatTexChon(ids);
@@ -2386,6 +2387,51 @@
     thongBao('Đã dựng hình từ mã TikZ' + (mo ? ': ' + mo : '') + (kq.canhBao.length ? ' · ' + kq.canhBao.length + ' chỗ bỏ qua' : ''));
     return kq;
   }
+  // ----- Tự cập nhật: báo có bản mới → bấm Cập nhật → tải về → cài và mở lại -----
+  var capNhat = { ban: null, dangTai: false, tay: false };
+  function theCapNhat(tieuDe, noiDung, nut, tien) {
+    var el = $('#the-cap-nhat'); el.classList.remove('an');
+    $('#tcn-tieu-de').textContent = tieuDe; $('#tcn-noi-dung').innerHTML = noiDung;
+    $('#tcn-thanh').classList.toggle('an', tien == null); if (tien != null) $('#tcn-tien').style.width = tien + '%';
+    var kn = $('#tcn-nut'); kn.innerHTML = '';
+    (nut || []).forEach(function (n) { var b = document.createElement('button'); b.className = 'nut chu' + (n.chinh ? ' chinh' : ''); b.textContent = n.ten; b.onclick = n.lam; kn.appendChild(b); });
+  }
+  function dongTheCapNhat() { $('#the-cap-nhat').classList.add('an'); }
+  function moiCapNhat() {
+    if (!capNhat.ban) return;
+    theCapNhat('Có bản GeoInk ' + capNhat.ban + ' mới', 'Bản bạn đang dùng cũ hơn. Bấm <b>Cập nhật</b> để tải về và cài; GeoInk sẽ tự mở lại sau khi cài xong.',
+      [{ ten: 'Để sau', lam: dongTheCapNhat }, { ten: 'Cập nhật', chinh: true, lam: batDauTai }]);
+  }
+  function batDauTai() {
+    if (capNhat.dangTai) return; capNhat.dangTai = true;
+    theCapNhat('Đang tải GeoInk ' + capNhat.ban, 'Vẫn dùng bảng bình thường trong lúc tải.', [], 0);
+    MT.taiCapNhat();
+  }
+  function caiDat() {
+    theCapNhat('Đang cài GeoInk ' + capNhat.ban, 'GeoInk sẽ đóng lại và tự mở lên sau khi cài xong.', []);
+    setTimeout(function () { MT.caiCapNhat(); }, 600);
+  }
+  function taiXong() {
+    capNhat.dangTai = false;
+    if (!daSua) return caiDat();
+    theCapNhat('Đã tải xong GeoInk ' + capNhat.ban, 'Bảng đang có thay đổi chưa lưu. Lưu lại trước khi cài bản mới?',
+      [{ ten: 'Để sau', lam: function () { dongTheCapNhat(); thongBao('Bản mới sẽ tự cài khi bạn đóng GeoInk'); } },
+       { ten: 'Cài, không lưu', lam: caiDat },
+       { ten: 'Lưu rồi cài', chinh: true, lam: function () { luu().then(function (ok) { if (ok) caiDat(); }); } }]);
+  }
+  if (MT && MT.khiCapNhat) MT.khiCapNhat(function (d) {
+    if (d.loai === 'co') { capNhat.ban = d.phienBan; var nb = $('#nut-cap-nhat'); nb.classList.remove('an'); nb.title = 'Có bản GeoInk ' + d.phienBan + ' — bấm để cập nhật'; if (!capNhat.dangTai) moiCapNhat(); capNhat.tay = false; }
+    else if (d.loai === 'khong') { if (capNhat.tay) thongBao('Bạn đang dùng bản GeoInk mới nhất'); capNhat.tay = false; }
+    else if (d.loai === 'tien') { if (capNhat.dangTai) { $('#tcn-thanh').classList.remove('an'); $('#tcn-tien').style.width = d.phanTram + '%'; $('#tcn-noi-dung').textContent = 'Đã tải ' + d.phanTram + '% · vẫn dùng bảng bình thường trong lúc tải.'; } }
+    else if (d.loai === 'xong') taiXong();
+    else if (d.loai === 'loi') {
+      if (capNhat.dangTai) { capNhat.dangTai = false; theCapNhat('Chưa cập nhật được', 'Lỗi: ' + escHtml(d.loi) + '<br>Kiểm tra mạng rồi thử lại.', [{ ten: 'Đóng', lam: dongTheCapNhat }, { ten: 'Thử lại', chinh: true, lam: batDauTai }]); }
+      else if (capNhat.tay) thongBao('Không kiểm tra được cập nhật: ' + d.loi);
+      capNhat.tay = false;
+    }
+  });
+  $('#nut-cap-nhat').onclick = function () { if (capNhat.dangTai) $('#the-cap-nhat').classList.remove('an'); else moiCapNhat(); };
+  $('#tcn-dong').onclick = dongTheCapNhat;
   var choXuatTex = false;
   function xuatTexChon(ids) {
     var ma = null; try { ma = GI.xuatTex.xuat(trang().hinh, ids, giaTri); } catch (e) { return thongBao('Không xuất được mã: ' + (e.message || e)); }

@@ -20,11 +20,32 @@
     "appId": "vn.geolab.geoink",
     "productName": "GeoInk",
     "copyright": "Nhóm nghiên cứu khoa học trường TH-THCS An Lạc",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["main.js", "preload.js", "src/**/*", "package.json"],
-    "fileAssociations": [{ "ext": "geoink", "name": "Bảng GeoInk", "description": "Bảng GeoInk" }],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "geoink",
+        "name": "Bảng GeoInk",
+        "description": "Bảng GeoInk"
+      }
+    ],
     "win": {
-      "target": [{ "target": "nsis-web", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis-web",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.ico"
     },
     "nsisWeb": {
@@ -36,6 +57,16 @@
       "shortcutName": "GeoInk",
       "artifactName": "GeoInk-Setup-${version}.${ext}"
     },
-    "publish": [{ "provider": "github", "owner": "tthuu-pixel", "repo": "geoink", "releaseType": "release" }]
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "tthuu-pixel",
+        "repo": "geoink",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
   }
 }

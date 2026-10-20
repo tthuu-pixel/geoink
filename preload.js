@@ -13,4 +13,9 @@ contextBridge.exposeInMainWorld('mayTinh', {
   khiMoTep: (f) => ipcRenderer.on('mo-tep', (e, d) => f(d)),
   khiHoiDong: (f) => ipcRenderer.on('hoi-dong', () => f()),
   dongThat: () => ipcRenderer.send('dong-that'),
+  // tự cập nhật
+  khiCapNhat: (f) => ipcRenderer.on('cap-nhat', (e, d) => f(d)),
+  kiemTraCapNhat: () => ipcRenderer.invoke('cap-nhat-kiem-tra'),
+  taiCapNhat: () => ipcRenderer.invoke('cap-nhat-tai'),
+  caiCapNhat: () => ipcRenderer.send('cap-nhat-cai'),
 });
