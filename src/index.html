@@ -20,6 +20,8 @@
   <div class="gian"></div>
   <span id="thong-tin" title="Bấm để về 100%">1 / 1 · 100%</span>
   <div class="gian"></div>
+  <button class="nguoi-dung an" id="nguoi-dung"></button>
+  <button class="nut-cap-nhat an" id="nut-cap-nhat" title="Có bản GeoInk mới"><i data-bt="capNhat"></i><span>Cập nhật</span></button>
   <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i></button>
 </header>
 
@@ -35,6 +37,8 @@
   <button class="nut" data-lenh="congThuc" title="Chèn công thức"><i data-bt="congThuc"></i></button>
   <button class="nut" data-lenh="mayTinh" title="Máy tính khoa học"><i data-bt="mayTinh"></i></button>
   <button class="nut" data-lenh="dungCu" title="Dụng cụ học tập"><i data-bt="dungCu"></i></button>
+  <button class="nut" data-lenh="nhapTex" title="Nhập mã TeX (TikZ) để dựng hình"><i data-bt="nhapTex"></i></button>
+  <button class="nut" data-lenh="xuatTex" title="Quét hình rồi xuất mã TeX (TikZ)"><i data-bt="xuatTex"></i></button>
   <div class="gian"></div>
   <span class="ke"></span>
   <button class="nut" data-cc="chon" title="Chọn (T)"><i data-bt="chon"></i></button>
@@ -79,6 +83,7 @@
   <button data-lenh="xoaTrangNay"><i data-bt="xoa"></i>Xoá trang này</button>
   <hr>
   <button data-lenh="toanManHinh"><i data-bt="toanManHinh"></i>Toàn màn hình<kbd>F11</kbd></button>
+  <button data-lenh="kiemTraCapNhat"><i data-bt="capNhat"></i>Kiểm tra cập nhật</button>
   <div class="phien-ban" id="phien-ban">GeoInk</div>
 </div>
 
@@ -124,6 +129,15 @@
   </div>
 </div>
 
+<div id="hop-xuat-tex" class="hop an" role="dialog" aria-label="Mã TikZ của hình">
+  <div class="hop-noi-dung rong">
+    <h2>Mã TikZ của hình</h2>
+    <p class="ghi-chu">Mã TikZ thuần theo khung 4 bước (khai báo điểm → vẽ → chú thích → xuất hiện điểm). Cần <code>\usetikzlibrary{angles, quotes, calc, intersections}</code>.</p>
+    <textarea id="xuat-tex-ma" spellcheck="false" rows="18" readonly></textarea>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Đóng</button><button class="nut chu chinh" id="xuat-tex-chep">Sao chép mã</button></div>
+  </div>
+</div>
+
 <div id="hop-nhap" class="hop an" role="dialog">
   <div class="hop-noi-dung">
     <h2>Nhập</h2>
@@ -133,6 +147,45 @@
   </div>
 </div>
 
+<div id="dang-nhap" class="an">
+  <section class="dn-trai">
+    <div class="dn-hieu"><img src="icon.png" alt=""><div><b>GeoInk</b><small>Bảng viết tay &amp; dựng hình cho giáo viên Toán</small></div></div>
+    <h1>Viết, vẽ, dựng hình<br><span>trên cùng một bảng.</span></h1>
+    <p class="dn-khau-hieu">Dùng chung tài khoản với GeoLab – Hình học tương tác THCS</p>
+    <svg class="dn-minh-hoa" viewBox="0 0 420 230" aria-hidden="true">
+      <g fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="150" cy="128" r="92" opacity=".5"/>
+        <path d="M150 36 L70 174 L238 160 Z"/>
+        <path d="M150 36 L150 168" stroke-dasharray="7 6" opacity=".8"/>
+        <path d="M150 156h12v12" stroke-width="2"/>
+        <path d="M262 182 c30 -40 60 -70 120 -88" stroke="#FDE68A" stroke-width="3.2"/>
+        <g transform="translate(382 94) rotate(40)" stroke="none"><rect x="-7" y="-64" width="14" height="48" rx="2" fill="#FDE68A"/><rect x="-7" y="-70" width="14" height="8" rx="2" fill="#F9A8D4"/><path d="M-7 -16 L0 0 L7 -16 Z" fill="#fff"/></g>
+      </g>
+      <g fill="#fff"><circle cx="150" cy="36" r="5"/><circle cx="70" cy="174" r="5"/><circle cx="238" cy="160" r="5"/><circle cx="150" cy="168" r="4.5"/></g>
+    </svg>
+    <div class="dn-diem"><span>Viết tay mượt</span><span>Dựng hình động</span><span>Mô hình GeoLab</span><span>Nhập / xuất mã TikZ</span></div>
+    <div class="dn-chan">Nhóm nghiên cứu khoa học trường TH-THCS An Lạc</div>
+  </section>
+  <section class="dn-phai">
+    <form id="dn-form" class="dn-the" autocomplete="on">
+      <h2>Đăng nhập</h2>
+      <p class="dn-phu">Dùng tài khoản <b>GeoLab</b> (nckh-geolab.com). Một tài khoản dùng cho cả hai hệ thống.</p>
+      <div class="dn-loi" id="dn-loi" role="alert"></div>
+      <label class="dn-truong"><span>Tên đăng nhập</span><input id="dn-ten" autocomplete="username" spellcheck="false" autocapitalize="off"></label>
+      <label class="dn-truong"><span>Mật khẩu</span><span class="dn-mk"><input id="dn-mk" type="password" autocomplete="current-password"><button type="button" id="dn-hien-mk" title="Hiện / ẩn mật khẩu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+      <label class="dn-nho"><input type="checkbox" id="dn-nho" checked> Ghi nhớ đăng nhập trên máy này</label>
+      <button class="dn-nut" id="dn-nut" type="submit"><span>Đăng nhập</span></button>
+      <p class="dn-ghi-chu">Chưa có tài khoản? Liên hệ quản trị viên GeoLab để được cấp.</p>
+    </form>
+  </section>
+</div>
+
+<div id="the-cap-nhat" class="an" role="alertdialog" aria-label="Cập nhật GeoInk">
+  <div class="tcn-dau"><i data-bt="capNhat"></i><b id="tcn-tieu-de">Có bản GeoInk mới</b><button class="tcn-dong" id="tcn-dong" title="Để sau">×</button></div>
+  <p id="tcn-noi-dung"></p>
+  <div class="tcn-thanh an" id="tcn-thanh"><span id="tcn-tien"></span></div>
+  <div class="tcn-nut" id="tcn-nut"></div>
+</div>
 <div id="tuy-chon-but" class="an"></div>
 <div id="thong-bao" class="an"></div>
 
@@ -147,7 +200,9 @@
 <script src="maytinh.js"></script>
 <script src="khoi.js"></script>
 <script src="tikz.js"></script>
+<script src="xuattex.js"></script>
 <script src="hinh.js"></script>
+<script src="taikhoan.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

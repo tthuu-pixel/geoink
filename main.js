@@ -1,5 +1,5 @@
 // GeoInk – tiến trình chính (cửa sổ, hộp thoại lưu/mở, mở link GeoLab)
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, net } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -32,7 +32,30 @@ function taoCuaSo() {
   });
   ipcMain.removeAllListeners('dong-that');
   ipcMain.on('dong-that', () => { choDong = true; cuaSo.close(); });
+  ipcMain.removeAllListeners('cap-nhat-cai');
+  ipcMain.on('cap-nhat-cai', () => { choDong = true; setImmediate(() => autoUpdater.quitAndInstall(true, true)); });
+  cuaSo.webContents.once('did-finish-load', () => setTimeout(() => kiemTraCapNhat(false), 4000));
 }
+
+// ----- Tự cập nhật (bản mới phát hành trên GitHub Releases) -----
+// Có bản mới: báo giao diện hiện nút "Cập nhật"; người dùng bấm thì tải về, tải xong cài và mở lại app.
+const { autoUpdater } = require('electron-updater');
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+let dangKiemTra = false, banMoi = null;
+function guiCapNhat(loai, duLieu) { if (cuaSo && !cuaSo.isDestroyed()) cuaSo.webContents.send('cap-nhat', Object.assign({ loai }, duLieu || {})); }
+autoUpdater.on('update-available', (i) => { banMoi = i; guiCapNhat('co', { phienBan: i.version, ghiChu: typeof i.releaseNotes === 'string' ? i.releaseNotes : '' }); });
+autoUpdater.on('update-not-available', () => guiCapNhat('khong'));
+autoUpdater.on('download-progress', (p) => guiCapNhat('tien', { phanTram: Math.round(p.percent || 0) }));
+autoUpdater.on('update-downloaded', (i) => guiCapNhat('xong', { phienBan: i.version }));
+autoUpdater.on('error', (e) => guiCapNhat('loi', { loi: String((e && e.message) || e).split('\n')[0] }));
+function kiemTraCapNhat(tay) {
+  if (!app.isPackaged) { if (tay) guiCapNhat('loi', { loi: 'Chỉ kiểm tra được ở bản đã cài đặt' }); return; }
+  if (dangKiemTra) return; dangKiemTra = true;
+  autoUpdater.checkForUpdates().catch((e) => { if (tay) guiCapNhat('loi', { loi: String((e && e.message) || e).split('\n')[0] }); }).finally(() => { dangKiemTra = false; });
+}
+ipcMain.handle('cap-nhat-kiem-tra', () => { kiemTraCapNhat(true); return true; });
+ipcMain.handle('cap-nhat-tai', () => autoUpdater.downloadUpdate().then(() => true, (e) => { guiCapNhat('loi', { loi: String((e && e.message) || e).split('\n')[0] }); return false; }));
 
 // Chỉ chạy một cửa sổ; mở tệp .geoink khi đã chạy thì đưa vào cửa sổ hiện có
 if (!app.requestSingleInstanceLock()) app.quit();
@@ -82,3 +105,17 @@ ipcMain.handle('xuat-anh', async (e, { duLieu, ten }) => {
 ipcMain.handle('mo-link', (e, url) => { if (/^https?:\/\//.test(url)) shell.openExternal(url); return true; });
 ipcMain.handle('toan-man-hinh', () => { if (cuaSo) cuaSo.setFullScreen(!cuaSo.isFullScreen()); return cuaSo ? cuaSo.isFullScreen() : false; });
 ipcMain.handle('phien-ban', () => app.getVersion());
+
+// ----- Tài khoản GeoLab (dùng chung với trang nckh-geolab.com) -----
+// Gọi cùng máy chủ Apps Script mà trang GeoLab dùng: { hd: 'dangNhap' | 'kiemTra' | 'dangXuat', token, ... }
+const GEOLAB_API = 'https://script.google.com/macros/s/AKfycbyDF-5Rkt6jlgPU1SoAExgp3gzU7hmgel7WP8cMqKc0YclwLS-eGdHNXCyhlzcwYu72RQ/exec';
+ipcMain.handle('tai-khoan', async (e, { hd, duLieu }) => {
+  if (!/^(dangNhap|kiemTra|dangXuat|doiMatKhau)$/.test(hd)) return { ok: false, loi: 'Yêu cầu không hợp lệ.' };
+  try {
+    const r = await net.fetch(GEOLAB_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ hd }, duLieu || {})), redirect: 'follow' });
+    const t = await r.text();
+    try { return JSON.parse(t); } catch (err) { return { ok: false, mang: true, loi: 'Máy chủ trả lời không hợp lệ. Thử lại sau.' }; }
+  } catch (err) {
+    return { ok: false, mang: true, loi: 'Không kết nối được máy chủ GeoLab. Kiểm tra mạng rồi thử lại.' };
+  }
+});
