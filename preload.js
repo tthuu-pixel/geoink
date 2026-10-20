@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('mayTinh', {
   luu: (noiDung, ten, hoiLai) => ipcRenderer.invoke('luu', { noiDung, ten, hoiLai }),
   mo: () => ipcRenderer.invoke('mo'),
+  moPdf: () => ipcRenderer.invoke('mo-pdf'),
   xuatAnh: (duLieu, ten) => ipcRenderer.invoke('xuat-anh', { duLieu, ten }),
   moLink: (url) => ipcRenderer.invoke('mo-link', url),
   toanManHinh: () => ipcRenderer.invoke('toan-man-hinh'),

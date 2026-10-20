@@ -11,11 +11,34 @@
 //   { id, loai: 'vuongGoc' | 'songSong', d, a }    đường qua a vuông góc / song song với d
 //   { id, loai: 'daGiac', ds: [id…] }              đa giác
 //   { id, loai: 'doDai', a, b } · { id, loai: 'goc', a, o, b }   số đo
-//   { id, loai: 'hamSo', bt }                      đồ thị y = f(x)
+//   { id, loai: 'hamSo', bt }                      đồ thị y = f(x) (dùng được tên thanh trượt)
+//   Mới: trungTruc, phanGiac, daGiacDeu (+ dinhDG), tronBanKinh, compa, tron3, banNguyet, cungTam, cung3, quatTam, quat3,
+//        tam, diemCach (đoạn có độ dài cố định), gapKhuc, gocVuong, dienTich, bienHinh, thanhTruot, chu
 window.GI = window.GI || {};
 GI.hinh = (function () {
-  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1 };
-  var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1 };
+  var DV = 40;   // 1 cm = 40 đơn vị thế giới
+  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1 };
+  var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1 };
+  var LA_TRON = { tron: 1, tronBanKinh: 1, compa: 1, tron3: 1 };
+  var LA_CUNG = { banNguyet: 1, cungTam: 1, cung3: 1, quatTam: 1, quat3: 1 };
+  // Các trường chứa id đối tượng khác (để tìm đối tượng phụ thuộc)
+  var TRUONG_REF = ['a', 'b', 'c', 'o', 'd', 'tren', 'o1', 'o2', 'nguon', 'tam', 'truc', 'tron', 'v1', 'v2', 'dg'];
+  function tamNgoaiTiep(A, B, C) {
+    var d = 2 * (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)); if (Math.abs(d) < 1e-9) return null;
+    var a2 = A.x * A.x + A.y * A.y, b2 = B.x * B.x + B.y * B.y, c2 = C.x * C.x + C.y * C.y;
+    var O = { x: (a2 * (B.y - C.y) + b2 * (C.y - A.y) + c2 * (A.y - B.y)) / d, y: (a2 * (C.x - B.x) + b2 * (A.x - C.x) + c2 * (B.x - A.x)) / d };
+    return { c: O, r: Math.hypot(A.x - O.x, A.y - O.y) };
+  }
+  function goc(P, C) { return Math.atan2(P.y - C.y, P.x - C.x); }
+  function chuanHoa(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a <= -Math.PI) a += 2 * Math.PI; return a; }
+  function quetDuong(a) { while (a < 0) a += 2 * Math.PI; while (a >= 2 * Math.PI) a -= 2 * Math.PI; return a; }   // 0..2π
+  // Cung qua 3 điểm A → B → C trên đường tròn ngoại tiếp
+  function cungQua3(A, B, C) {
+    var T = tamNgoaiTiep(A, B, C); if (!T) return null;
+    var a0 = goc(A, T.c), sAB = quetDuong(goc(B, T.c) - a0), sAC = quetDuong(goc(C, T.c) - a0);
+    var da = sAB < sAC ? sAC : sAC - 2 * Math.PI;   // đi qua B
+    return { c: T.c, r: T.r, a0: a0, da: da };
+  }
 
   function hieu(a, b) { return { x: a.x - b.x, y: a.y - b.y }; }
   function dai(v) { return Math.hypot(v.x, v.y); }
@@ -53,7 +76,8 @@ GI.hinh = (function () {
 
   // Tính giá trị (toạ độ) của mọi đối tượng. Trả về { id: giá trị | null }
   function tinh(ds) {
-    var gt = {}, theoId = {};
+    var gt = {}, theoId = {}, bien = {};
+    ds.forEach(function (o) { if (o.loai === 'thanhTruot' && o.ten) bien[o.ten] = o.gt; });
     ds.forEach(function (o) { theoId[o.id] = o; });
     function lay(id) {
       if (id in gt) return gt[id];
@@ -63,6 +87,35 @@ GI.hinh = (function () {
       return gt[id];
     }
     function diem(id) { var v = lay(id); return v && v.k === 'diem' ? v : null; }
+    // Phép biến hình áp dụng lên giá trị v của đối tượng nguồn
+    function bienHinh(o, v) {
+      if (!v) return null;
+      var f, lat = false, kTL = 1;
+      if (o.kieu === 'dxTruc') {
+        var L = lay(o.truc); if (!L || L.k !== 'thang') return null; lat = true;
+        f = function (P) { var u = hieu(L.q, L.p), t = ((P.x - L.p.x) * u.x + (P.y - L.p.y) * u.y) / (u.x * u.x + u.y * u.y), K = { x: L.p.x + u.x * t, y: L.p.y + u.y * t }; return { x: 2 * K.x - P.x, y: 2 * K.y - P.y }; };
+      } else if (o.kieu === 'dxTam') {
+        var I = diem(o.tam); if (!I) return null; f = function (P) { return { x: 2 * I.x - P.x, y: 2 * I.y - P.y }; };
+      } else if (o.kieu === 'quay') {
+        var Q = diem(o.tam); if (!Q) return null; var a = -(o.goc || 0) * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);   // góc dương = ngược chiều kim đồng hồ trên màn hình
+        f = function (P) { var x = P.x - Q.x, y = P.y - Q.y; return { x: Q.x + x * cs - y * sn, y: Q.y + x * sn + y * cs }; };
+      } else if (o.kieu === 'tinhTien') {
+        var V1 = diem(o.v1), V2 = diem(o.v2); if (!V1 || !V2) return null; f = function (P) { return { x: P.x + V2.x - V1.x, y: P.y + V2.y - V1.y }; };
+      } else if (o.kieu === 'viTu') {
+        var T = diem(o.tam); if (!T) return null; kTL = o.k == null ? 2 : o.k; f = function (P) { return { x: T.x + (P.x - T.x) * kTL, y: T.y + (P.y - T.y) * kTL }; };
+      } else if (o.kieu === 'nghichDao') {
+        var C = lay(o.tron); if (!C || C.k !== 'tron' || v.k !== 'diem') return null;
+        var dx = v.x - C.c.x, dy = v.y - C.c.y, d2 = dx * dx + dy * dy; if (d2 < 1e-9) return null;
+        return { k: 'diem', x: C.c.x + dx * C.r * C.r / d2, y: C.c.y + dy * C.r * C.r / d2 };
+      } else return null;
+      function d(P) { var R = f(P); return { k: 'diem', x: R.x, y: R.y }; }
+      if (v.k === 'diem') return d(v);
+      if (v.k === 'thang') return { k: 'thang', loai: v.loai, p: d(v.p), q: d(v.q) };
+      if (v.k === 'tron') return { k: 'tron', c: d(v.c), r: v.r * Math.abs(kTL) };
+      if (v.k === 'daGiac' || v.k === 'gapKhuc') return { k: v.k, ds: v.ds.map(d) };
+      if (v.k === 'cung') { var C2 = d(v.c), S2 = d({ x: v.c.x + v.r * Math.cos(v.a0), y: v.c.y + v.r * Math.sin(v.a0) }); return { k: 'cung', c: C2, r: v.r * Math.abs(kTL), a0: goc(S2, C2), da: lat ? -v.da : v.da, quat: v.quat }; }
+      return null;
+    }
     function tinhMot(o) {
       switch (o.loai) {
         case 'diem': return { k: 'diem', x: o.x, y: o.y };
@@ -98,9 +151,65 @@ GI.hinh = (function () {
           return { k: 'goc', a: A6, o: O6, b: B6, a1: a1, da: da, do: Math.abs(da) * 180 / Math.PI };
         }
         case 'hamSo': {
-          if (!o._f || o._bt !== o.bt) { try { var r = GI.bieuThuc.doc(o.bt); o._f = r.f; o._ve = r.ve; o._bt = o.bt; } catch (e) { return null; } }
-          return { k: 'ham', f: o._f, ve: o._ve };
+          var khoaBien = Object.keys(bien).join(',');
+          if (!o._f || o._bt !== o.bt || o._kb !== khoaBien) { try { var r = GI.bieuThuc.doc(o.bt, Object.keys(bien)); o._f = r.f; o._ve = r.ve; o._bt = o.bt; o._kb = khoaBien; } catch (e) { return null; } }
+          var fh = o._f; return { k: 'ham', f: function (x) { return fh(x, bien); }, ve: o._ve };
         }
+        case 'tam': { var Tt = lay(o.d); return Tt && (Tt.k === 'tron' || Tt.k === 'cung') ? { k: 'diem', x: Tt.c.x, y: Tt.c.y } : null; }
+        case 'diemCach': { var Ac = diem(o.a); return Ac ? { k: 'diem', x: Ac.x + o.l * DV * Math.cos(o.t || 0), y: Ac.y + o.l * DV * Math.sin(o.t || 0) } : null; }
+        case 'trungTruc': {
+          var At = diem(o.a), Bt = diem(o.b); if (!At || !Bt || kc(At, Bt) < 1e-9) return null;
+          var Mt = { x: (At.x + Bt.x) / 2, y: (At.y + Bt.y) / 2 };
+          return { k: 'thang', loai: 'duong', p: Mt, q: { x: Mt.x - (Bt.y - At.y), y: Mt.y + (Bt.x - At.x) } };
+        }
+        case 'phanGiac': {
+          var Ap = diem(o.a), Op = diem(o.o), Bp = diem(o.b); if (!Ap || !Op || !Bp) return null;
+          var u1 = hieu(Ap, Op), u2 = hieu(Bp, Op), l1 = dai(u1), l2 = dai(u2); if (l1 < 1e-9 || l2 < 1e-9) return null;
+          var w2 = { x: u1.x / l1 + u2.x / l2, y: u1.y / l1 + u2.y / l2 }; if (dai(w2) < 1e-9) w2 = { x: -u1.y / l1, y: u1.x / l1 };
+          return { k: 'thang', loai: 'duong', p: Op, q: { x: Op.x + w2.x * 100, y: Op.y + w2.y * 100 } };
+        }
+        case 'daGiacDeu': {
+          var A7 = diem(o.a), B7 = diem(o.b); if (!A7 || !B7 || o.n < 3) return null;
+          var ps7 = [A7, B7], ngoai = -2 * Math.PI / o.n;
+          for (var i7 = 2; i7 < o.n; i7++) {
+            var P1 = ps7[i7 - 1], P0 = ps7[i7 - 2], e7 = hieu(P1, P0), cs = Math.cos(ngoai), sn = Math.sin(ngoai);
+            ps7.push({ k: 'diem', x: P1.x + e7.x * cs - e7.y * sn, y: P1.y + e7.x * sn + e7.y * cs });
+          }
+          return { k: 'daGiac', ds: ps7 };
+        }
+        case 'dinhDG': { var G = lay(o.dg); return G && G.ds[o.i] ? { k: 'diem', x: G.ds[o.i].x, y: G.ds[o.i].y } : null; }
+        case 'tronBanKinh': { var Or = diem(o.o); return Or ? { k: 'tron', c: Or, r: Math.abs(o.r) * DV } : null; }
+        case 'compa': { var Oc = diem(o.o), Ac2 = diem(o.a), Bc2 = diem(o.b); return Oc && Ac2 && Bc2 ? { k: 'tron', c: Oc, r: kc(Ac2, Bc2) } : null; }
+        case 'tron3': { var A8 = diem(o.a), B8 = diem(o.b), C8 = diem(o.c); var T8 = A8 && B8 && C8 && tamNgoaiTiep(A8, B8, C8); return T8 ? { k: 'tron', c: T8.c, r: T8.r } : null; }
+        case 'banNguyet': {
+          var A9 = diem(o.a), B9 = diem(o.b); if (!A9 || !B9 || kc(A9, B9) < 1e-9) return null;
+          var M9 = { x: (A9.x + B9.x) / 2, y: (A9.y + B9.y) / 2 };
+          return { k: 'cung', c: M9, r: kc(A9, B9) / 2, a0: goc(A9, M9), da: Math.PI };   // A trái, B phải → nửa phía trên
+        }
+        case 'cungTam': case 'quatTam': {
+          var Ok = diem(o.o), Ak = diem(o.a), Bk = diem(o.b); if (!Ok || !Ak || !Bk || kc(Ok, Ak) < 1e-9) return null;
+          var a0k = goc(Ak, Ok); return { k: 'cung', c: Ok, r: kc(Ok, Ak), a0: a0k, da: -quetDuong(a0k - goc(Bk, Ok)), quat: o.loai === 'quatTam' };
+        }
+        case 'cung3': case 'quat3': {
+          var Ak3 = diem(o.a), Bk3 = diem(o.b), Ck3 = diem(o.c); var K3 = Ak3 && Bk3 && Ck3 && cungQua3(Ak3, Bk3, Ck3);
+          return K3 ? { k: 'cung', c: K3.c, r: K3.r, a0: K3.a0, da: K3.da, quat: o.loai === 'quat3' } : null;
+        }
+        case 'gapKhuc': { var psg = o.ds.map(diem); return psg.every(Boolean) ? { k: 'gapKhuc', ds: psg } : null; }
+        case 'gocVuong': {
+          var Av = diem(o.a), Ov = diem(o.o), Bv = diem(o.b); if (!Av || !Ov || !Bv) return null;
+          var g1 = hieu(Av, Ov), g2 = hieu(Bv, Ov), d1 = dai(g1), d2 = dai(g2); if (d1 < 1e-9 || d2 < 1e-9) return null;
+          return { k: 'gocVuong', o: Ov, u1: { x: g1.x / d1, y: g1.y / d1 }, u2: { x: g2.x / d2, y: g2.y / d2 } };
+        }
+        case 'dienTich': {
+          var Dd = lay(o.d); if (!Dd) return null;
+          if (Dd.k === 'daGiac') { var S = 0, cx = 0, cy = 0; Dd.ds.forEach(function (P, i) { var Q = Dd.ds[(i + 1) % Dd.ds.length]; S += P.x * Q.y - Q.x * P.y; cx += P.x; cy += P.y; }); return { k: 'dienTich', S: Math.abs(S) / 2, vi: { x: cx / Dd.ds.length, y: cy / Dd.ds.length } }; }
+          if (Dd.k === 'tron') return { k: 'dienTich', S: Math.PI * Dd.r * Dd.r, vi: Dd.c };
+          if (Dd.k === 'cung' && Dd.quat) { var am = Dd.a0 + Dd.da / 2; return { k: 'dienTich', S: Dd.r * Dd.r * Math.abs(Dd.da) / 2, vi: { x: Dd.c.x + Math.cos(am) * Dd.r * 0.55, y: Dd.c.y + Math.sin(am) * Dd.r * 0.55 } }; }
+          return null;
+        }
+        case 'bienHinh': return bienHinh(o, lay(o.nguon));
+        case 'thanhTruot': return { k: 'truot', x: o.x, y: o.y };
+        case 'chu': return { k: 'chu', x: o.x, y: o.y };
       }
       return null;
     }
@@ -118,7 +227,13 @@ GI.hinh = (function () {
       return kc(M, { x: v.p.x + u.x * t, y: v.p.y + u.y * t });
     }
     if (v.k === 'tron') return Math.abs(kc(M, v.c) - v.r);
-    if (v.k === 'daGiac') { var m = Infinity; for (var i = 0; i < v.ds.length; i++) m = Math.min(m, khoangCach({ k: 'thang', loai: 'doan', p: v.ds[i], q: v.ds[(i + 1) % v.ds.length] }, M)); return m; }
+    if (v.k === 'daGiac' || v.k === 'gapKhuc') { var m = Infinity, n = v.ds.length - (v.k === 'gapKhuc' ? 1 : 0); for (var i = 0; i < n; i++) m = Math.min(m, khoangCach({ k: 'thang', loai: 'doan', p: v.ds[i], q: v.ds[(i + 1) % v.ds.length] }, M)); return m; }
+    if (v.k === 'cung') {
+      var a = Math.atan2(M.y - v.c.y, M.x - v.c.x), t = v.da >= 0 ? quetDuong(a - v.a0) : quetDuong(v.a0 - a), S = { x: v.c.x + v.r * Math.cos(v.a0), y: v.c.y + v.r * Math.sin(v.a0) }, E = { x: v.c.x + v.r * Math.cos(v.a0 + v.da), y: v.c.y + v.r * Math.sin(v.a0 + v.da) };
+      var dC = t <= Math.abs(v.da) ? Math.abs(kc(M, v.c) - v.r) : Math.min(kc(M, S), kc(M, E));
+      if (v.quat) dC = Math.min(dC, khoangCach({ k: 'thang', loai: 'doan', p: v.c, q: S }, M), khoangCach({ k: 'thang', loai: 'doan', p: v.c, q: E }, M));
+      return dC;
+    }
     return Infinity;
   }
   // Tham số của hình chiếu M lên đường / đường tròn (dùng cho điểm trên đối tượng)
@@ -135,11 +250,11 @@ GI.hinh = (function () {
       doi = false;
       ds.forEach(function (o) {
         if (bo[o.id]) return;
-        var ref = [o.a, o.b, o.o, o.d, o.tren, o.o1, o.o2].concat(o.ds || []);
+        var ref = TRUONG_REF.map(function (k) { return o[k]; }).concat(o.ds || []);
         if (ref.some(function (r) { return r && bo[r]; })) { bo[o.id] = 1; doi = true; }
       });
     }
     return bo;
   }
-  return { tinh: tinh, catNhau: catNhau, khoangCach: khoangCach, thamSo: thamSo, phuThuoc: phuThuoc, LA_DIEM: LA_DIEM, LA_THANG: LA_THANG, kc: kc };
+  return { tinh: tinh, catNhau: catNhau, khoangCach: khoangCach, thamSo: thamSo, phuThuoc: phuThuoc, LA_DIEM: LA_DIEM, LA_THANG: LA_THANG, LA_TRON: LA_TRON, LA_CUNG: LA_CUNG, kc: kc, DV: DV };
 })();

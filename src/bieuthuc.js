@@ -1,12 +1,13 @@
 // Đọc biểu thức hàm số do giáo viên gõ: "y = 2x + 1", "x^2 - 3", "1/2x", "sin(x)", "√x", "|x|"
-// Không dùng eval: tự phân tích cú pháp rồi tạo hàm tính f(x).
+// Không dùng eval: tự phân tích cú pháp rồi tạo hàm tính f(x, s).
 window.GI = window.GI || {};
 GI.bieuThuc = (function () {
   var HAM = {
-    sin: Math.sin, cos: Math.cos, tan: Math.tan, cot: function (x) { return 1 / Math.tan(x); },
-    sqrt: Math.sqrt, can: Math.sqrt, abs: Math.abs, ln: Math.log, log: function (x) { return Math.log(x) / Math.LN10; }, exp: Math.exp,
+    sin: Math.sin, cos: Math.cos, tan: Math.tan, cot: function (x, s) { return 1 / Math.tan(x); },
+    sqrt: Math.sqrt, can: Math.sqrt, abs: Math.abs, ln: Math.log, log: function (x, s) { return Math.log(x) / Math.LN10; }, exp: Math.exp,
   };
-  function tachTu(s) {
+  function tachTu(s, bien) {
+    bien = bien || [];
     var ds = [], i = 0;
     s = s.replace(/\s+/g, '').replace(/[×·]/g, '*').replace(/[÷:]/g, '/').replace(/[−–]/g, '-').replace(/²/g, '^2').replace(/³/g, '^3').replace(/π/g, 'pi').replace(/√/g, 'sqrt');
     while (i < s.length) {
@@ -14,11 +15,14 @@ GI.bieuThuc = (function () {
       if (/[0-9.,]/.test(c)) { var j = i; while (j < s.length && /[0-9.,]/.test(s[j])) j++; var so = s.slice(i, j).replace(',', '.'); if (isNaN(parseFloat(so))) throw new Error('Số không hợp lệ: ' + s.slice(i, j)); ds.push({ k: 'so', v: parseFloat(so) }); i = j; continue; }
       if (/[a-zA-Z]/.test(c)) {
         var j2 = i; while (j2 < s.length && /[a-zA-Z]/.test(s[j2])) j2++;
-        var tu = s.slice(i, j2).toLowerCase();
+        var tu = s.slice(i, j2);
         // tách "2xsin" … thành các phần nhận biết được
         while (tu.length) {
-          var gap = Object.keys(HAM).concat(['pi', 'e', 'x']).sort(function (a, b) { return b.length - a.length; }).filter(function (h) { return tu.indexOf(h) === 0; })[0];
-          if (!gap) throw new Error('Không hiểu "' + tu + '". Chỉ dùng biến x và các hàm sin, cos, tan, sqrt, abs, ln, log.');
+          var thuong = tu.toLowerCase();
+          var gap = Object.keys(HAM).concat(['pi', 'e', 'x']).sort(function (a, b) { return b.length - a.length; }).filter(function (h) { return thuong.indexOf(h) === 0; })[0];
+          var tenBien = bien.filter(function (b) { return tu.indexOf(b) === 0; }).sort(function (a, b) { return b.length - a.length; })[0];
+          if (tenBien && (!gap || tenBien.length >= gap.length)) { ds.push({ k: 'bien', v: tenBien }); tu = tu.slice(tenBien.length); continue; }
+          if (!gap) throw new Error('Không hiểu "' + tu + '". Dùng biến x, tên thanh trượt và các hàm sin, cos, tan, sqrt, abs, ln, log.');
           ds.push(HAM[gap] && gap !== 'e' ? { k: 'ham', v: gap } : { k: 'ten', v: gap });
           tu = tu.slice(gap.length);
         }
@@ -44,8 +48,8 @@ GI.bieuThuc = (function () {
       while (xem() && (xem().k === '+' || xem().k === '-')) { var op = lay().k, b = tich(); a = op === '+' ? cong(a, b) : tru(a, b); }
       return a;
     }
-    function cong(a, b) { return function (x) { return a(x) + b(x); }; }
-    function tru(a, b) { return function (x) { return a(x) - b(x); }; }
+    function cong(a, b) { return function (x, s) { return a(x, s) + b(x, s); }; }
+    function tru(a, b) { return function (x, s) { return a(x, s) - b(x, s); }; }
     function tich() {
       var a = dau();
       for (;;) {
@@ -57,31 +61,32 @@ GI.bieuThuc = (function () {
     }
     var moTri = 0;
     function demGiaTriTuyetDoi() { return moTri > 0; }
-    function nhan(a, b) { return function (x) { return a(x) * b(x); }; }
-    function chia(a, b) { return function (x) { return a(x) / b(x); }; }
+    function nhan(a, b) { return function (x, s) { return a(x, s) * b(x, s); }; }
+    function chia(a, b) { return function (x, s) { return a(x, s) / b(x, s); }; }
     function dau() {
       var t = xem();
-      if (t && t.k === '-') { lay(); var a = dau(); return function (x) { return -a(x); }; }
+      if (t && t.k === '-') { lay(); var a = dau(); return function (x, s) { return -a(x, s); }; }
       if (t && t.k === '+') { lay(); return dau(); }
       return luyThua();
     }
     function luyThua() {
       var a = coSo();
-      if (xem() && xem().k === '^') { lay(); var b = dau(); return function (x) { return Math.pow(a(x), b(x)); }; }
+      if (xem() && xem().k === '^') { lay(); var b = dau(); return function (x, s) { return Math.pow(a(x, s), b(x, s)); }; }
       return a;
     }
     function coSo() {
       var t = lay();
       if (!t) throw new Error('Biểu thức chưa đầy đủ.');
       if (t.k === 'so') { var v = t.v; return function () { return v; }; }
-      if (t.k === 'ten') { if (t.v === 'x') return function (x) { return x; }; var c = t.v === 'pi' ? Math.PI : Math.E; return function () { return c; }; }
+      if (t.k === 'bien') { var tb = t.v; return function (x, s) { return s && tb in s ? s[tb] : NaN; }; }
+      if (t.k === 'ten') { if (t.v === 'x') return function (x, s) { return x; }; var c = t.v === 'pi' ? Math.PI : Math.E; return function () { return c; }; }
       if (t.k === 'ham') {
         var f = HAM[t.v], arg;
         if (xem() && xem().k === '(') { lay('('); arg = tong(); lay(')'); } else arg = luyThua();
-        return function (x) { return f(arg(x)); };
+        return function (x, s) { return f(arg(x, s)); };
       }
       if (t.k === '(') { var a = tong(); lay(')'); return a; }
-      if (t.k === '|') { moTri++; var b = tong(); moTri--; lay('|'); return function (x) { return Math.abs(b(x)); }; }
+      if (t.k === '|') { moTri++; var b = tong(); moTri--; lay('|'); return function (x, s) { return Math.abs(b(x, s)); }; }
       throw new Error('Biểu thức chưa đúng gần "' + t.k + '".');
     }
     var f = tong();
@@ -95,12 +100,12 @@ GI.bieuThuc = (function () {
       .replace(/sqrt/g, '√').replace(/\*/g, '·').replace(/pi/g, 'π').replace(/([^\s(])([+\-])/g, '$1 $2 ').replace(/-/g, '−').replace(/^−\s/, '−');
   }
   // Trả về { f, ve: chuỗi hiển thị } hoặc ném lỗi tiếng Việt
-  function doc(chuoi) {
+  function doc(chuoi, bien) {
     var s = String(chuoi || '').trim();
     var m = s.match(/^(?:y|f\s*\(\s*x\s*\))\s*=\s*(.*)$/i);
     if (m) s = m[1];
     if (!s) throw new Error('Hãy nhập biểu thức, ví dụ 2x + 1');
-    var f = phanTich(tachTu(s));
+    var f = phanTich(tachTu(s, bien));
     return { f: f, ve: 'y = ' + dep(s) };
   }
   return { doc: doc };

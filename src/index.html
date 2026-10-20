@@ -17,11 +17,11 @@
   <button class="nut" data-lenh="hoanTac" title="Hoàn tác (Ctrl+Z)"><i data-bt="hoanTac"></i></button>
   <button class="nut" data-lenh="lamLai" title="Làm lại (Ctrl+Y)"><i data-bt="lamLai"></i></button>
   <span class="ke"></span>
-  <button class="nut" data-cc="but" title="Bút (P)"><i data-bt="but"></i></button>
-  <button class="nut" data-cc="tay" title="Tẩy (E)"><i data-bt="tay"></i></button>
-  <button class="nut" data-cc="dq" title="Bút dạ quang (H)"><i data-bt="dq"></i></button>
-  <button class="nut" data-cc="thang" title="Nét thẳng"><i data-bt="thang"></i></button>
-  <button class="nut" data-cc="laser" title="Bút chỉ (L)"><i data-bt="laser"></i></button>
+  <button class="nut" data-lenh="nhapPdf" title="Nhập tệp PDF"><i data-bt="pdf"></i></button>
+  <span class="ke"></span>
+  <div class="cap"><button class="nut" data-cc="but" title="Bút (P)"><i data-bt="but"></i></button><button class="mui-xo" data-xo="but" title="Độ dày, màu bút"><i data-bt="xuong"></i></button></div>
+  <div class="cap"><button class="nut" data-cc="tay" title="Tẩy (E)"><i data-bt="tay"></i></button><button class="mui-xo" data-xo="tay" title="Cỡ tẩy"><i data-bt="xuong"></i></button></div>
+  <div class="cap"><button class="nut" data-cc="dq" title="Bút dạ quang (H)"><i data-bt="dq"></i></button><button class="mui-xo" data-xo="dq" title="Độ dày, màu dạ quang"><i data-bt="xuong"></i></button></div>
   <div class="khay" id="khay-mau" title="Màu bút"></div>
   <div class="khay" id="khay-co" title="Độ dày nét"></div>
   <div class="khay" id="khay-dq" title="Màu dạ quang"></div>
@@ -36,11 +36,15 @@
 <!-- Hàng 2: dựng hình, đo, đồ thị (kiểu GeoGebra) -->
 <nav id="hang-hinh" class="hang"></nav>
 
+<aside id="thanh-trai">
+  <div id="ds-trang-pdf"></div>
+  <div id="tay-keo-trai" title="Kéo để mở rộng / thu hẹp"><span></span></div>
+</aside>
+
 <main id="bang">
   <canvas id="ve"></canvas>
   <canvas id="nhap"></canvas>
   <div id="goi-y" class="an"></div>
-  <div id="tuy-chon-but" class="an"></div>
   <div id="thu-phong">
     <button class="nut nho" data-lenh="thuNho" title="Thu nhỏ"><i data-bt="thuNho"></i></button>
     <button class="nut nho" data-lenh="phongTo" title="Phóng to"><i data-bt="phongTo"></i></button>
@@ -55,6 +59,7 @@
   <button data-lenh="mo"><i data-bt="mo"></i>Mở…<kbd>Ctrl+O</kbd></button>
   <button data-lenh="luu"><i data-bt="luu"></i>Lưu<kbd>Ctrl+S</kbd></button>
   <button data-lenh="luuThanh"><i data-bt="luu"></i>Lưu thành tệp khác…<kbd>Ctrl+⇧+S</kbd></button>
+  <button data-lenh="nhapPdf"><i data-bt="pdf"></i>Nhập tệp PDF…</button>
   <button data-lenh="xuatAnh"><i data-bt="anh"></i>Xuất trang ra ảnh PNG</button>
   <hr>
   <div class="tieu-de-menu">Nền trang</div>
@@ -92,8 +97,20 @@
   </div>
 </div>
 
+<div id="hop-nhap" class="hop an" role="dialog">
+  <div class="hop-noi-dung">
+    <h2>Nhập</h2>
+    <label class="nhap-dong"><span>Giá trị</span><input autocomplete="off" spellcheck="false"><textarea rows="3" class="an"></textarea></label>
+    <div class="loi"></div>
+    <div class="hanh-dong"><button class="nut chu" data-huy>Huỷ</button><button class="nut chu chinh">Đồng ý</button></div>
+  </div>
+</div>
+
+<div id="tuy-chon-but" class="an"></div>
 <div id="thong-bao" class="an"></div>
 
+<script src="thu-vien/pdf.min.js"></script>
+<script src="bieutuong.js"></script>
 <script src="mohinh.js"></script>
 <script src="bieuthuc.js"></script>
 <script src="hinh.js"></script>

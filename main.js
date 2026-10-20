@@ -67,6 +67,12 @@ ipcMain.handle('mo', async () => {
   return docTep(kq.filePaths[0]);
 });
 
+ipcMain.handle('mo-pdf', async () => {
+  const kq = await dialog.showOpenDialog(cuaSo, { title: 'Nhập tệp PDF', properties: ['openFile'], filters: [{ name: 'Tệp PDF', extensions: ['pdf'] }] });
+  if (kq.canceled || !kq.filePaths[0]) return { huy: true };
+  try { return { ten: path.basename(kq.filePaths[0]), duLieu: fs.readFileSync(kq.filePaths[0]).toString('base64') }; } catch (err) { return { loi: String(err.message || err) }; }
+});
+
 ipcMain.handle('xuat-anh', async (e, { duLieu, ten }) => {
   const kq = await dialog.showSaveDialog(cuaSo, { title: 'Xuất ảnh', defaultPath: ten || 'GeoInk.png', filters: [{ name: 'Ảnh PNG', extensions: ['png'] }] });
   if (kq.canceled || !kq.filePath) return { huy: true };
