@@ -597,7 +597,7 @@
     }
     // ảnh (dán / cắt từ màn hình) nằm dưới cùng
     t.hinh.forEach(function (o) {
-      if (o.loai !== 'anh' || !hien(o)) return; var img = anhCua(o.tn);
+      if (o.loai !== 'anh' || !hien(o)) return; var img = anhTaiNguyen(o.tn);
       if (img) c.drawImage(img, o.x, o.y, o.w, o.h); else { c.save(); c.fillStyle = '#F1F5F9'; c.fillRect(o.x, o.y, o.w, o.h); c.restore(); }
       if (sang(o) && c === ctx) {
         c.save(); c.setLineDash([6 * px, 4 * px]); c.strokeStyle = mauSang; c.lineWidth = 1.6 * px; c.strokeRect(o.x, o.y, o.w, o.h); c.setLineDash([]);
@@ -1791,7 +1791,7 @@
      TỆP PDF: trang PDF đặt trên bảng (từ trên xuống), ảnh nhỏ ở cột trái
      ===================================================================== */
   var boNhoAnh = {};
-  function anhCua(id) {   // ảnh (Image) theo id tài nguyên; nạp xong thì vẽ lại
+  function anhTaiNguyen(id) {   // ảnh (Image) theo id tài nguyên; nạp xong thì vẽ lại (khác anhCua: ảnh minh hoạ mô hình GeoLab)
     var r = taiNguyen[id]; if (!r) return null;
     var b = boNhoAnh[id]; if (b) return b.complete && b.naturalWidth ? b : null;
     b = boNhoAnh[id] = new Image(); b.onload = canVe; b.src = r.duLieu; return null;
