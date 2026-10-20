@@ -1905,11 +1905,11 @@
       }
       case 'd_duongCao': {
         var t2 = tamGiacTuDo(), cao = [];
-        [[0, 1, 2, 'H'], [1, 0, 2, 'K'], [2, 0, 1, 'I']].forEach(function (q) {
+        [[0, 1, 2, 'D'], [1, 0, 2, 'E'], [2, 0, 1, 'F']].forEach(function (q) {
           var canh = B.an(dt('duong', { a: t2[q[1]], b: t2[q[2]] })), vg2 = B.an(dt('vuongGoc', { d: canh, a: t2[q[0]], kyHieuVuong: false }));
           var chan = B.giao(vg2, canh, q[3]); doan(t2[q[0]], chan); B.vuong(t2[q[0]], chan, t2[q[2]]); cao.push(vg2);
         });
-        B.giao(cao[0], cao[1], 'O'); break;
+        B.giao(cao[0], cao[1], 'H'); break;
       }
       case 'd_phanGiac': {
         var t3 = tamGiacTuDo(), pg = [];
