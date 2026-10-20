@@ -43,7 +43,9 @@ i { font-style: normal; }
 .cap:has(.nut.bat) .mui-xo:hover { background: rgba(255,255,255,.12); }
 .mui-xo { color: #2B2B2E; }
 #hang-dau .nut, #hang-viet .nut { border-radius: 14px; }
-#hang-dau .nut i, #hang-viet .nut i { width: 28px; height: 28px; }
+#hang-dau .nut, #hang-viet .nut { width: 50px; height: 50px; }
+#hang-dau .nut i, #hang-viet .nut i { width: 34px; height: 34px; }   /* mọi icon hai hàng trên to đều nhau */
+#hang-viet .mui-xo { height: 50px; }
 #hang-dau #thong-tin { font-size: 16px; font-weight: 400; color: #3F3F46; }
 .cap { display: flex; align-items: center; flex: none; }
 .mui-xo { width: 20px; height: 46px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; padding: 0; display: grid; place-items: center; }
@@ -256,9 +258,5 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 .tt-nhieu { margin: 0 0 10px; padding: 6px 10px; border-radius: 6px; background: #EFF6FF; color: #1E40AF; font-size: 13.5px; }
 
 /* bút chì (to), mũi tên, bàn tay có màu ở hàng viết tay */
-#hang-viet [data-cc="but"] i { width: 40px; height: 40px; }
-#hang-viet [data-cc="but"] { width: 52px; }
-#hang-viet [data-cc="chon"] i, #hang-viet [data-cc="keo"] i { width: 32px; height: 32px; }
-#hang-viet [data-cc="dq"] i { width: 36px; height: 36px; }
-#hang-viet [data-cc="dq"] { width: 50px; }
+
 #hang-dau #thong-tin { max-width: none; overflow: visible; }
