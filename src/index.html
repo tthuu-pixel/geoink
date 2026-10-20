@@ -19,7 +19,6 @@
   <span class="ke"></span>
   <button class="nut" data-lenh="nhapPdf" title="Nhập tệp PDF"><i data-bt="pdf"></i></button>
   <span class="ke"></span>
-  <div class="cap"><button class="nut" data-cc="but" title="Bút (P)"><i data-bt="but"></i></button><button class="mui-xo" data-xo="but" title="Độ dày, màu bút"><i data-bt="xuong"></i></button></div>
   <div class="cap"><button class="nut" data-cc="tay" title="Tẩy (E)"><i data-bt="tay"></i></button><button class="mui-xo" data-xo="tay" title="Cỡ tẩy"><i data-bt="xuong"></i></button></div>
   <div class="cap"><button class="nut" data-cc="dq" title="Bút dạ quang (H)"><i data-bt="dq"></i></button><button class="mui-xo" data-xo="dq" title="Độ dày, màu dạ quang"><i data-bt="xuong"></i></button></div>
   <div class="khay" id="khay-mau" title="Màu bút"></div>
@@ -28,6 +27,7 @@
   <span class="ke"></span>
   <button class="nut" data-cc="chon" title="Chọn và kéo (V)"><i data-bt="chon"></i></button>
   <button class="nut" data-cc="keo" title="Kéo trang"><i data-bt="keo"></i></button>
+  <div class="cap"><button class="nut" data-cc="but" title="Bút chì (P)"><i data-bt="but"></i></button><button class="mui-xo" data-xo="but" title="Độ dày, màu bút"><i data-bt="xuong"></i></button></div>
   <div class="gian"></div>
   <span id="thong-tin" title="Bấm để về 100%">1 / 1 · 100%</span>
   <button class="nut" data-lenh="toanManHinh" title="Toàn màn hình (F11)"><i data-bt="toanManHinh"></i></button>
@@ -71,20 +71,6 @@
   <hr>
   <button data-lenh="toanManHinh"><i data-bt="toanManHinh"></i>Toàn màn hình<kbd>F11</kbd></button>
   <div class="phien-ban" id="phien-ban">GeoInk</div>
-</div>
-
-<div id="hop-ham-so" class="hop an" role="dialog" aria-label="Vẽ đồ thị hàm số">
-  <div class="hop-noi-dung">
-    <h2>Vẽ đồ thị hàm số</h2>
-    <label class="o-ham">y = <input id="o-ham" autocomplete="off" spellcheck="false" placeholder="2x + 1"></label>
-    <div id="loi-ham" class="loi"></div>
-    <div class="vi-du">Ví dụ:
-      <button data-vd="2x + 1">2x + 1</button><button data-vd="-x + 3">−x + 3</button><button data-vd="x^2">x²</button>
-      <button data-vd="-1/2x^2 + 2">−½x² + 2</button><button data-vd="1/x">1/x</button><button data-vd="sqrt(x)">√x</button><button data-vd="|x|">|x|</button>
-    </div>
-    <p class="ghi-chu">Viết <b>x^2</b> cho x², <b>1/2x</b> cho ½x, <b>sqrt(x)</b> cho √x. Có thể dùng sin, cos, tan, |x|.</p>
-    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="nut-ve-ham">Vẽ đồ thị</button></div>
-  </div>
 </div>
 
 <div id="hop-mo-hinh" class="hop an" role="dialog" aria-label="Chèn mô hình GeoLab">

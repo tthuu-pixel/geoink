@@ -7,7 +7,7 @@ window.GI = window.GI || {};
   function n(x1, y1, x2, y2, mau, w, dash) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (mau || DEN) + '" stroke-width="' + (w || 1.8) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
   function p(dd, mau, w, to) { return '<path d="' + dd + '" fill="' + (to || 'none') + '" stroke="' + (mau || DEN) + '" stroke-width="' + (w || 1.8) + '" stroke-linecap="round" stroke-linejoin="round"/>'; }
   function tron(cx, cy, r, mau, w, to) { return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + (to || 'none') + '" stroke="' + (mau || DEN) + '" stroke-width="' + (w || 1.8) + '"/>'; }
-  function chu(x, y, t, mau, co) { return '<text x="' + x + '" y="' + y + '" font-family="Cambria Math,Times New Roman,serif" font-style="italic" font-weight="700" font-size="' + (co || 9) + '" fill="' + (mau || DEN) + '">' + t + '</text>'; }
+  function chu(x, y, t, mau, co) { return '<text x="' + x + '" y="' + y + '" font-family="LM Roman,Cambria Math,Times New Roman,serif" font-style="italic" font-size="' + (co || 9) + '" fill="' + (mau || DEN) + '">' + t + '</text>'; }
 
   // Cây bút chì (thân xanh, đầu tẩy cam, gỗ vàng, ngòi đen) — giống hình mẫu
   var BUT_CHI = '<g transform="rotate(45 12 12)">' +
@@ -61,7 +61,7 @@ window.GI = window.GI || {};
     daGiacDeu: p('M12 3l8.5 6.2-3.2 10H6.7l-3.2-10z', DO, 1.8, TO) + d(12, 3) + d(20.5, 9.2) + d(17.3, 19.2) + d(6.7, 19.2) + d(3.5, 9.2),
     tron: tron(12, 12, 8.5, DEN, 1.8) + d(12, 12) + d(18, 18),
     tronBanKinh: tron(12, 12, 8.5, DEN, 1.8) + d(12, 12) + n(12, 12, 18, 6, DO, 1.6),
-    compa: tron(14, 13, 7.5, DO, 1.8) + d(14, 13) + n(3, 21, 9, 21, DEN, 1.6) + d(3, 21) + d(9, 21),
+    compa: C(20, 13, 9, R, 2.2) + D(20, 13) + L(6, 27.5, 15, 27.5) + D(6, 27.5) + D(15, 27.5),
     tron3Diem: tron(12, 12, 8.5, DEN, 1.8) + d(5, 7.5) + d(19.6, 9) + d(9, 20),
     banNguyet: p('M4 16a8 8 0 0 1 16 0', DEN, 1.8) + d(4, 16) + d(20, 16),
     cungTam: p('M19 12a7 7 0 0 0-10.5-6', DEN, 1.8) + d(12, 12) + d(19, 12) + d(8.5, 6),
@@ -76,7 +76,7 @@ window.GI = window.GI || {};
     dxTruc: n(4, 3, 20, 21) + d(7, 15) + d(17, 9, DO),
     dxTam: d(5, 18) + d(12, 12, '#111827') + d(19, 6, DO),
     nghichDao: p('M3 21a17 17 0 0 1 18-18', DEN, 1.6) + d(7, 16) + d(15, 8, DO),
-    quay: p('M12 4a8 8 0 1 1-7.4 5', DEN, 1.5, null) + p('M3 6l1.6 3.4 3.3-1.6', DEN, 1.5) + d(12, 12, '#111827') + d(12, 4) + d(20, 12, DO),
+    quay: L(8, 24, 28, 24, XAM, 1.4, '2 2') + L(8, 24, 19.5, 7.6, XAM, 1.4, '2 2') + P('M20 24A12 12 0 0 0 15.4 14.6', R, 2) + muiTen(14.9, 14.2, -145, R) + D(8, 24, '#3A3F47') + D(28, 24) + D(19.5, 7.6, R),
     tinhTien: d(4, 17) + d(14, 17, DO) + d(8, 9) + d(18, 9, DO) + n(10, 9, 15.5, 9, DEN, 1.4) + p('M14 7l2 2-2 2', DEN, 1.4),
     viTu: n(3, 20, 21, 4, DEN, 1.2, '2 2') + d(3, 20, '#111827') + d(10, 13.8) + d(19, 5.8, DO) + chu(14, 19, 'k', DEN, 9),
     thanhTruot: n(3, 15, 21, 15, DEN, 2) + '<circle cx="11" cy="15" r="3" fill="#2563EB" stroke="#1E3A8A" stroke-width="1"/>' + chu(5, 9, 'a = 2', DEN, 7.5),
@@ -85,8 +85,66 @@ window.GI = window.GI || {};
     hamSo: n(3, 21, 3, 3, DEN, 1.4) + n(3, 21, 21, 21, DEN, 1.4) + p('M4 18c3-1 4-12 8-12s4 10 9 10', DO, 2),
     moHinh: '<path d="M12 2.8l8 4.5v9.2L12 21l-8-4.5V7.3z" fill="#BFDBFE" stroke="#1D4ED8" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 12l8-4.7M12 12L4 7.3M12 12v9" stroke="#1D4ED8" stroke-width="1.4"/><path d="M12 12L4 7.3 12 2.8l8 4.5z" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.4" stroke-linejoin="round"/>',
   };
+  // ----- Hàng 2: biểu tượng kiểu GeoGebra, vẽ trên lưới 32 × 32 cho nét -----
+  var X = '#2F6FD8', XV = '#0E2A5C', K = '#22272E', R = '#E0352B', RT = 'rgba(224,53,43,.22)', NAU = '#8A4B2A', NAUT = '#EDBFA6', XAM = '#8D97A5';
+  var FONT = "'LM Roman','Latin Modern Roman','Cambria Math','Times New Roman',serif";
+  function D(x, y, mau, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + (r || 3.4) + '" fill="' + (mau || X) + '" stroke="' + XV + '" stroke-width="1.3"/>'; }
+  function L(x1, y1, x2, y2, mau, w, dash) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
+  function P(dd, mau, w, to, dash) { return '<path d="' + dd + '" fill="' + (to || 'none') + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '" stroke-linecap="round" stroke-linejoin="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
+  function C(cx, cy, r, mau, w, to) { return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + (to || 'none') + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '"/>'; }
+  function T(x, y, t, mau, co, kieu, giua) { return '<text x="' + x + '" y="' + y + '"' + (giua ? ' text-anchor="middle"' : '') + ' font-family="' + FONT + '"' + (kieu === 'dung' ? '' : ' font-style="italic"') + (kieu === 'dam' ? ' font-weight="700"' : '') + ' font-size="' + (co || 12) + '" fill="' + (mau || K) + '">' + t + '</text>'; }
+  function muiTen(x, y, goc, mau) { return '<path d="M0 0 L-6 -3.6 L-6 3.6 Z" fill="' + (mau || K) + '" transform="translate(' + x + ' ' + y + ') rotate(' + goc + ')"/>'; }
+  function to24(k) { return '<g transform="scale(1.3333)">' + B[k] + '</g>'; }
+  var B32 = {
+    chon: '<path d="M8 4v21.5l5.4-4.9 3.9 8 3.4-1.6-3.9-7.9h7.3z" fill="#fff" stroke="' + K + '" stroke-width="2" stroke-linejoin="round"/>',
+    diem: D(11, 21, X, 4.2) + T(16, 14, 'A', X, 15),
+    diemTren: P('M5 25L13 6l14 8-6 13z', K, 2, '#F6E3D8') + D(9, 15.5),
+    ganDiem: P('M4 27C11 23 20 13 28 5', K, 2.2) + D(10, 22.6) + P('M14 20.5l6 3', XAM, 1.6, null, '2 2.4') + D(23, 25, R),
+    giao: L(4, 8, 28, 24) + L(4, 26, 28, 6) + D(16, 16, R),
+    trungDiem: L(5, 25, 27, 7, XAM, 1.6, '2.5 2.5') + D(5, 25) + D(27, 7) + D(16, 16, R),
+    duong: L(2, 28, 30, 4) + D(10, 21.1) + D(22, 10.9),
+    doan: L(6, 25, 26, 7, K, 2.4) + D(6, 25) + D(26, 7),
+    doanCoDinh: L(6, 25, 26, 7, K, 2.4) + D(6, 25) + D(26, 7, R) + T(5, 14, 'a', R, 13),
+    tia: L(6, 25, 30, 4) + D(6, 25) + D(17, 15.4),
+    gapKhuc: P('M4 24L11 8l9 16 8-15', K, 2.2) + D(4, 24) + D(11, 8) + D(20, 24) + D(28, 9),
+    vuongGoc: L(2, 23, 30, 23) + L(14, 3, 14, 30, R, 2.4) + P('M14 17.5h5.5V23', K, 1.5) + D(14, 9),
+    songSong: L(2, 24, 30, 16) + L(2, 13, 30, 5, R, 2.4) + D(10, 10.7),
+    trungTruc: L(5, 22, 27, 10) + L(10, 4.5, 22, 27.5, R, 2.4) + D(5, 22) + D(27, 10),
+    phanGiac: L(5, 26, 29, 26) + L(5, 26, 17, 4) + L(5, 26, 29, 11.8, R, 2.4) + D(5, 26) + D(17, 4) + D(27, 26),
+    daGiac: P('M5 25L12 6l15 6-5 15z', NAU, 2, NAUT) + D(5, 25) + D(12, 6) + D(27, 12) + D(22, 27),
+    daGiacDeu: P('M16 5.5l10.5 7.6-4 12.4h-13l-4-12.4z', NAU, 2, NAUT) + D(16, 5.5) + D(26.5, 13.1) + D(22.5, 25.5) + D(9.5, 25.5) + D(5.5, 13.1),
+    tron: C(16, 16, 11) + D(16, 16) + D(23.8, 23.8),
+    tronBanKinh: C(16, 16, 11) + L(16, 16, 23.8, 8.2, R, 2) + D(16, 16) + T(19.5, 21.5, 'r', R, 11),
+    compa: C(20, 13, 9, R, 2.2) + D(20, 13) + L(6, 27.5, 15, 27.5) + D(6, 27.5) + D(15, 27.5),
+    tron3Diem: C(16, 16, 11) + D(6.5, 10.5) + D(26.5, 12.6) + D(12.2, 26.3),
+    banNguyet: P('M5 21A11 11 0 0 1 27 21', K, 2.2) + L(5, 21, 27, 21, XAM, 1.4, '2.5 2.5') + D(5, 21) + D(27, 21),
+    cungTam: L(9, 23, 25, 23, XAM, 1.3, '2 2') + L(9, 23, 9, 7, XAM, 1.3, '2 2') + P('M25 23A16 16 0 0 0 9 7', K, 2.2) + D(9, 23, '#3A3F47') + D(25, 23) + D(9, 7),
+    cung3Diem: P('M5.2 18.1A11 11 0 0 1 26.3 16.2', K, 2.2) + D(5.2, 18.1) + D(16, 9) + D(26.3, 16.2),
+    quatTam: P('M8 25h19A19 19 0 0 0 17.5 8.6z', NAU, 2, NAUT) + D(8, 25, '#3A3F47') + D(27, 25) + D(17.5, 8.6),
+    quat3Diem: P('M16 24L3.8 19.6A13 13 0 0 1 28.2 19.6z', NAU, 2, NAUT) + D(3.8, 19.6) + D(16, 11) + D(28.2, 19.6),
+    goc: L(5, 26, 29, 26) + L(5, 26, 20, 6) + P('M5 26h10A10 10 0 0 0 11 18z', R, 1.4, RT) + T(17, 23, 'α', R, 12) + D(5, 26) + D(29, 26) + D(20, 6),
+    gocChoTruoc: L(5, 26, 29, 26) + L(5, 26, 20, 6) + P('M5 26h10A10 10 0 0 0 11 18z', R, 1.4, RT) + T(15.5, 22.5, '45°', R, 9.5, 'dung') + D(5, 26) + D(29, 26) + D(20, 6, R),
+    gocVuong: L(6, 26, 29, 26) + L(6, 26, 6, 4) + P('M6 17h9v9', R, 2.2, RT) + D(6, 26) + D(29, 26) + D(6, 4),
+    doDai: L(5, 24, 27, 24) + D(5, 24) + D(27, 24) + L(7, 12, 25, 12, R, 1.5) + muiTen(5.5, 12, 180, R) + muiTen(26.5, 12, 0, R) + L(5, 8, 5, 16, R, 1.2) + L(27, 8, 27, 16, R, 1.2) + T(16, 9, 'cm', R, 8.5, 'dung', 1),
+    dienTich: P('M4 27l6-12 7 5 11-15v22z', '#1D4ED8', 2, '#A9C9F7') + T(4, 11, 'S', '#1D4ED8', 13),
+    dxTruc: L(7, 3, 25, 29) + L(8, 19, 21.6, 9.6, XAM, 1.4, '2 2.2') + D(8, 19) + D(21.6, 9.6, R),
+    dxTam: L(6, 24, 26, 8, XAM, 1.4, '2 2.2') + D(6, 24) + D(16, 16, '#3A3F47') + D(26, 8, R),
+    nghichDao: C(12, 20, 9.5, K, 2) + L(12, 20, 26, 4, XAM, 1.3, '2 2') + D(12, 20, '#3A3F47', 2.6) + D(16.5, 14.9) + D(26, 4, R),
+    quay: L(8, 24, 28, 24, XAM, 1.4, '2 2') + L(8, 24, 19.5, 7.6, XAM, 1.4, '2 2') + P('M20 24A12 12 0 0 0 15.4 14.6', R, 2) + muiTen(14.9, 14.2, -145, R) + D(8, 24, '#3A3F47') + D(28, 24) + D(19.5, 7.6, R),
+    tinhTien: P('M3 28h9l-5-8z', NAU, 1.8, NAUT) + P('M18 15h9l-5-8z', R, 1.8, RT) + L(9, 21, 19.5, 13.3, K, 1.8) + muiTen(21, 12.2, -36, K),
+    viTu: L(4, 28, 29, 5, XAM, 1.4, '2.2 2.2') + D(4, 28, '#3A3F47') + D(13, 19.7) + D(26, 7.8, R) + T(19, 28, 'k', K, 14),
+    thanhTruot: T(16, 12.5, '<tspan font-style="italic">a</tspan> = 2', K, 11, 'dung', 1) + L(4, 22, 28, 22, K, 2) + C(13, 22, 3.8, XV, 1.3, X),
+    diChuyen: P('M16 5v22M5 16h22', K, 2.4) + muiTen(16, 3, -90) + muiTen(16, 29, 90) + muiTen(3, 16, 180) + muiTen(29, 16, 0),
+    chu: T(16, 21.5, 'ABC', K, 13, 'dung', 1).replace('<text', '<text font-weight="700"'),
+    xoa: '<g transform="rotate(-35 16 16)"><rect x="5" y="10.5" width="22" height="11" rx="2.2" fill="#F9A8D4" stroke="#BE185D" stroke-width="1.6"/><rect x="5" y="10.5" width="8.5" height="11" rx="2.2" fill="#fff" stroke="#BE185D" stroke-width="1.6"/></g>' + L(15, 28.5, 28, 28.5, XAM, 1.6),
+  };
+  B32.moHinh = to24('moHinh');
   GI.BIEU_TUONG_CC = B;
-  GI.bieuTuong = function (k) { return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + (B[k] || '') + '</svg>'; };
+  GI.bieuTuong = function (k, hang2) {
+    if (hang2 && B32[k]) return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' + B32[k] + '</svg>';
+    if (B32[k] && !B[k]) return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' + B32[k] + '</svg>';
+    return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + (B[k] || '') + '</svg>';
+  };
 
   // ----- Con trỏ chuột (vẽ ra PNG để mọi máy đều hiển thị) -----
   GI.CON_TRO = {};
@@ -94,11 +152,15 @@ window.GI = window.GI || {};
     GI.CON_TRO[ten] = duPhong;
     var img = new Image();
     img.onload = function () {
-      var c = document.createElement('canvas'); c.width = kt; c.height = kt; c.getContext('2d').drawImage(img, 0, 0, kt, kt);
-      GI.CON_TRO[ten] = 'url(' + c.toDataURL('image/png') + ') ' + hx + ' ' + hy + ', ' + duPhong;
+      function anh(k) { var c = document.createElement('canvas'); c.width = kt * k; c.height = kt * k; c.getContext('2d').drawImage(img, 0, 0, kt * k, kt * k); return c.toDataURL('image/png'); }
+      var mot = anh(1), hai = anh(2);
+      // màn hình phóng to (125%, 150%…) dùng ảnh 2x cho nét; máy không hỗ trợ image-set thì dùng ảnh thường
+      var thu = document.createElement('div'), coBo = 'image-set(url("' + hai + '") 2x, url("' + mot + '") 1x) ' + hx + ' ' + hy + ', ' + duPhong;
+      thu.style.cursor = coBo;
+      GI.CON_TRO[ten] = thu.style.cursor ? coBo : 'url(' + mot + ') ' + hx + ' ' + hy + ', ' + duPhong;
       if (GI.khiCoConTro) GI.khiCoConTro();
     };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + kt + '" height="' + kt + '">' + svg + '</svg>');
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + kt * 2 + '" height="' + kt * 2 + '">' + svg + '</svg>');
   }
   // bút chì: đầu ngòi ở góc dưới trái
   taoConTro('but', '<g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g>', 32, 3, 28, 'crosshair');
