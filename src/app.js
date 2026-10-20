@@ -1417,7 +1417,7 @@
     NHOM_TT.forEach(function (n) {
       var ds = t.hinh.filter(n[1]); if (!ds.length) return;
       h += '<button class="tt-nhom" data-nhom-tt="' + NHOM_TT.indexOf(n) + '" title="Chọn tất cả ' + n[0].toLowerCase() + '">' + n[0] + ' <small>(' + ds.length + ')</small></button>' + ds.map(function (o) {
-        return '<button class="tt-muc' + (o.id === chonId ? ' bat' : '') + '" data-id="' + o.id + '" title="' + dinhNghia(o).replace(/"/g, '&quot;') + '">' +
+        return '<button class="tt-muc' + (o.id === chonId || trongNhom({ h: o.id }) ? ' bat' : '') + '" data-id="' + o.id + '" title="' + dinhNghia(o).replace(/"/g, '&quot;') + '">' +
           '<span class="tt-cham' + (o.an ? ' rong' : '') + '" style="--m:' + mauMacDinh(o) + '"></span>' + (o.ten || dinhNghia(o)) + '</button>';
       }).join('');
     });
@@ -1466,7 +1466,13 @@
     $('#tt-tab').innerHTML = TAB.map(function (x) { return '<button data-tab="' + x[0] + '"' + (x[0] === tabTT ? ' class="bat"' : '') + '>' + x[1] + '</button>'; }).join('');
     $$('#tt-tab [data-tab]').forEach(function (b) { b.onclick = function () { tabTT = b.dataset.tab; veThuocTinh(); }; });
     var noi = $('#tt-noi'); noi.innerHTML = '';
-    var soHinh = cacHinhChon().length; if (soHinh > 1 && tabTT !== 'coBan') { var nn = document.createElement('div'); nn.className = 'tt-nhieu'; nn.textContent = 'Đang chọn ' + soHinh + ' đối tượng: thay đổi ở đây áp dụng cho tất cả.'; noi.appendChild(nn); }
+    var dsChon = cacHinhChon(), soHinh = dsChon.length;
+    if (soHinh > 1) {
+      var nn = document.createElement('div'); nn.className = 'tt-nhieu';
+      var tenDs = dsChon.map(function (x) { return x.ten || '?'; }); if (tenDs.length > 8) tenDs = tenDs.slice(0, 8).concat('…');
+      nn.textContent = 'Đang chọn ' + soHinh + ' đối tượng (' + tenDs.join(', ') + '): ' + (tabTT === 'coBan' ? 'hiển thị đối tượng, hiển thị tên áp dụng cho tất cả.' : 'thay đổi ở đây áp dụng cho tất cả.');
+      noi.appendChild(nn);
+    }
     if (tabTT === 'coBan') {
       var oTen = document.createElement('input'); oTen.className = 'tt-o'; oTen.value = o.ten || ''; oTen.placeholder = o.loai === 'hamSo' ? '(không cần tên)' : '';
       oTen.onchange = function () {
@@ -1879,5 +1885,5 @@
   } else {
     window.addEventListener('beforeunload', function (e) { if (daSua) { e.preventDefault(); e.returnValue = ''; } });
   }
-  window.GeoInk = { tl: function () { return tl; }, V: function () { return V; }, chonCongCu: chonCongCu, lenh: LENH, giaTri: function () { return giaTri; } };   // để kiểm thử
+  window.GeoInk = { tl: function () { return tl; }, nhom: function () { return nhom.map(function (x) { return x.h || (x.n ? 'net' : 'mh'); }); }, V: function () { return V; }, chonCongCu: chonCongCu, lenh: LENH, giaTri: function () { return giaTri; } };   // để kiểm thử
 })();
