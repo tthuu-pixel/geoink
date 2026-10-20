@@ -22,18 +22,22 @@ GI.dungCu = (function () {
   function raTG(dc, lx, ly) { var c = Math.cos(dc.goc), s = Math.sin(dc.goc); return { x: dc.x + lx * c - ly * s, y: dc.y + lx * s + ly * c }; }
   function veCB(dc, P) { var c = Math.cos(dc.goc), s = Math.sin(dc.goc), dx = P.x - dc.x, dy = P.y - dc.y; return { x: dx * c + dy * s, y: -dx * s + dy * c }; }
   function cacEke(loai) { var L1 = loai === 'eke45' ? 8 * CM : 10.4 * CM, L2 = loai === 'eke45' ? 8 * CM : 6 * CM; return { L1: L1, L2: L2 }; }
-  // Thước parabol hình giọt nước: đỉnh parabol ở trên (gốc toạ độ), thon dần xuống đáy tròn
-  var F_PB = 0.9 * CM, Y_PB = 1.7 * CM, DAY_Y = 9.6 * CM, R_DAY = 0.85 * CM;
+  // Thước parabol (giống thước thật, hình dấu "!"): đầu trên là cung parabol rộng, vai tròn,
+  // thon dần xuống phần đuôi hẹp có đáy tròn; khe cong ở nửa trên, lỗ tròn gần đáy. Gốc toạ độ: đỉnh parabol.
+  var F_PB = 0.72 * CM, X_VAI = 1.25 * CM, R_DAY = 1.15 * CM, Y_DAY = 9.2 * CM;
+  function bezier(P0, P1, P2, P3, n, ds) {
+    for (var i = 1; i <= n; i++) { var t = i / n, u = 1 - t; ds.push({ x: u * u * u * P0.x + 3 * u * u * t * P1.x + 3 * u * t * t * P2.x + t * t * t * P3.x, y: u * u * u * P0.y + 3 * u * u * t * P1.y + 3 * u * t * t * P2.y + t * t * t * P3.y }); }
+  }
   function vienPB() {
-    var phai = [], i;
-    for (i = 0; i <= 24; i++) { var y = Y_PB * i / 24; phai.push({ x: Math.sqrt(4 * F_PB * y), y: y }); }
-    var x0 = Math.sqrt(4 * F_PB * Y_PB);
-    for (i = 1; i <= 30; i++) { var t = i / 30, yy = Y_PB + (DAY_Y - Y_PB) * t; phai.push({ x: x0 + (R_DAY - x0) * (1 - Math.pow(1 - t, 1.6)), y: yy }); }
-    for (i = 1; i <= 18; i++) { var a = Math.PI * i / 18; phai.push({ x: R_DAY * Math.cos(a), y: DAY_Y + R_DAY * Math.sin(a) }); }
-    var trai = phai.slice(0, phai.length - 18).map(function (P) { return { x: -P.x, y: P.y }; }).reverse();
+    var phai = [], i, c = CM;
+    for (i = 0; i <= 20; i++) { var x = X_VAI * i / 20; phai.push({ x: x, y: x * x / (4 * F_PB) }); }   // cung parabol ở đầu
+    var A = phai[phai.length - 1], k = X_VAI / (2 * F_PB), L = Math.hypot(1, k);   // tiếp tuyến tại cuối cung
+    bezier(A, { x: A.x + 0.75 * c / L, y: A.y + 0.75 * c * k / L }, { x: 2.08 * c, y: 1.25 * c }, { x: 2.08 * c, y: 2.35 * c }, 16, phai);   // vai tròn
+    bezier({ x: 2.08 * c, y: 2.35 * c }, { x: 2.08 * c, y: 4.4 * c }, { x: R_DAY, y: 6.8 * c }, { x: R_DAY, y: Y_DAY }, 26, phai);       // thon dần xuống đuôi
+    for (i = 1; i <= 20; i++) { var a = Math.PI * i / 20; phai.push({ x: R_DAY * Math.cos(a), y: Y_DAY + R_DAY * Math.sin(a) }); }   // đáy tròn
+    var trai = phai.slice(1, phai.length - 20).map(function (P) { return { x: -P.x, y: P.y }; }).reverse();
     return phai.concat(trai);
   }
-
   // Thân dụng cụ (đa giác, toạ độ cục bộ) và các mép vẽ được
   function hinhDang(dc) {
     var L = dc.loai;
@@ -49,7 +53,7 @@ GI.dungCu = (function () {
     }
     if (L === 'parabol') {
       var v = vienPB();
-      return { ghim: { x: 0, y: 0 }, than: v, mep: [], cong: v.concat([v[0]]), tam: { x: 0, y: 4 * CM }, xoay: { x: 3.2 * CM, y: 3 * CM } };
+      return { ghim: { x: 0, y: 0 }, than: v, mep: [], cong: v.concat([v[0]]), tam: { x: 0, y: 4 * CM }, xoay: { x: 3.1 * CM, y: 2.4 * CM } };
     }
     return null;
   }
@@ -160,9 +164,9 @@ GI.dungCu = (function () {
     } else if (dc.loai === 'parabol') {
       // khe cong bên trong và lỗ tròn gần đáy (như thước thật)
       c.lineCap = 'round'; c.strokeStyle = MAU_VIEN;
-      var khe = new Path2D('M ' + 0.25 * CM + ' ' + 1.05 * CM + ' Q ' + 1.75 * CM + ' ' + 1.6 * CM + ' ' + 0.95 * CM + ' ' + 5.6 * CM);
-      c.lineWidth = 0.42 * CM; c.stroke(khe); c.lineWidth = 0.42 * CM - 2.6 * px; c.strokeStyle = 'rgba(255,255,255,.85)'; c.stroke(khe);
-      c.beginPath(); c.arc(0, 8.2 * CM, 0.55 * CM, 0, Math.PI * 2); c.fillStyle = 'rgba(255,255,255,.85)'; c.fill(); c.strokeStyle = MAU_VIEN; c.lineWidth = 1.3 * px; c.stroke();
+      var khe = new Path2D('M ' + (-0.25 * CM) + ' ' + 1.15 * CM + ' C ' + 0.9 * CM + ' ' + 1.0 * CM + ' ' + 1.45 * CM + ' ' + 3.0 * CM + ' ' + 0.9 * CM + ' ' + 5.8 * CM);
+      c.lineWidth = 0.34 * CM; c.stroke(khe); c.lineWidth = 0.34 * CM - 2.6 * px; c.strokeStyle = 'rgba(255,255,255,.85)'; c.stroke(khe);
+      c.beginPath(); c.arc(0, Y_DAY - 0.05 * CM, 0.62 * CM, 0, Math.PI * 2); c.fillStyle = 'rgba(255,255,255,.85)'; c.fill(); c.strokeStyle = MAU_VIEN; c.lineWidth = 1.3 * px; c.stroke();
     }
     // điểm cố định (ghim): bấm để ghim, đã ghim thì kéo thân là quay quanh điểm này
     c.beginPath(); c.arc(H.ghim.x, H.ghim.y, (dc.ghim ? 6.5 : 5) * px, 0, Math.PI * 2); c.fillStyle = dc.ghim ? '#DC2626' : '#FFFFFF'; c.fill(); c.strokeStyle = '#DC2626'; c.lineWidth = 2 * px; c.stroke();
