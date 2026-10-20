@@ -1,18 +1,14 @@
-@font-face { font-family: "LM Roman"; src: url("thu-vien/font/LatinModernRoman-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
-@font-face { font-family: "LM Roman"; src: url("thu-vien/font/LatinModernRoman-Italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
-@font-face { font-family: "LM Roman"; src: url("thu-vien/font/LatinModernRoman-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
-@font-face { font-family: "LM Roman"; src: url("thu-vien/font/LatinModernRoman-BoldItalic.woff2") format("woff2"); font-weight: 700; font-style: italic; font-display: block; }
 /* GeoInk – giao diện kiểu Scrble Ink: hai hàng công cụ phía trên, tab trang ở đáy */
 :root {
   --nhan: #7A1E1E; --nhan-nhat: #F6E7E7;        /* màu nhấn (nút đang chọn) */
   --chinh: #2451C7; --chinh-nhat: #E3EBFF;
   --nen: #F3F4F6; --the: #FFFFFF; --vien: #E2E5EA; --chu: #1F2937; --chu-phu: #6B7280;
   --bong: 0 6px 22px rgba(17, 24, 39, .14);
-  --phong: "LM Roman", "Cambria Math", "Times New Roman", serif;
+  --phong: Arial, "Liberation Sans", Helvetica, sans-serif;
   --cao-1: 64px; --cao-2: 70px; --cao-tab: 38px; --rong-trai: 190px;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--nen); color: var(--chu); font-family: var(--phong); font-size: 16.5px; user-select: none; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--nen); color: var(--chu); font-family: var(--phong); font-size: 15px; user-select: none; }
 button { font-family: inherit; }
 i { font-style: normal; }
 .an { display: none !important; }
@@ -137,7 +133,7 @@ i { font-style: normal; }
 .tt-than { flex: 1; display: flex; min-height: 0; }
 .tt-ds { width: 190px; flex: none; overflow-y: auto; border-right: 1px solid var(--vien); padding: 6px; background: #FAFBFC; }
 .tt-nhom { font-weight: 700; font-size: 14px; padding: 8px 6px 2px; color: #374151; }
-.tt-muc { display: flex; align-items: center; gap: 8px; width: 100%; padding: 4px 6px 4px 16px; border: 0; border-radius: 6px; background: transparent; font: italic 600 16px var(--phong); color: var(--chu); cursor: pointer; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-muc { display: flex; align-items: center; gap: 8px; width: 100%; padding: 4px 6px 4px 16px; border: 0; border-radius: 6px; background: transparent; font: 16px var(--phong); color: var(--chu); cursor: pointer; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tt-muc:hover { background: #EEF1F5; }
 .tt-muc.bat { background: #DCE6F7; }
 .tt-cham { width: 11px; height: 11px; border-radius: 50%; background: var(--m); flex: none; }
@@ -201,21 +197,20 @@ i { font-style: normal; }
 .trang-nho.bat { border-color: var(--nhan); }
 
 /* ---------- Hàng 2: nhóm công cụ kiểu GeoGebra ---------- */
-#hang-hinh { gap: 4px; }
-.nhom-cc { position: relative; width: 60px; height: 60px; flex: none; border: 1px solid #C9D2DE; border-radius: 6px; background: #fff; cursor: pointer; padding: 0; display: grid; place-items: center; }
+#hang-hinh { gap: 5px; }
+.nhom-cc { position: relative; width: 60px; height: 60px; flex: none; border: 1px solid #B9C0CB; border-radius: 3px; background: linear-gradient(#FFFFFF, #F4F5F7); cursor: pointer; padding: 0; display: grid; place-items: center; }
 .nhom-cc i { width: 42px; height: 42px; display: block; } .nhom-cc i svg { width: 100%; height: 100%; }
 .nhom-cc:hover { background: #F3F6FB; }
-.nhom-cc.bat { border: 2px solid #2563EB; background: #EAF1FF; box-shadow: 0 0 0 2px #BFDBFE; }
-.nhom-cc .tam-giac { position: absolute; right: 0; bottom: 0; width: 20px; height: 20px; }
-.nhom-cc .tam-giac::after { content: ''; position: absolute; right: 4px; bottom: 4px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #64748B; }
-.nhom-cc.bat .tam-giac::after { border-top-color: #DC2626; }
+.nhom-cc.bat { border: 3px solid #1F3A93; background: #fff; box-shadow: inset 0 0 0 1px #fff, 0 0 0 1px #B9C0CB; }
+.nhom-cc .tam-giac { position: absolute; right: 1px; bottom: 1px; width: 16px; height: 14px; display: grid; place-items: center; }
+.nhom-cc .tam-giac svg { display: block; }
 #xo-nhom { position: fixed; z-index: 46; min-width: 330px; padding: 4px 0; background: #fff; border: 1px solid #C9D2DE; border-radius: 6px; box-shadow: 0 10px 28px rgba(15,23,42,.2); }
 #xo-nhom button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 5px 14px 5px 8px; border: 0; background: transparent; font-size: 15px; color: var(--chu); cursor: pointer; text-align: left; }
 #xo-nhom button:hover, #xo-nhom button.bat { background: #CFE3FB; }
 #xo-nhom button i { width: 44px; height: 44px; border: 1px solid #D4DAE3; border-radius: 4px; background: #fff; flex: none; display: grid; place-items: center; }
 #xo-nhom button i svg { width: 38px; height: 38px; }
 #xo-nhom hr { border: 0; border-top: 1px solid #E2E8F0; margin: 4px 0; }
-#hang-hinh .nut-don { width: 60px; height: 60px; flex: none; border: 1px solid #C9D2DE; border-radius: 6px; background: #fff; cursor: pointer; padding: 0; display: grid; place-items: center; }
+#hang-hinh .nut-don { width: 60px; height: 60px; flex: none; border: 1px solid #B9C0CB; border-radius: 3px; background: linear-gradient(#FFFFFF, #F4F5F7); cursor: pointer; padding: 0; display: grid; place-items: center; }
 #hang-hinh .nut-don i { width: 42px; height: 42px; display: block; } #hang-hinh .nut-don i svg { width: 100%; height: 100%; }
 #hang-hinh .nut-don:hover { background: #F3F6FB; }
 #hang-hinh .nut-don.bat { border: 2px solid #2563EB; background: #EAF1FF; }

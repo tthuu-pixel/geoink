@@ -7,7 +7,7 @@ window.GI = window.GI || {};
   function n(x1, y1, x2, y2, mau, w, dash) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (mau || DEN) + '" stroke-width="' + (w || 1.8) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
   function p(dd, mau, w, to) { return '<path d="' + dd + '" fill="' + (to || 'none') + '" stroke="' + (mau || DEN) + '" stroke-width="' + (w || 1.8) + '" stroke-linecap="round" stroke-linejoin="round"/>'; }
   function tron(cx, cy, r, mau, w, to) { return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + (to || 'none') + '" stroke="' + (mau || DEN) + '" stroke-width="' + (w || 1.8) + '"/>'; }
-  function chu(x, y, t, mau, co) { return '<text x="' + x + '" y="' + y + '" font-family="LM Roman,Cambria Math,Times New Roman,serif" font-style="italic" font-size="' + (co || 9) + '" fill="' + (mau || DEN) + '">' + t + '</text>'; }
+  function chu(x, y, t, mau, co) { return '<text x="' + x + '" y="' + y + '" font-family="Arial,Liberation Sans,Helvetica,sans-serif" font-size="' + (co || 9) + '" fill="' + (mau || DEN) + '">' + t + '</text>'; }
 
   // Cây bút chì (thân xanh, đầu tẩy cam, gỗ vàng, ngòi đen) — giống hình mẫu
   var BUT_CHI = '<g transform="rotate(45 12 12)">' +
@@ -87,17 +87,17 @@ window.GI = window.GI || {};
   };
   // ----- Hàng 2: biểu tượng kiểu GeoGebra, vẽ trên lưới 32 × 32 cho nét -----
   var X = '#2F6FD8', XV = '#0E2A5C', K = '#22272E', R = '#E0352B', RT = 'rgba(224,53,43,.22)', NAU = '#8A4B2A', NAUT = '#EDBFA6', XAM = '#8D97A5';
-  var FONT = "'LM Roman','Latin Modern Roman','Cambria Math','Times New Roman',serif";
+  var FONT = "Arial,'Liberation Sans',Helvetica,sans-serif";
   function D(x, y, mau, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + (r || 3.4) + '" fill="' + (mau || X) + '" stroke="' + XV + '" stroke-width="1.3"/>'; }
   function L(x1, y1, x2, y2, mau, w, dash) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
   function P(dd, mau, w, to, dash) { return '<path d="' + dd + '" fill="' + (to || 'none') + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '" stroke-linecap="round" stroke-linejoin="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
   function C(cx, cy, r, mau, w, to) { return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + (to || 'none') + '" stroke="' + (mau || K) + '" stroke-width="' + (w || 2.2) + '"/>'; }
-  function T(x, y, t, mau, co, kieu, giua) { return '<text x="' + x + '" y="' + y + '"' + (giua ? ' text-anchor="middle"' : '') + ' font-family="' + FONT + '"' + (kieu === 'dung' ? '' : ' font-style="italic"') + (kieu === 'dam' ? ' font-weight="700"' : '') + ' font-size="' + (co || 12) + '" fill="' + (mau || K) + '">' + t + '</text>'; }
+  function T(x, y, t, mau, co, kieu, giua) { return '<text x="' + x + '" y="' + y + '"' + (giua ? ' text-anchor="middle"' : '') + ' font-family="' + FONT + '"' + (kieu === 'nghieng' ? ' font-style="italic"' : '') + (kieu === 'dam' ? ' font-weight="700"' : '') + ' font-size="' + (co || 12) + '" fill="' + (mau || K) + '">' + t + '</text>'; }
   function muiTen(x, y, goc, mau) { return '<path d="M0 0 L-6 -3.6 L-6 3.6 Z" fill="' + (mau || K) + '" transform="translate(' + x + ' ' + y + ') rotate(' + goc + ')"/>'; }
   function to24(k) { return '<g transform="scale(1.3333)">' + B[k] + '</g>'; }
   var B32 = {
     chon: '<path d="M8 4v21.5l5.4-4.9 3.9 8 3.4-1.6-3.9-7.9h7.3z" fill="#fff" stroke="' + K + '" stroke-width="2" stroke-linejoin="round"/>',
-    diem: D(11, 21, X, 4.2) + T(16, 14, 'A', X, 15),
+    diem: D(11, 21, X, 4.2) + T(16.5, 14.5, 'A', X, 14),
     diemTren: P('M5 25L13 6l14 8-6 13z', K, 2, '#F6E3D8') + D(9, 15.5),
     ganDiem: P('M4 27C11 23 20 13 28 5', K, 2.2) + D(10, 22.6) + P('M14 20.5l6 3', XAM, 1.6, null, '2 2.4') + D(23, 25, R),
     giao: L(4, 8, 28, 24) + L(4, 26, 28, 6) + D(16, 16, R),
@@ -133,9 +133,12 @@ window.GI = window.GI || {};
     quay: L(8, 24, 28, 24, XAM, 1.4, '2 2') + L(8, 24, 19.5, 7.6, XAM, 1.4, '2 2') + P('M20 24A12 12 0 0 0 15.4 14.6', R, 2) + muiTen(14.9, 14.2, -145, R) + D(8, 24, '#3A3F47') + D(28, 24) + D(19.5, 7.6, R),
     tinhTien: P('M3 28h9l-5-8z', NAU, 1.8, NAUT) + P('M18 15h9l-5-8z', R, 1.8, RT) + L(9, 21, 19.5, 13.3, K, 1.8) + muiTen(21, 12.2, -36, K),
     viTu: L(4, 28, 29, 5, XAM, 1.4, '2.2 2.2') + D(4, 28, '#3A3F47') + D(13, 19.7) + D(26, 7.8, R) + T(19, 28, 'k', K, 14),
-    thanhTruot: T(16, 12.5, '<tspan font-style="italic">a</tspan> = 2', K, 11, 'dung', 1) + L(4, 22, 28, 22, K, 2) + C(13, 22, 3.8, XV, 1.3, X),
+    thanhTruot: T(16, 12.5, 'a = 2', K, 11, 'dung', 1) + L(4, 22, 28, 22, K, 2) + C(13, 22, 3.8, XV, 1.3, X),
     diChuyen: P('M16 5v22M5 16h22', K, 2.4) + muiTen(16, 3, -90) + muiTen(16, 29, 90) + muiTen(3, 16, 180) + muiTen(29, 16, 0),
-    chu: T(16, 21.5, 'ABC', K, 13, 'dung', 1).replace('<text', '<text font-weight="700"'),
+    chu: T(16, 21, 'ABC', K, 12.5, 'dung', 1),
+    elip: '<ellipse cx="16" cy="16" rx="13" ry="8.5" transform="rotate(-25 16 16)" fill="none" stroke="' + K + '" stroke-width="2.2"/>' + D(9.2, 19.2) + D(22.8, 12.8) + D(22.4, 23.4),
+    hypebol: P('M3 4Q13 16 3 28', K, 2.2) + P('M29 4Q19 16 29 28', K, 2.2) + D(16, 16, '#3A3F47', 2.4) + D(6.4, 16) + D(25.6, 16),
+    parabol: P('M4 4Q16 40 28 4', K, 2.2) + L(3, 29, 29, 29, R, 2) + D(16, 13),
     xoa: '<g transform="rotate(-35 16 16)"><rect x="5" y="10.5" width="22" height="11" rx="2.2" fill="#F9A8D4" stroke="#BE185D" stroke-width="1.6"/><rect x="5" y="10.5" width="8.5" height="11" rx="2.2" fill="#fff" stroke="#BE185D" stroke-width="1.6"/></g>' + L(15, 28.5, 28, 28.5, XAM, 1.6),
   };
   B32.moHinh = to24('moHinh');
@@ -163,7 +166,7 @@ window.GI = window.GI || {};
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + kt * 2 + '" height="' + kt * 2 + '">' + svg + '</svg>');
   }
   // bút chì: đầu ngòi ở góc dưới trái
-  taoConTro('but', '<g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g>', 32, 3, 28, 'crosshair');
+  taoConTro('but', '<g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g>', 48, 5, 42, 'crosshair');
   taoConTro('dq', '<g transform="translate(1 -1)">' + B.dq.replace(/<path d="M3 21.5h12".*$/, '') + '</g>', 32, 7, 26, 'crosshair');
   // chữ thập đen viền trắng (dễ thấy trên nền trắng lẫn nền tối)
   var THAP = '<path d="M12 2v8M12 14v8M2 12h8M14 12h8" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M12 2.5v7.5M12 14v7.5M2.5 12h7.5M14 12h7.5" stroke="#111827" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1.3" fill="#111827" stroke="#fff" stroke-width=".8"/>';

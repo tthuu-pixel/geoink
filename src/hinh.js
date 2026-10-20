@@ -21,6 +21,7 @@ GI.hinh = (function () {
   var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1 };
   var LA_TRON = { tron: 1, tronBanKinh: 1, compa: 1, tron3: 1 };
   var LA_CUNG = { banNguyet: 1, cungTam: 1, cung3: 1, quatTam: 1, quat3: 1 };
+  var LA_CONIC = { elip: 1, hypebol: 1, parabol: 1 };
   // Các trường chứa id đối tượng khác (để tìm đối tượng phụ thuộc)
   var TRUONG_REF = ['a', 'b', 'c', 'o', 'd', 'tren', 'o1', 'o2', 'nguon', 'tam', 'truc', 'tron', 'v1', 'v2', 'dg'];
   function tamNgoaiTiep(A, B, C) {
@@ -210,6 +211,29 @@ GI.hinh = (function () {
         case 'bienHinh': return bienHinh(o, lay(o.nguon));
         case 'thanhTruot': return { k: 'truot', x: o.x, y: o.y };
         case 'chu': return { k: 'chu', x: o.x, y: o.y };
+        case 'elip': case 'hypebol': {
+          var F1 = diem(o.a), F2 = diem(o.b), Pc = diem(o.c); if (!F1 || !F2 || !Pc) return null;
+          var cc = kc(F1, F2) / 2, d1 = kc(Pc, F1), d2 = kc(Pc, F2), Mc = { x: (F1.x + F2.x) / 2, y: (F1.y + F2.y) / 2 }, th = Math.atan2(F2.y - F1.y, F2.x - F1.x);
+          var co = Math.cos(th), si = Math.sin(th);
+          function dat(x, y) { return { x: Mc.x + x * co - y * si, y: Mc.y + x * si + y * co }; }
+          if (o.loai === 'elip') {
+            var Ae = (d1 + d2) / 2, Be = Math.sqrt(Math.max(0, Ae * Ae - cc * cc)); if (Be < 1e-6) return null;
+            var pe = []; for (var ie = 0; ie <= 144; ie++) { var te = ie / 144 * 2 * Math.PI; pe.push(dat(Ae * Math.cos(te), Be * Math.sin(te))); }
+            return { k: 'cong', nhanh: [pe], kin: true };
+          }
+          var Ah = Math.abs(d1 - d2) / 2, Bh = Math.sqrt(Math.max(0, cc * cc - Ah * Ah)); if (Ah < 1e-6 || Bh < 1e-6) return null;
+          var U = Math.log(60 * DV / Bh + Math.sqrt(1 + Math.pow(60 * DV / Bh, 2))), nh = [[], []];
+          for (var ih = 0; ih <= 120; ih++) { var u = -U + 2 * U * ih / 120; nh[0].push(dat(Ah * Math.cosh(u), Bh * Math.sinh(u))); nh[1].push(dat(-Ah * Math.cosh(u), Bh * Math.sinh(u))); }
+          return { k: 'cong', nhanh: nh, kin: false };
+        }
+        case 'parabol': {
+          var Fp = diem(o.a), Dp = lay(o.d); if (!Fp || !Dp || Dp.k !== 'thang') return null;
+          var up = hieu(Dp.q, Dp.p), Lp = dai(up); up = { x: up.x / Lp, y: up.y / Lp };
+          var tp = (Fp.x - Dp.p.x) * up.x + (Fp.y - Dp.p.y) * up.y, Hp = { x: Dp.p.x + up.x * tp, y: Dp.p.y + up.y * tp }, pp = kc(Fp, Hp); if (pp < 1e-6) return null;
+          var np = { x: (Fp.x - Hp.x) / pp, y: (Fp.y - Hp.y) / pp }, Vp = { x: (Fp.x + Hp.x) / 2, y: (Fp.y + Hp.y) / 2 }, Sp = Math.sqrt(2 * pp * 60 * DV), pts = [];
+          for (var ip = 0; ip <= 160; ip++) { var sp = -Sp + 2 * Sp * ip / 160, hp = sp * sp / (2 * pp); pts.push({ x: Vp.x + up.x * sp + np.x * hp, y: Vp.y + up.y * sp + np.y * hp }); }
+          return { k: 'cong', nhanh: [pts], kin: false };
+        }
       }
       return null;
     }
@@ -228,6 +252,10 @@ GI.hinh = (function () {
     }
     if (v.k === 'tron') return Math.abs(kc(M, v.c) - v.r);
     if (v.k === 'daGiac' || v.k === 'gapKhuc') { var m = Infinity, n = v.ds.length - (v.k === 'gapKhuc' ? 1 : 0); for (var i = 0; i < n; i++) m = Math.min(m, khoangCach({ k: 'thang', loai: 'doan', p: v.ds[i], q: v.ds[(i + 1) % v.ds.length] }, M)); return m; }
+    if (v.k === 'cong') {
+      var mc = Infinity; v.nhanh.forEach(function (ds) { for (var j = 0; j + 1 < ds.length; j++) mc = Math.min(mc, khoangCach({ k: 'thang', loai: 'doan', p: ds[j], q: ds[j + 1] }, M)); });
+      return mc;
+    }
     if (v.k === 'cung') {
       var a = Math.atan2(M.y - v.c.y, M.x - v.c.x), t = v.da >= 0 ? quetDuong(a - v.a0) : quetDuong(v.a0 - a), S = { x: v.c.x + v.r * Math.cos(v.a0), y: v.c.y + v.r * Math.sin(v.a0) }, E = { x: v.c.x + v.r * Math.cos(v.a0 + v.da), y: v.c.y + v.r * Math.sin(v.a0 + v.da) };
       var dC = t <= Math.abs(v.da) ? Math.abs(kc(M, v.c) - v.r) : Math.min(kc(M, S), kc(M, E));
@@ -256,5 +284,5 @@ GI.hinh = (function () {
     }
     return bo;
   }
-  return { tinh: tinh, catNhau: catNhau, khoangCach: khoangCach, thamSo: thamSo, phuThuoc: phuThuoc, LA_DIEM: LA_DIEM, LA_THANG: LA_THANG, LA_TRON: LA_TRON, LA_CUNG: LA_CUNG, kc: kc, DV: DV };
+  return { tinh: tinh, catNhau: catNhau, khoangCach: khoangCach, thamSo: thamSo, phuThuoc: phuThuoc, LA_DIEM: LA_DIEM, LA_THANG: LA_THANG, LA_TRON: LA_TRON, LA_CUNG: LA_CUNG, LA_CONIC: LA_CONIC, kc: kc, DV: DV };
 })();

@@ -3,7 +3,7 @@
   'use strict';
   var MT = window.mayTinh || null;          // cầu nối Electron (null khi mở bằng trình duyệt)
   var DV = 40;   // 1 đơn vị (1 cm) = 40 điểm ảnh ở mức phóng 100%
-  var FONT_TEX = '"LM Roman", "Cambria Math", "Times New Roman", serif';   // font kiểu LaTeX (Latin Modern)
+  var FONT_TEX = 'Arial, "Liberation Sans", Helvetica, sans-serif';   // font chữ giống GeoGebra
   var H = GI.hinh;
   function $(s) { return document.querySelector(s); }
   function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
@@ -120,6 +120,7 @@
     [['tron', 'Đường tròn khi biết tâm và 1 điểm trên đường tròn'], ['tronBanKinh', 'Đường tròn khi biết tâm và bán kính'], ['compa', 'Compa'], ['tron3Diem', 'Đường tròn qua 3 điểm có sẵn'], '-',
       ['banNguyet', 'Hình bán nguyệt qua 2 điểm'], ['cungTam', 'Cung tròn khi biết tâm và 2 điểm trên cung tròn'], ['cung3Diem', 'Cung tròn qua 3 điểm'], '-',
       ['quatTam', 'Hình quạt khi biết tâm và qua 2 điểm trên hình quạt'], ['quat3Diem', 'Hình quạt đi qua 3 điểm']],
+    [['elip', 'Elip'], ['hypebol', 'Hypebol'], ['parabol', 'Parabol']],
     [['goc', 'Góc'], ['gocChoTruoc', 'Góc với độ lớn cho trước'], ['gocVuong', 'Kí hiệu góc vuông (bấm 3 điểm)'], '-', ['doDai', 'Khoảng cách, độ dài'], ['dienTich', 'Diện tích']],
     [['dxTruc', 'Đối xứng qua đường thẳng'], ['dxTam', 'Đối xứng qua điểm'], ['nghichDao', 'Đối xứng điểm qua đường tròn'], ['quay', 'Quay đối tượng quanh 1 điểm theo 1 góc cho trước'], ['tinhTien', 'Phép tịnh tiến'], ['viTu', 'Phép vị tự']],
     [['thanhTruot', 'Thanh trượt']],
@@ -151,7 +152,7 @@
 
   function veThanhCongCu() {
     $('#hang-hinh').innerHTML = NHOM_HINH.map(function (n, i) {
-      return '<button class="nhom-cc" data-nhom="' + i + '"><i></i>' + (n.length > 1 ? '<span class="tam-giac" data-mo-nhom="' + i + '"></span>' : '') + '</button>';
+      return '<button class="nhom-cc" data-nhom="' + i + '"><i></i>' + (n.length > 1 ? '<span class="tam-giac" data-mo-nhom="' + i + '"><svg viewBox="0 0 10 8" width="11" height="9"><path d="M1 1h8L5 7z" fill="#fff" stroke="#6B7280" stroke-width="1.1" stroke-linejoin="round"/></svg></span>' : '') + '</button>';
     }).join('') + '<span class="ke"></span>' +
       '<button class="nut-don" data-cc="moHinh" title="Chèn mô hình GeoLab"><i>' + btHang2('moHinh') + '</i></button>' +
       '<div class="gian"></div>' +
@@ -320,7 +321,7 @@
     for (var i = Math.ceil(vn.x0 / DV / b) * b; i * DV <= vn.x1; i += b) { if (!i) continue; c.beginPath(); c.moveTo(i * DV, -4 * px); c.lineTo(i * DV, 4 * px); c.stroke(); c.fillText(soVN(i, 0), i * DV, 6 * px); }
     c.textAlign = 'right'; c.textBaseline = 'middle';
     for (var j = Math.ceil(vn.y0 / DV / b) * b; j * DV <= vn.y1; j += b) { if (!j) continue; c.beginPath(); c.moveTo(-4 * px, j * DV); c.lineTo(4 * px, j * DV); c.stroke(); c.fillText(soVN(-j, 0), -7 * px, j * DV); }
-    c.font = 'italic ' + (19 * px) + 'px ' + FONT_TEX;
+    c.font = (18 * px) + 'px ' + FONT_TEX;
     c.textAlign = 'right'; c.textBaseline = 'top'; c.fillText('x', vn.x1 - 6 * px, 8 * px);
     c.textAlign = 'left'; c.fillText('y', 9 * px, vn.y0 + 4 * px);
     c.textAlign = 'right'; c.fillText('O', -5 * px, 5 * px);
@@ -461,7 +462,7 @@
   }
   function veTen(c, ten, x, y, px, mau) {
     c.save(); c.setLineDash([]);
-    c.font = 'italic ' + (21 * px) + 'px ' + FONT_TEX; c.textAlign = 'left'; c.textBaseline = 'bottom';
+    c.font = (19 * px) + 'px ' + FONT_TEX; c.textAlign = 'left'; c.textBaseline = 'bottom';
     c.lineWidth = 4 * px; c.strokeStyle = kieuNen().mau; c.lineJoin = 'round'; c.strokeText(ten, x, y);
     c.fillStyle = mau; c.fillText(ten, x, y); c.restore();
   }
@@ -537,6 +538,10 @@
         else c.arc(v.c.x, v.c.y, v.r, v.a0, v.a0 + v.da, v.da < 0);
         var wc = datNet(c, o, px, sang(o), 2.6, mauChinh); c.lineJoin = 'round'; keNet(c, sang(o), wc, px);
         if (o.ten && hienTenCua(o)) { var am = v.a0 + v.da / 2; veTen(c, o.ten, v.c.x + Math.cos(am) * (v.r + 10 * px), v.c.y + Math.sin(am) * (v.r + 10 * px), px, o.mau || mauChu); }
+      } else if (v.k === 'cong') {
+        c.beginPath(); v.nhanh.forEach(function (ds) { ds.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); }); if (v.kin) c.closePath(); });
+        var wk = datNet(c, o, px, sang(o), 2.6, mauChinh); c.lineJoin = 'round'; keNet(c, sang(o), wk, px);
+        if (o.ten && hienTenCua(o)) { var Pk = v.nhanh[0][Math.round(v.nhanh[0].length * 0.12)]; veTen(c, o.ten, Pk.x + 8 * px, Pk.y - 6 * px, px, o.mau || mauChu); }
       } else if (v.k === 'gapKhuc') {
         c.beginPath(); v.ds.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); });
         var wg = datNet(c, o, px, sang(o), 2.6, mauChinh); c.lineJoin = 'round'; keNet(c, sang(o), wg, px);
@@ -592,7 +597,7 @@
         c.beginPath(); c.moveTo(o.x, o.y); c.lineTo(o.x + L, o.y); c.strokeStyle = '#CBD5E1'; c.lineWidth = 5 * px; c.stroke();
         c.beginPath(); c.moveTo(o.x, o.y); c.lineTo(X, o.y); c.strokeStyle = o.mau || '#2563EB'; c.lineWidth = 5 * px; c.stroke();
         c.beginPath(); c.arc(X, o.y, (sang(o) ? 10 : 8) * px, 0, Math.PI * 2); c.fillStyle = o.mau || '#2563EB'; c.fill(); c.strokeStyle = '#fff'; c.lineWidth = 2 * px; c.stroke();
-        c.font = 'italic ' + (20 * px) + 'px ' + FONT_TEX; c.fillStyle = mauChu; c.textAlign = 'left'; c.textBaseline = 'bottom';
+        c.font = (18 * px) + 'px ' + FONT_TEX; c.fillStyle = mauChu; c.textAlign = 'left'; c.textBaseline = 'bottom';
         c.fillText(o.ten + ' = ' + soVN(o.gt, 2), o.x, o.y - 12 * px);
         c.restore();
       }
@@ -674,7 +679,7 @@
     return H.kc(g, M) < nguong(10) ? g : M;
   }
   function themHinh(o) {
-    if (!o.ten && (H.LA_THANG[o.loai] || H.LA_TRON[o.loai] || H.LA_CUNG[o.loai] || o.loai === 'gapKhuc')) o.ten = tenDuongMoi();
+    if (!o.ten && (H.LA_THANG[o.loai] || H.LA_TRON[o.loai] || H.LA_CUNG[o.loai] || o.loai === 'gapKhuc' || H.LA_CONIC[o.loai])) o.ten = tenDuongMoi();
     trang().hinh.push(o); giaTri = H.tinh(trang().hinh); return o;
   }
   function tenDuongMoi() {   // tên chữ thường cho đường thẳng, đoạn, tia, đường tròn (ẩn tên theo mặc định)
@@ -700,7 +705,7 @@
      ===================================================================== */
   function laTron(o, v) { return v.k === 'tron'; }
   function laVung(o, v) { return v.k === 'daGiac' || v.k === 'tron' || (v.k === 'cung' && v.quat); }
-  function laHinh(o, v) { return { thang: 1, tron: 1, daGiac: 1, gapKhuc: 1, cung: 1 }[v.k] === 1; }
+  function laHinh(o, v) { return { thang: 1, tron: 1, daGiac: 1, gapKhuc: 1, cung: 1, cong: 1 }[v.k] === 1; }
   function trongDaGiac(ds, M) { var c = false; for (var i = 0, j = ds.length - 1; i < ds.length; j = i++) { var a = ds[i], b = ds[j]; if ((a.y > M.y) !== (b.y > M.y) && M.x < (b.x - a.x) * (M.y - a.y) / (b.y - a.y) + a.x) c = !c; } return c; }
   function timVung(M) {
     var o = timDoiTuong(M, laVung); if (o) return o;
@@ -733,6 +738,9 @@
       return hoi({ tieuDe: 'Đoạn thẳng với độ dài cố định', nhan: 'Độ dài (cm)', macDinh: '3' }).then(function (l) {
         if (!(l > 0)) return; var B = themHinh({ id: idMoi('d'), loai: 'diemCach', a: ids[0], l: l, t: 0, ten: tenDiemMoi() }); themHinh({ id: idMoi('h'), loai: 'doan', a: ids[0], b: B.id }); }); } },
     tia: { buoc: ['diem', 'diem'], goiY: ['Chọn gốc của tia', 'Chọn điểm tia đi qua'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'tia', a: ids[0], b: ids[1] }); } },
+    elip: { buoc: ['diem', 'diem', 'diem'], goiY: ['Chọn tiêu điểm thứ nhất', 'Chọn tiêu điểm thứ hai', 'Chọn một điểm trên elip'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'elip', a: ids[0], b: ids[1], c: ids[2] }); } },
+    hypebol: { buoc: ['diem', 'diem', 'diem'], goiY: ['Chọn tiêu điểm thứ nhất', 'Chọn tiêu điểm thứ hai', 'Chọn một điểm trên hypebol'], tao: function (ids) { if (!H.tinh(trang().hinh.concat([{ id: '_t', loai: 'hypebol', a: ids[0], b: ids[1], c: ids[2] }]))._t) return thongBao('Điểm này không tạo được hypebol'); themHinh({ id: idMoi('h'), loai: 'hypebol', a: ids[0], b: ids[1], c: ids[2] }); } },
+    parabol: { buoc: ['diem', 'thang'], goiY: ['Chọn tiêu điểm', 'Chọn đường chuẩn (đường thẳng)'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'parabol', a: ids[0], d: ids[1] }); } },
     gapKhuc: { buoc: ['nhieu'], goiY: ['Chọn lần lượt các điểm, bấm lại điểm cuối để kết thúc'] },
     vuongGoc: { buoc: ['diem', 'thang'], linhHoat: true, goiY: ['Chọn một điểm và một đường thẳng', 'Chọn đường thẳng (hoặc điểm) còn lại'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'vuongGoc', a: ids[0], d: ids[1] }); } },
     songSong: { buoc: ['diem', 'thang'], linhHoat: true, goiY: ['Chọn một điểm và một đường thẳng', 'Chọn đường thẳng (hoặc điểm) còn lại'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'songSong', a: ids[0], d: ids[1] }); } },
@@ -1251,6 +1259,7 @@
     ['Đường gấp khúc', function (o) { return kieuGT(o) === 'gapKhuc'; }],
     ['Đường tròn', function (o) { return kieuGT(o) === 'tron'; }],
     ['Cung tròn, hình quạt', function (o) { return kieuGT(o) === 'cung'; }],
+    ['Đường conic', function (o) { return kieuGT(o) === 'cong'; }],
     ['Đa giác', function (o) { return kieuGT(o) === 'daGiac'; }],
     ['Số đo', function (o) { return o.loai === 'doDai' || o.loai === 'goc' || o.loai === 'dienTich' || o.loai === 'gocVuong'; }],
     ['Thanh trượt', function (o) { return o.loai === 'thanhTruot'; }], ['Chữ', function (o) { return o.loai === 'chu'; }],
@@ -1291,6 +1300,9 @@
       case 'quatTam': return 'Hình quạt(tâm ' + T(o.o) + ', ' + T(o.a) + ', ' + T(o.b) + ')';
       case 'cung3': return 'Cung tròn(' + T(o.a) + ', ' + T(o.b) + ', ' + T(o.c) + ')';
       case 'quat3': return 'Hình quạt(' + T(o.a) + ', ' + T(o.b) + ', ' + T(o.c) + ')';
+      case 'elip': return 'Elip(' + T(o.a) + ', ' + T(o.b) + ', ' + T(o.c) + ')';
+      case 'hypebol': return 'Hypebol(' + T(o.a) + ', ' + T(o.b) + ', ' + T(o.c) + ')';
+      case 'parabol': return 'Parabol(' + T(o.a) + ', ' + T(o.d) + ')';
       case 'gapKhuc': return 'Đường gấp khúc(' + o.ds.map(T).join(', ') + ')';
       case 'gocVuong': return 'Kí hiệu góc vuông(' + T(o.a) + ', ' + T(o.o) + ', ' + T(o.b) + ')';
       case 'dienTich': return 'Diện tích(' + T(o.d) + ')';
@@ -1649,8 +1661,6 @@
     else { var phim = { v: 'chon', p: 'but', h: 'dq', e: 'tay' }[k]; if (phim) chonCongCu(phim); }
   });
 
-  // nạp sẵn font LaTeX rồi vẽ lại (canvas không tự vẽ lại khi font tải xong)
-  if (document.fonts) ['400 16px', 'italic 400 16px', '700 16px', 'italic 700 16px'].forEach(function (f) { document.fonts.load(f + ' "LM Roman"', 'Aă').then(function () { canVe(); capNhatNhom(); }); });
   window.addEventListener('resize', doiKichThuoc);
   doiKichThuoc();
   chonCongCu('but'); sauKhiDoiTrang(); requestAnimationFrame(vong);
