@@ -455,3 +455,9 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #menu-nguoi-dung button:hover { background: #F1F5F9; }
 #menu-nguoi-dung button.do { color: #B91C1C; }
 #menu-nguoi-dung button i svg { width: 22px; height: 22px; display: block; }
+/* Thanh trượt dọc bên phải bảng */
+#cuon-doc { position: absolute; right: 3px; top: 8px; bottom: 70px; width: 12px; z-index: 5; border-radius: 6px; background: rgba(148,163,184,.12); cursor: pointer; }
+#cuon-doc:hover, #cuon-doc.dang { background: rgba(148,163,184,.25); }
+#cuon-nut { position: absolute; left: 2px; right: 2px; top: 0; height: 40px; border-radius: 5px; background: rgba(71,85,105,.45); cursor: grab; }
+#cuon-doc:hover #cuon-nut { background: rgba(51,65,85,.6); }
+#cuon-doc.dang #cuon-nut { background: rgba(36,81,199,.75); cursor: grabbing; }

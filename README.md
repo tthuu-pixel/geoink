@@ -54,6 +54,10 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
+**Ảnh, cắt hình**: nút *Cắt hình* (cây kéo, cạnh hai nút TeX) tạm ẩn GeoInk, chụp màn hình rồi cho kéo khung chọn vùng bất kỳ (trang web, đề thi, ảnh…), vùng chọn được dán lên bảng. Ctrl+V dán ảnh đã sao chép (kể cả ảnh chụp bằng Win+Shift+S). Ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ (giữ tỉ lệ), xoá bằng Delete; ảnh được lưu trong tệp .geoink.
+
+**Cuộn, phóng to**: lăn chuột để cuộn bảng lên xuống (Shift + lăn: cuộn ngang); thanh trượt bên phải để kéo nhanh; phóng to / thu nhỏ bằng Ctrl + lăn chuột (hoặc nút +/−).
+
 **Đăng nhập bằng tài khoản GeoLab**: mở GeoInk sẽ gặp trang đăng nhập; dùng chính tài khoản được cấp trên nckh-geolab.com (cùng máy chủ tài khoản). Tick *Ghi nhớ đăng nhập* thì lần sau mở thẳng vào bảng (mất mạng vẫn dùng được; phiên hết hạn thì đăng nhập lại). Tên người dùng ở góc trên: *Mở GeoLab (đã đăng nhập)*, *Đăng xuất*. Mọi liên kết sang GeoLab (kể cả nút mở mô hình) mang theo phiên nên vào thẳng, không phải đăng nhập lại.
 
 **Tự cập nhật**: mỗi lần mở, GeoInk (bản đã cài) tự kiểm tra bản mới trên GitHub Releases. Có bản mới thì hiện thẻ thông báo ở góc dưới và nút xanh **Cập nhật** trên thanh trên cùng; bấm *Cập nhật* để tải về, tải xong tự cài và mở lại (nếu bảng chưa lưu thì hỏi lưu trước). Có thể kiểm tra tay ở menu ☰ → *Kiểm tra cập nhật*.
