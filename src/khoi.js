@@ -8,6 +8,7 @@ GI.khoi = (function () {
   var TEN = {
     hop: 'Hình hộp chữ nhật', lapPhuong: 'Hình lập phương', lang3: 'Lăng trụ đứng tam giác', lang4: 'Lăng trụ đứng tứ giác',
     chop3: 'Hình chóp tam giác đều', chop4: 'Hình chóp tứ giác đều', tru: 'Hình trụ', non: 'Hình nón', cau: 'Hình cầu',
+    tuDoChop: 'Hình chóp', tuDoLang: 'Hình lăng trụ',
   };
   var MAC_DINH = {
     hop: { a: 200, b: 140, c: 130 }, lapPhuong: { a: 150, b: 150, c: 150 }, lang3: { a: 190, b: 140, c: 170 }, lang4: { a: 190, b: 130, c: 150 },
@@ -18,6 +19,12 @@ GI.khoi = (function () {
   // Mô hình 3D: đỉnh (X, Y lên trên, Z vào sâu), mặt (chỉ số đỉnh), tên đỉnh, cạnh phụ (nét đứt luôn)
   function moHinh(o) {
     var a = o.a, b = o.b, c = o.c, d = o.dang;
+    if (d === 'tuDoChop' || d === 'tuDoLang') {   // đa diện dựng bằng cách bấm đỉnh: o.dinh3 (toạ độ 3D), o.mat (mặt), o.tenDinh
+      var day = o.mat[0].map(function (i) { return o.dinh3[i]; }), M = { dinh: o.dinh3, mat: o.mat, ten: o.tenDinh, tamDay: tam(day) };
+      if (d === 'tuDoChop' && o.chan) { M.chan = o.chan; M.phu = o.chanTrung != null ? [] : [{ a: o.dinh3.length - 1, b: 'H' }]; M.O = true; M.tenO = o.chanTrung != null ? null : 'H'; }
+      if (d === 'tuDoLang' && o.dung) M.vuong = true;
+      return M;
+    }
     if (d === 'lapPhuong') { b = a; c = a; }
     if (d === 'hop' || d === 'lapPhuong' || d === 'lang4') {
       var s = d === 'lang4' ? Math.min(a * 0.22, 40) : 0;   // lăng trụ tứ giác: đáy là hình thang
@@ -48,7 +55,9 @@ GI.khoi = (function () {
   // Phép chiếu: quay quanh trục đứng qua tâm đáy rồi chiếu xiên
   function boChieu(o, g) {
     var q = (o.xoay || 0) * Math.PI / 180, al = (o.alpha == null ? 40 : o.alpha) * Math.PI / 180, cq = Math.cos(q), sq = Math.sin(q);
-    function quay(p) { var x = p[0] - g[0], z = p[2] - g[2]; return [x * cq - z * sq, p[1], x * sq + z * cq]; }
+    var ng = (o.nghieng || 0) * Math.PI / 180, cn = Math.cos(ng), sn = Math.sin(ng);
+    // quay quanh trục đứng (xoay) rồi nghiêng quanh trục ngang (nghieng)
+    function quay(p) { var x = p[0] - g[0], z = p[2] - g[2], y = p[1], x1 = x * cq - z * sq, z1 = x * sq + z * cq; return [x1, y * cn + z1 * sn, -y * sn + z1 * cn]; }
     function chieu(p) { var r = quay(p); return { x: o.x + r[0] + K * r[2] * Math.cos(al), y: o.y - r[1] - K * r[2] * Math.sin(al) }; }
     var huong = [-K * Math.cos(al), -K * Math.sin(al), 1];   // hướng nhìn
     return { quay: quay, chieu: chieu, huong: huong, al: al, q: q };
@@ -81,19 +90,24 @@ GI.khoi = (function () {
     M.mat.forEach(function (f, fi) { if (thay[fi]) f.forEach(function (i) { dinhThay[i] = true; }); });
     var gC = { x: 0, y: 0 }; P.forEach(function (p) { gC.x += p.x / P.length; gC.y += p.y / P.length; });
     var dinh = P.map(function (p, i) { return { ten: M.ten[i], P: p, an: !dinhThay[i] }; });
-    var Oc = B.chieu(M.tamDay);
+    var Oc = B.chieu(M.chan || M.tamDay);
     if (M.O) {
-      dinh.push({ ten: 'O', P: Oc, an: true });
-      M.phu.forEach(function (e) { ds.push({ p: e.a === 'O' ? Oc : P[e.a], q: e.b === 'O' ? Oc : P[e.b], an: true, phu: true }); });
+      if (M.tenO !== null) dinh.push({ ten: M.tenO || 'O', P: Oc, an: true, phu: true });
+      M.phu.forEach(function (e) { var p1 = e.a === 'O' || e.a === 'H' ? Oc : P[e.a], q1 = e.b === 'O' || e.b === 'H' ? Oc : P[e.b]; ds.push({ p: p1, q: q1, an: true, phu: true }); });
     }
+    // các mặt (để tô màu): sắp xa → gần theo chiều nhìn
+    var mat = M.mat.map(function (f, fi) { var sau = vh(tam(f.map(function (i) { return R[i]; })), B.huong); return { pts: f.map(function (i) { return P[i]; }), thay: thay[fi], sau: sau }; });
+    mat.sort(function (u, w) { return w.sau - u.sau; });
     var n = M.dinh.length, vuong = [];
     if (M.vuong) { var nn = n / 2; vuong.push({ o: P[0], u1: donVi(P[1], P[0]), u2: donVi(P[nn], P[0]) }); }
+    if (M.chan && o.hienCao !== false) { var nd = M.mat[0][0]; vuong.push({ o: Oc, u1: donVi(P[n - 1], Oc), u2: donVi(P[o.chanTrung != null ? (o.chanTrung + 1) % (n - 1) : nd], Oc) }); }
     // tay nắm: điểm kéo + tham số thay đổi
     var tay = [];
-    if (d === 'chop3' || d === 'chop4') { tay.push({ ts: 'a', P: P[1] }, { ts: 'c', P: P[n - 1] }); }
+    if (d === 'tuDoChop' || d === 'tuDoLang') { }   // dựng tự do: không có tay nắm đổi kích thước
+    else if (d === 'chop3' || d === 'chop4') { tay.push({ ts: 'a', P: P[1] }, { ts: 'c', P: P[n - 1] }); }
     else if (d === 'lapPhuong') tay.push({ ts: 'a', P: P[1] });
     else { var m2 = n / 2; tay.push({ ts: 'a', P: P[1] }, { ts: 'b', P: P[m2 - 1] }, { ts: 'c', P: P[m2] }); }
-    return ketQua(o, ds, [], dinh, tay, vuong, P.concat([Oc]));
+    var kq = ketQua(o, ds, [], dinh, tay, vuong, P.concat([Oc])); kq.mat = mat; return kq;
   }
   function donVi(P, Q) { var x = P.x - Q.x, y = P.y - Q.y, l = Math.hypot(x, y) || 1; return { x: x / l, y: y / l }; }
 
@@ -170,5 +184,36 @@ GI.khoi = (function () {
     v.cong.forEach(function (c) { for (var i = 0; i + 1 < c.pts.length; i++) m = Math.min(m, kcDoan(c.pts[i], c.pts[i + 1])); });
     return m;
   }
-  return { TEN: TEN, moi: moi, tinh: tinh, keo: keo, daoHam: daoHam, giuNeo: giuNeo, khoangCach: khoangCach };
+  // Dựng đa diện từ các điểm bấm trên bảng: đáy (≥ 3 điểm) nằm ngang, vẽ theo phép chiếu song song chuẩn.
+  //   chop: dinhTren = đỉnh S; lang: dinhTren = vị trí A' (đỉnh đáy trên ứng với đỉnh đầu tiên)
+  function dungTuDiem(loai, day, dinhTren) {
+    var al = 40 * Math.PI / 180, ca = Math.cos(al), sa = Math.sin(al), O = day[0], tenDay = 'ABCDEFGHKMN';
+    function vao3(Q) { var z = (O.y - Q.y) / (K * sa), x = (Q.x - O.x) - K * z * ca; return [x, 0, z]; }
+    var d3 = day.map(vao3), n = d3.length;
+    // đáy theo chiều ngược kim đồng hồ nhìn từ trên xuống (để mặt hướng ra ngoài đúng)
+    var dt = 0; for (var i = 0; i < n; i++) { var p = d3[i], q = d3[(i + 1) % n]; dt += p[0] * q[2] - q[0] * p[2]; }
+    var o = { loai: 'khoi', dang: loai === 'chop' ? 'tuDoChop' : 'tuDoLang', xoay: 0, nghieng: 0, alpha: 40, a: 0, b: 0, c: 0 };
+    var ten = day.map(function (_, i) { return tenDay.charAt(i) || ('A' + i); }), mat = [];
+    if (loai === 'chop') {
+      // chân đường cao: ngay dưới S nếu S thẳng trên một đỉnh đáy, không thì ở giữa đáy (cùng độ sâu với tâm đáy)
+      var gy = day.reduce(function (s2, P) { return s2 + P.y; }, 0) / n, chanTrung = null, chan;
+      for (var j = 0; j < n; j++) if (Math.abs(dinhTren.x - day[j].x) < 14 && dinhTren.y < day[j].y - 10) { chanTrung = j; break; }
+      if (chanTrung != null) chan = d3[chanTrung].slice(); else chan = vao3({ x: dinhTren.x, y: gy });
+      var yChan = chanTrung != null ? day[chanTrung].y : gy, h = yChan - dinhTren.y; if (h < 8) return null;
+      var S = [chan[0], h, chan[2]];
+      o.dinh3 = d3.concat([S]); o.tenDinh = ten.concat(['S']); o.chan = chan; o.chanTrung = chanTrung;
+      mat.push(d3.map(function (_, i) { return i; })); for (var k = 0; k < n; k++) mat.push([k, (k + 1) % n, n]);
+    } else {
+      var hL = O.y - dinhTren.y; if (hL < 8) return null;
+      var lech = Math.abs(dinhTren.x - O.x) < 14 ? 0 : dinhTren.x - O.x, tren = d3.map(function (p) { return [p[0] + lech, hL, p[2]]; });
+      o.dinh3 = d3.concat(tren); o.tenDinh = ten.concat(ten.map(function (t) { return t + "'"; })); o.dung = !lech;
+      mat.push(d3.map(function (_, i) { return i; })); mat.push(tren.map(function (_, i) { return i + n; }));
+      for (var m = 0; m < n; m++) mat.push([m, (m + 1) % n, (m + 1) % n + n, m + n]);
+    }
+    o.mat = mat;
+    // tâm đáy trên bảng (điểm o.x, o.y là hình chiếu của tâm đáy)
+    var g = tam(d3); o.x = O.x + g[0] + K * g[2] * ca; o.y = O.y - K * g[2] * sa;
+    void dt; return o;
+  }
+  return { TEN: TEN, moi: moi, dungTuDiem: dungTuDiem, tinh: tinh, keo: keo, daoHam: daoHam, giuNeo: giuNeo, khoangCach: khoangCach };
 })();

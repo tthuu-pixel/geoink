@@ -1,5 +1,5 @@
 // GeoInk – tiến trình chính (cửa sổ, hộp thoại lưu/mở, mở link GeoLab)
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu, net, desktopCapturer, screen, clipboard } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, net, clipboard, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -120,46 +120,8 @@ ipcMain.handle('tai-khoan', async (e, { hd, duLieu }) => {
   }
 });
 
-// ----- Cắt hình ở bất kỳ đâu trên màn hình -----
-// Ẩn GeoInk, chụp màn hình đang có con trỏ, mở lớp phủ toàn màn hình để kéo chọn vùng; trả về ảnh vùng đã chọn (PNG data URL)
-let dangCat = false;
-ipcMain.handle('cat-man-hinh', async () => {
-  if (dangCat || !cuaSo) return null; dangCat = true;
-  const man = screen.getDisplayNearestPoint(screen.getCursorScreenPoint()), daPhongTo = cuaSo.isMaximized(), toanMH = cuaSo.isFullScreen();
-  try {
-    cuaSo.hide();
-    await new Promise((r) => setTimeout(r, 380));
-    const sf = man.scaleFactor || 1, nguon = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: Math.round(man.size.width * sf), height: Math.round(man.size.height * sf) } });
-    const src = nguon.find((x) => String(x.display_id) === String(man.id)) || nguon[0];
-    if (!src) throw new Error('Không chụp được màn hình');
-    const anh = src.thumbnail, kt = anh.getSize();
-    const kq = await new Promise((xong) => {
-      const w = new BrowserWindow({ x: man.bounds.x, y: man.bounds.y, width: man.bounds.width, height: man.bounds.height, frame: false, resizable: false, movable: false,
-        minimizable: false, maximizable: false, skipTaskbar: true, alwaysOnTop: true, enableLargerThanScreen: true, backgroundColor: '#000000', show: false,
-        webPreferences: { preload: path.join(__dirname, 'preload-cat.js'), contextIsolation: true, nodeIntegration: false } });
-      let daXong = false;
-      function ket(r) { if (daXong) return; daXong = true; ipcMain.removeAllListeners('cat-chon'); if (!w.isDestroyed()) w.close(); xong(r); }
-      ipcMain.removeAllListeners('cat-chon');
-      ipcMain.on('cat-chon', (e, r) => {
-        if (!r || r.w < 3 || r.h < 3) return ket(null);
-        const tx = kt.width / man.bounds.width, ty = kt.height / man.bounds.height;
-        const vung = { x: Math.max(0, Math.round(r.x * tx)), y: Math.max(0, Math.round(r.y * ty)), width: Math.round(r.w * tx), height: Math.round(r.h * ty) };
-        vung.width = Math.min(vung.width, kt.width - vung.x); vung.height = Math.min(vung.height, kt.height - vung.y);
-        ket({ duLieu: anh.crop(vung).toDataURL(), rong: r.w, cao: r.h });
-      });
-      w.on('closed', () => ket(null));
-      w.setAlwaysOnTop(true, 'screen-saver');
-      w.loadFile(path.join(__dirname, 'src', 'cat-hinh.html'));
-      w.webContents.once('did-finish-load', () => { w.webContents.send('anh-man-hinh', anh.toDataURL()); w.show(); w.focus(); });
-    });
-    return kq;
-  } catch (err) {
-    return { loi: String((err && err.message) || err) };
-  } finally {
-    dangCat = false;
-    if (cuaSo && !cuaSo.isDestroyed()) { cuaSo.show(); if (toanMH) cuaSo.setFullScreen(true); else if (daPhongTo) cuaSo.maximize(); cuaSo.focus(); }
-  }
-});
+// Cắt hình trên bảng: ghi ảnh (PNG data URL) vào clipboard của máy để dán sang Word…
+ipcMain.handle('chep-anh', (e, duLieu) => { try { clipboard.writeImage(nativeImage.createFromDataURL(duLieu)); return true; } catch (err) { return false; } });
 // Dán: đọc ảnh / chữ trong clipboard của máy
 ipcMain.handle('doc-clipboard', () => {
   const anh = clipboard.readImage();

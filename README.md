@@ -39,6 +39,8 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 
 **Mẫu hình** (cạnh nút GeoLab, bấm nút rồi bấm lên bảng: hình hiện đúng chỗ bấm): hình không gian (hộp chữ nhật, lập phương, lăng trụ đứng, chóp đều, trụ, nón, cầu — kéo điểm có vòng tròn để đổi kích thước theo đúng hướng, nút ↻ để xoay), đường tròn (nội tiếp, đường kính, tiếp tuyến…), hình phẳng (tam giác, tứ giác đặc biệt, lục giác đều), đường đặc biệt trong tam giác (phân giác, trung trực, đường trung bình). Nhóm này còn có công cụ dựng trên tam giác có sẵn: đường trung tuyến, đường cao (bấm đỉnh rồi 2 đầu cạnh đối diện; đường cao tự có kí hiệu góc vuông và nét đứt kéo dài cạnh khi chân nằm ngoài), trọng tâm, trực tâm (bấm 3 đỉnh). Kéo đỉnh thì hình vẫn giữ đúng tính chất.
 
+**Dựng và xoay hình không gian 3D** (nhóm hình không gian): *Dựng hình chóp* — bấm lần lượt các đỉnh đáy (vẽ như nhìn xiên trong sách), bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh S (bấm thẳng trên một đỉnh đáy thì cạnh bên đó vuông góc với đáy); *Dựng hình lăng trụ* — bấm các đỉnh đáy rồi bấm đỉnh A′ (thẳng phía trên A: lăng trụ đứng). Hình thành khối 3D thật: kéo nút ↻ (ngang: quay, dọc: nghiêng), nét khuất tự tính lại. Khi chọn một hình không gian (cả các hình mẫu) hiện thanh hiệu chỉnh: Góc chuẩn, Tự quay, Quay / Nghiêng / Xiên, Tô mặt (màu, độ đậm), Nét khuất (đứt / ẩn), Tên đỉnh, Đường cao. Góc nhìn đã xoay được giữ trong tệp.
+
 **Nhập tệp PDF**: bấm nút PDF (hoặc menu ☰ → Nhập tệp PDF…). Các trang PDF xếp từ trên xuống trên bảng, cột trái hiện trang nhỏ (bấm để đến trang đó). Viết, vẽ, dựng hình thẳng lên trang; lăn chuột để cuộn, Ctrl + lăn chuột để phóng to. Tệp PDF được lưu kèm trong tệp `.geoink`. Xuất ảnh PNG sẽ xuất trang PDF đang xem.
 
 **Dựng hình (thao tác như GeoGebra)**: chọn công cụ rồi bấm lên bảng.
@@ -54,7 +56,13 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
-**Ảnh, cắt hình**: nút *Cắt hình* (cây kéo, cạnh hai nút TeX) tạm ẩn GeoInk, chụp màn hình rồi cho kéo khung chọn vùng bất kỳ (trang web, đề thi, ảnh…), vùng chọn được dán lên bảng. Ctrl+V dán ảnh đã sao chép (kể cả ảnh chụp bằng Win+Shift+S). Ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ (giữ tỉ lệ), xoá bằng Delete; ảnh được lưu trong tệp .geoink.
+**Đồ thị hàm số** (nút hệ trục có đường thẳng và parabol, hàng 2): nhập *Đồ thị 1: y = …* (ví dụ `2x + 1`, `1/2x^2`, `-x^2`), bấm *+ Thêm đồ thị* để có Đồ thị 2, 3…; mỗi đồ thị chọn màu và độ dày. Chọn giới hạn hệ trục *Ox từ … đến …*, *Oy từ … đến …*, bật/tắt lưới ô vuông và nhãn phương trình. *Bảng giá trị*: chỉ nhập các giá trị x (cách nhau bằng dấu ;), chọn bảng của đồ thị nào, bấm *+ Thêm bảng giá trị* cho đồ thị khác — giá trị y tự tính, phân số viết chồng kiểu LaTeX. Hình vẽ kiểu LaTeX: trục có mũi tên, nhãn O, x, y, vạch số, chữ in nghiêng. Kéo để di chuyển, bấm đúp để sửa, cắt hình để đưa sang Word.
+
+**Thước parabol**: hai đầu trên và dưới đều dùng để vẽ. Bấm một đầu thì đầu đó hiện xanh và thành điểm cố định; kéo đầu còn lại để xoay, nghiêng thước quanh điểm cố định. Bấm lại để bỏ cố định.
+
+**Xoay hình 3D**: nút *Dựng hình chóp* / *Dựng hình lăng trụ* (nhóm hình không gian) — bấm lần lượt các đỉnh đáy, bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh trên → thành khối 3D. Kéo núm ↻ để xoay ngang / nghiêng. Thanh hiệu chỉnh dưới bảng: góc xoay, góc nghiêng, tô mặt, độ trong, nét khuất (đứt / ẩn), đường cao, tự quay; nút *Góc nhìn chuẩn* đưa về hình vẽ SGK, hình đã xoay vẫn giữ nguyên khi tắt thanh.
+
+**Cắt hình** (nút cây kéo, cạnh hai nút TeX): kéo khung quanh hình trên bảng → vùng đó được vẽ lại nét gấp 3 lần màn hình (≈ 300 dpi), nền trắng không dòng kẻ, tự chép vào clipboard để mở Word bấm Ctrl+V; có nút *Lưu ra tệp PNG*. Esc hoặc chuột phải để huỷ. Muốn lấy hình từ bên ngoài vào bảng: dùng công cụ cắt của Windows (Win+Shift+S) rồi Ctrl+V trên bảng; ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ, lưu trong tệp .geoink.
 
 **Cuộn, phóng to**: lăn chuột để cuộn bảng lên xuống (Shift + lăn: cuộn ngang); thanh trượt bên phải để kéo nhanh; phóng to / thu nhỏ bằng Ctrl + lăn chuột (hoặc nút +/−).
 

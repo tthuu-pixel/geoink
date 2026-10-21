@@ -6,20 +6,19 @@ GI.mayTinh = (function () {
   var st = { cheDo: 'tinh', goc: 'D', shift: false, alpha: false, sto: false, ans: 0, bien: { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, x: 0, y: 0, M: 0 }, kq: null, dang: 'chinh', vuaTinh: false, loi: '' };
   var TEN_CHE_DO = { tinh: 'Tính toán', tk: 'Thống kê', bang: 'Bảng', pt: 'Phương trình', bpt: 'Bất phương trình' };
 
-  // ---------- phím ----------
-  //   [mã, nhãn, nhãn SHIFT, nhãn ALPHA, kiểu]  kiểu: 'cn' (chức năng), 'so', 'xoa', 'bang'
-  var PHIM_TREN = [
-    [['shift', 'SHIFT', '', '', 'shift'], ['alpha', 'ALPHA', '', '', 'alpha'], ['trai', '◀', '', '', 'dh'], ['len', '▲', '', '', 'dh'], ['xuong', '▼', '', '', 'dh'], ['phai', '▶', '', '', 'dh']],
-    [['menu', 'MENU', '', '', 'cn2'], ['setup', 'SETUP', '', '', 'cn2'], ['x', '<i>x</i>', '', '<i>y</i>', 'cn'], ['frac', '<span class="mt-ps">▫<br>▫</span>', '', '', 'cn'], ['sqrt', '√▫', '∛▫', '', 'cn'], ['sq', '<i>x</i>²', '<i>x</i>³', '', 'cn']],
-    [['pow', '<i>x</i><sup>▫</sup>', '<sup>▫</sup>√▫', '', 'cn'], ['log', 'log<sub>▫</sub>', '10<sup>▫</sup>', '', 'cn'], ['ln', 'ln', '<i>e</i><sup>▫</sup>', '', 'cn'], ['am', '(−)', '', 'A', 'cn'], ['dms', '° ′ ″', '', 'B', 'cn'], ['inv', '<i>x</i>⁻¹', '<i>x</i>!', 'C', 'cn']],
-    [['sin', 'sin', 'sin⁻¹', 'D', 'cn'], ['cos', 'cos', 'cos⁻¹', 'E', 'cn'], ['tan', 'tan', 'tan⁻¹', 'F', 'cn'], ['sto', 'STO', '', '', 'cn'], ['sd', 'S⇔D', '', '', 'cn'], ['abs', '|<i>x</i>|', '', '', 'cn']],
-    [['mo', '(', '', '', 'cn'], ['dong', ')', '', '', 'cn'], ['pt', '%', '', '', 'cn'], ['ncr', '<i>n</i>C<i>r</i>', '<i>n</i>P<i>r</i>', '', 'cn'], ['mcong', 'M+', 'M−', 'M', 'cn'], ['ans2', 'Ans', '', '', 'cn']],
+  // ---------- phím (bố cục giống máy fx-880BTG, phần dùng cho THCS) ----------
+  //   [mã, nhãn, nhãn SHIFT (ghi phía trên phím), kiểu]
+  var SVG = { nha: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7M6 9.5V20h12V9.5"/></svg>', caiDat: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>', quay: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5M4 12h11a5 5 0 000-10h-2"/></svg>', bien: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6l6 12M11 6L5 18"/><path d="M14 12h6M17.5 9.5L20 12l-2.5 2.5"/></svg>', ham: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c2 0 2-14 5-14 1 0 1.5.5 1.5.5M7 11h7"/><path d="M16 13l4 5M20 13l-4 5"/></svg>', sach: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5A2.5 2.5 0 017.5 3H19v15H7.5A2.5 2.5 0 005 20.5zM5 20.5A2.5 2.5 0 017.5 18H19v3H7.5"/></svg>', cong: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18" cy="12" r="1.6" fill="currentColor"/></svg>', shift: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l7 8h-4v7H9v-7H5z"/></svg>', xoaLui: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h11v14H9l-6-7z"/><path d="M12 9l5 6M17 9l-5 6"/></svg>' };
+  var HANG_CN = [
+    [['shift', SVG.shift, '', 'shift'], ['var', SVG.bien, '', 'cn'], ['fn', SVG.ham, '', 'cn'], ['catalog', SVG.sach, '', 'cn'], ['tools', SVG.cong, '', 'cn']],
+    [['x', '<i>x</i>', '', 'cn'], ['frac', '<svg viewBox="0 0 20 24" width="15" height="19"><rect x="4.5" y="1.5" width="11" height="7.5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 12h15" stroke="currentColor" stroke-width="1.9"/><rect x="4.5" y="15" width="11" height="7.5" rx="1.2" fill="currentColor"/></svg>', '', 'cn'], ['sqrt', '√▪', '∛▪', 'cn'], ['sq', '▪²', '▪<sup>▫</sup>', 'cn'], ['log', 'log<sub>▪</sub>▫', '10<sup>▪</sup>', 'cn']],
+    [['ans', 'Ans', 'PreAns', 'cn'], ['sin', 'sin', 'sin⁻¹', 'cn'], ['cos', 'cos', 'cos⁻¹', 'cn'], ['tan', 'tan', 'tan⁻¹', 'cn'], ['mo', '(', '', 'cn'], ['dong', ')', '', 'cn']],
   ];
   var PHIM_SO = [
-    [['7', '7'], ['8', '8'], ['9', '9'], ['del', 'DEL', '', '', 'xoa'], ['ac', 'AC', '', '', 'xoa']],
+    [['7', '7'], ['8', '8'], ['9', '9'], ['del', SVG.xoaLui, 'INS', 'xoa'], ['ac', 'AC', '', 'xoa']],
     [['4', '4'], ['5', '5'], ['6', '6'], ['nhan', '×'], ['chia', '÷']],
     [['1', '1'], ['2', '2'], ['3', '3'], ['cong', '+'], ['tru', '−']],
-    [['0', '0'], ['cham', '.'], ['e10', '×10<sup><i>x</i></sup>', 'π', '<i>e</i>'], ['ans', 'Ans'], ['bang', '=', '', '', 'bang']],
+    [['0', '0'], ['cham', '.'], ['e10', '×10<sup><i>x</i></sup>', 'π'], ['format', 'FORMAT', '', 'fmt'], ['bang', 'EXE', '', 'exe']],
   ];
   // LaTeX chèn vào ô nhập (#0: chỗ đặt con trỏ)
   var CHEN = {
@@ -27,30 +26,38 @@ GI.mayTinh = (function () {
     sin: '\\sin\\left(#0\\right)', cos: '\\cos\\left(#0\\right)', tan: '\\tan\\left(#0\\right)', abs: '\\left|#0\\right|', mo: '\\left(', dong: '\\right)', pt: '\\%', ncr: '\\operatorname{C}',
     ans: '\\mathrm{Ans}', ans2: '\\mathrm{Ans}', cham: '.', e10: '\\times10^{#0}', nhan: '\\times', chia: '\\div', cong: '+', tru: '-', dms: '^{\\circ}',
     's:sqrt': '\\sqrt[3]{#0}', 's:sq': '^{3}', 's:pow': '\\sqrt[#0]{#?}', 's:log': '10^{#0}', 's:ln': 'e^{#0}', 's:inv': '!', 's:sin': '\\sin^{-1}\\left(#0\\right)', 's:cos': '\\cos^{-1}\\left(#0\\right)', 's:tan': '\\tan^{-1}\\left(#0\\right)',
-    's:ncr': '\\operatorname{P}', 's:e10': '\\pi', 'a:e10': 'e', 'a:x': 'y', 'a:am': 'A', 'a:dms': 'B', 'a:inv': 'C', 'a:sin': 'D', 'a:cos': 'E', 'a:tan': 'F', 'a:mcong': 'M',
+    's:ncr': '\\operatorname{P}', 's:e10': '\\pi', 's:sq': '^{#0}', cube: '^{3}', nthRoot: '\\sqrt[#0]{#?}', exp: 'e^{#0}', fact: '!', hangE: 'e', hangPi: '\\pi', 'a:e10': 'e', 'a:x': 'y', 'a:am': 'A', 'a:dms': 'B', 'a:inv': 'C', 'a:sin': 'D', 'a:cos': 'E', 'a:tan': 'F', 'a:mcong': 'M',
   };
   for (var so = 0; so <= 9; so++) CHEN[String(so)] = String(so);
-  var LA_TOAN_TU = { sq: 1, pow: 1, inv: 1, nhan: 1, chia: 1, cong: 1, tru: 1, pt: 1, ncr: 1, 's:sq': 1, 's:inv': 1, 's:ncr': 1 };
+  var LA_TOAN_TU = { sq: 1, pow: 1, inv: 1, nhan: 1, chia: 1, cong: 1, tru: 1, pt: 1, ncr: 1, 's:sq': 1, 's:inv': 1, 's:ncr': 1, cube: 1, fact: 1 };
 
-  function htmlPhim(p, nho) {
-    var kieu = p[4] || 'so';
-    return '<button class="mt-k mt-' + kieu + (nho ? ' nho' : '') + '" data-k="' + p[0] + '">' +
-      (p[2] ? '<span class="mt-s">' + p[2] + '</span>' : '') + (p[3] ? '<span class="mt-a">' + p[3] + '</span>' : '') + '<b>' + p[1] + '</b></button>';
+  function htmlPhim(p) {
+    var kieu = p[3] || 'so';
+    var tieuDe = { var: 'VARIABLE: gọi biến · SHIFT + VARIABLE: STO (lưu Ans vào biến)', fn: 'FUNCTION: các hàm', catalog: 'CATALOG: hàm và hằng số π, e', tools: 'TOOLS: M+, M−, xoá bộ nhớ, S⇔D', format: 'FORMAT: đổi dạng kết quả (phân số / thập phân / độ phút giây)', bang: 'EXE: tính' }[p[0]];
+    return '<button class="mt-k mt-' + kieu + '" data-k="' + p[0] + '"' + (tieuDe ? ' title="' + tieuDe + '"' : '') + '>' + (p[2] ? '<span class="mt-s">' + p[2] + '</span>' : '') + '<b>' + p[1] + '</b></button>';
   }
   function tao() {
     el = document.createElement('div'); el.id = 'may-tinh'; el.className = 'an';
-    el.innerHTML = '<div class="mt-dau"><span class="mt-ten">MÁY TÍNH KHOA HỌC</span><span class="mt-phu">CHẾ ĐỘ THCS</span><button class="mt-dong" title="Đóng">×</button></div>' +
-      '<div class="mt-lcd"><div class="mt-tt"></div><div class="mt-man"></div></div>' +
-      '<div class="mt-ban-tren">' + PHIM_TREN.map(function (h) { return h.map(function (p) { return htmlPhim(p, true); }).join(''); }).join('') + '</div>' +
-      '<div class="mt-ban-so">' + PHIM_SO.map(function (h) { return h.map(function (p) { return htmlPhim(p, false); }).join(''); }).join('') + '</div>';
+    el.innerHTML = '<div class="mt-dau"><span class="mt-hieu">GeoInk</span><span class="mt-phu">máy tính khoa học · THCS</span><button class="mt-dong" title="Đóng máy tính">×</button></div>' +
+      '<div class="mt-vien-lcd"><div class="mt-lcd"><div class="mt-tt"></div><div class="mt-man"></div></div></div>' +
+      '<div class="mt-dong-chu">GEOINK</div>' +
+      '<div class="mt-cum">' +
+        '<div class="mt-trai"><div class="mt-cap"><span>ON</span><button class="mt-tron" data-k="on">' + '' + '</button></div><div class="mt-cap"><span>HOME</span><button class="mt-tron" data-k="home">' + SVG.nha + '</button></div>' +
+          '<div class="mt-cap"><span>SETTINGS</span><button class="mt-tron" data-k="settings">' + SVG.caiDat + '</button></div><div class="mt-cap"><span>&nbsp;</span><button class="mt-tron" data-k="quay">' + SVG.quay + '</button></div></div>' +
+        '<div class="mt-dpad"><button data-k="len" class="d-len">▲</button><button data-k="trai" class="d-trai">◀</button><button data-k="ok" class="d-ok">OK</button><button data-k="phai" class="d-phai">▶</button><button data-k="xuong" class="d-xuong">▼</button></div>' +
+        '<div class="mt-cuon"><button data-k="len">︿</button><button data-k="xuong">﹀</button></div>' +
+      '</div>' +
+      '<div class="mt-nhan-cn"><span>SHIFT</span><span>VARIABLE</span><span>FUNCTION</span><span>CATALOG</span><span>TOOLS</span></div>' +
+      HANG_CN.map(function (h, i) { return '<div class="mt-hang mt-hang' + i + '">' + h.map(htmlPhim).join('') + '</div>'; }).join('') +
+      '<div class="mt-ban-so">' + PHIM_SO.map(function (h) { return h.map(htmlPhim).join(''); }).join('') + '</div>';
     document.body.appendChild(el);
     tt = el.querySelector('.mt-tt'); man = el.querySelector('.mt-man');
     el.querySelectorAll('[data-k]').forEach(function (b) { b.addEventListener('mousedown', function (e) { e.preventDefault(); }); b.onclick = function () { nhan(b.dataset.k); }; });
     el.querySelector('.mt-dong').onclick = dong;
-    // kéo máy tính
+    // kéo máy tính bằng phần đầu (chỗ chữ GeoInk)
     var dau = el.querySelector('.mt-dau'), keo = null;
-    dau.addEventListener('pointerdown', function (e) { if (e.target.closest('button')) return; var r = el.getBoundingClientRect(); keo = { dx: e.clientX - r.left, dy: e.clientY - r.top }; dau.setPointerCapture(e.pointerId); });
-    dau.addEventListener('pointermove', function (e) { if (!keo) return; el.style.left = Math.max(0, Math.min(window.innerWidth - 80, e.clientX - keo.dx)) + 'px'; el.style.top = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - keo.dy)) + 'px'; el.style.right = 'auto'; });
+    dau.addEventListener('pointerdown', function (e) { if (e.target.closest('button')) return; var r = el.getBoundingClientRect(), z = parseFloat(el.style.zoom) || 1; keo = { dx: e.clientX / z - r.left / z, dy: e.clientY / z - r.top / z, z: z }; dau.setPointerCapture(e.pointerId); });
+    dau.addEventListener('pointermove', function (e) { if (!keo) return; el.style.left = Math.max(0, e.clientX / keo.z - keo.dx) + 'px'; el.style.top = Math.max(0, e.clientY / keo.z - keo.dy) + 'px'; el.style.right = 'auto'; });
     dau.addEventListener('pointerup', function () { keo = null; });
     el.addEventListener('keydown', function (e) {   // bàn phím máy tính thật
       e.stopPropagation();
@@ -77,20 +84,29 @@ GI.mayTinh = (function () {
 
   // ---------- trạng thái ----------
   function veTrangThai() {
-    tt.innerHTML = '<span class="' + (st.shift ? 'bat' : '') + '">S</span><span class="' + (st.alpha ? 'bat' : '') + '">A</span>' + (st.sto ? '<span class="bat">STO</span>' : '') +
+    tt.innerHTML = '<span class="' + (st.shift ? 'bat' : '') + '">S</span>' + (st.sto ? '<span class="bat">STO</span>' : '') +
       '<span class="bat">' + (st.goc === 'D' ? 'D' : 'R') + '</span>' + (st.bien.M ? '<span class="bat">M</span>' : '') + '<span class="mt-cd">' + TEN_CHE_DO[st.cheDo] + '</span>';
   }
   var manHinh = 'tinh', luoi = null, dsKq = null, chonMuc = 0;
+  // ô trên màn hình HOME (biểu tượng vẽ kiểu màn hình LCD)
+  var IC = function (d) { return '<svg viewBox="0 0 32 24" width="34" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; };
+  var MUC_HOME = [
+    ['tinh', 'Tính thường', IC('<path d="M5 6h7M8.5 2.5v7M20 6h7M5 18l6-5M11 18l-6-5M20 15.5h7M20 20.5h7"/>')],
+    ['tk', 'Thống kê', IC('<path d="M4 21h24M7 21V13M12 21V6M17 21V10M22 21V15M27 21V8" stroke-width="2.6"/>')],
+    ['bang', 'Bảng giá trị', IC('<rect x="4" y="3" width="24" height="18" rx="1.5"/><path d="M4 9h24M4 15h24M14 3v18"/>')],
+    ['pt', 'Phương trình', IC('<path d="M3 9c3-6 6-6 9 0s6 6 9 0M3 15h8M15 15h3M21 12v6M24 15h5"/>')],
+    ['bpt', 'Bất phương trình', IC('<path d="M5 6l8 6-8 6M17 18h11M17 6h11M17 12h11" />')],
+  ];
   function veMan() {
     veTrangThai(); man.innerHTML = '';
     if (manHinh === 'tinh') { man.appendChild(mf); var k = document.createElement('div'); k.className = 'mt-kq'; man.appendChild(k); veKetQua(); return; }
     if (manHinh === 'menu') {
-      var M = [['tinh', '1', 'Tính toán', '<b>√</b>÷'], ['tk', '2', 'Thống kê', '<b>x̄</b>'], ['bang', '3', 'Bảng', '<b>f(x)</b>'], ['pt', '4', 'Phương trình', '<b>x=</b>'], ['bpt', '5', 'Bất phương trình', '<b>x&gt;</b>']];
-      man.innerHTML = '<div class="mt-menu">' + M.map(function (m, i) { return '<div class="mt-mn' + (i === chonMuc ? ' chon' : '') + '"><span class="mt-mn-i">' + m[3] + '</span><span>' + m[1] + ': ' + m[2] + '</span></div>'; }).join('') + '</div>';
+      man.innerHTML = '<div class="mt-menu">' + MUC_HOME.map(function (m, i) { return '<div class="mt-mn' + (i === chonMuc ? ' chon' : '') + '"><span class="mt-mn-i">' + m[2] + '</span><span class="mt-mn-t">' + m[1] + '</span></div>'; }).join('') + '</div>';
       return;
     }
     if (manHinh === 'danhSach') {   // chọn trong danh sách (loại phương trình, bậc, dấu…)
-      man.innerHTML = '<div class="mt-tieu-de">' + dsChon.tieuDe + '</div><div class="mt-ds">' + dsChon.ds.map(function (d, i) { return '<div class="' + (i === chonMuc ? 'chon' : '') + '">' + (i + 1) + ': ' + d[1] + '</div>'; }).join('') + '</div>';
+      man.innerHTML = '<div class="mt-tieu-de">' + dsChon.tieuDe + '</div><div class="mt-ds">' + dsChon.ds.map(function (d, i) { return '<div class="' + (i === chonMuc ? 'chon' : '') + '">' + (i < 9 ? (i + 1) + ': ' : '') + d[1] + '</div>'; }).join('') + '</div>';
+      var cs = man.querySelector('.mt-ds .chon'); if (cs) cs.scrollIntoView({ block: 'nearest' });
       return;
     }
     if (manHinh === 'luoi') { veLuoi(); return; }
@@ -115,16 +131,58 @@ GI.mayTinh = (function () {
 
   // ---------- xử lí phím ----------
   function nhan(k) {
-    if (k === 'shift') { st.shift = !st.shift; st.alpha = false; veTrangThai(); return; }
-    if (k === 'alpha') { st.alpha = !st.alpha; st.shift = false; veTrangThai(); return; }
-    var ma = st.shift ? 's:' + k : st.alpha ? 'a:' + k : k; st.shift = false; st.alpha = false;
-    if (k === 'menu') { manHinh = 'menu'; chonMuc = 0; veMan(); return; }
-    if (k === 'setup') { st.goc = st.goc === 'D' ? 'R' : 'D'; veTrangThai(); thongBaoNho(st.goc === 'D' ? 'Đơn vị góc: Độ (D)' : 'Đơn vị góc: Radian (R)'); return; }
+    if (k === 'shift') { st.shift = !st.shift; veTrangThai(); return; }
+    var coShift = st.shift, ma = coShift ? 's:' + k : k; st.shift = false;
+    if (k === 'on') { if (coShift) return dong(); manHinh = 'tinh'; st.cheDo = 'tinh'; veMan(); return nhan('ac'); }
+    if (k === 'home' || k === 'menu') { manHinh = 'menu'; chonMuc = Math.max(0, MUC_HOME.map(function (m) { return m[0]; }).indexOf(st.cheDo)); veMan(); return; }
+    if (k === 'ok') k = ma = 'bang';
+    if (k === 'quay') return quayLai();
+    if (k === 'settings') return moDanhSach('Cài đặt', [['D', 'Đơn vị góc: Độ (D)'], ['R', 'Đơn vị góc: Radian (R)']], function (g) { st.goc = g; veTrangThai(); thongBaoNho(g === 'D' ? 'Đơn vị góc: Độ (D)' : 'Đơn vị góc: Radian (R)'); });
+    if (k === 'var') return coShift ? moBien(true) : moBien(false);
+    if (k === 'fn' || k === 'catalog') return moHam(k === 'catalog');
+    if (k === 'tools') return moCongCu();
+    if (k === 'ans' && coShift) { var o = oHienTai(); o.executeCommand(['insert', L.hienThi(st.preAns || 0).latex, { focus: true }]); return; }
+    if (k === 'format') { if (manHinh === 'tinh' && st.vuaTinh && st.kq != null) { st.dang = st.dang === 'chinh' ? 'thapPhan' : st.dang === 'thapPhan' ? 'dms' : 'chinh'; veKetQua(); } return; }
+    if (k === 'del' && coShift) return;
     if (manHinh === 'menu') return nhanMenu(k);
     if (manHinh === 'danhSach') return nhanDanhSach(k);
     if (manHinh === 'luoi') return nhanLuoi(k, ma);
     if (manHinh === 'ketQua') { if (k === 'ac' || k === 'trai' || k === 'del') { manHinh = 'luoi'; veMan(); } else if (k === 'bang') { manHinh = 'luoi'; veMan(); } return; }
     nhanTinh(k, ma);
+  }
+  function oHienTai() { return manHinh === 'luoi' && oSua ? oSua : mf; }
+  function quayLai() {
+    if (manHinh === 'danhSach') { manHinh = dsChon.quayVe || 'menu'; veMan(); if (dsChon.giu != null) khoiPhucO(); return; }
+    if (manHinh === 'ketQua') { manHinh = 'luoi'; veMan(); return; }
+    if (manHinh === 'luoi' || manHinh === 'menu') { manHinh = 'menu'; if (st.cheDo === 'tinh') manHinh = 'tinh'; veMan(); return; }
+  }
+  // danh sách chọn (Cài đặt, biến, hàm, công cụ…): chọn xong quay về màn hình đang dùng
+  function moDanhSach(tieuDe, ds, xong) {
+    var ve = manHinh === 'danhSach' ? (dsChon.quayVe || 'tinh') : manHinh, giu = ve === 'luoi' && oSua ? oSua.value : null;
+    dsChon = { tieuDe: tieuDe, ds: ds, quayVe: ve, giu: giu, xong: function (v) { manHinh = ve; veMan(); if (giu != null) khoiPhucO(); xong(v); } };
+    manHinh = 'danhSach'; chonMuc = 0; veMan();
+  }
+  function khoiPhucO() { if (oSua && dsChon && dsChon.giu != null) { oSua.value = dsChon.giu; oSua.executeCommand('moveToMathfieldEnd'); } }
+  function chenVao(ma) { setTimeout(function () { var o = oHienTai(); if (manHinh === 'tinh' && st.vuaTinh) { mf.value = LA_TOAN_TU[ma] ? '\\mathrm{Ans}' : ''; st.vuaTinh = false; st.dang = 'chinh'; veKetQua(); } chen(ma, o); }, 0); }
+  function moBien(luu) {
+    var ten = ['A', 'B', 'C', 'D', 'E', 'F', 'x', 'y', 'M'];
+    moDanhSach(luu ? 'STO: lưu Ans vào biến' : 'Biến (VARIABLE)', ten.map(function (t) { return [t, t + ' = ' + L.hienThi(st.bien[t] || 0).chu]; }), function (t) {
+      if (luu) { st.bien[t] = st.ans; thongBaoNho('Ans → ' + t + ' = ' + L.hienThi(st.ans).chu); return; }
+      setTimeout(function () { oHienTai().executeCommand(['insert', t, { focus: true }]); }, 0);
+    });
+  }
+  function moHam(coHang) {
+    var ds = [['abs', '|x|  (giá trị tuyệt đối)'], ['inv', 'x⁻¹'], ['cube', 'x³'], ['nthRoot', 'ⁿ√  (căn bậc n)'], ['ln', 'ln'], ['exp', 'eˣ'], ['fact', 'x!  (giai thừa)'], ['ncr', 'nCr  (tổ hợp)'], ['s:ncr', 'nPr  (chỉnh hợp)'], ['pt', '%'], ['dms', '° ′ ″  (độ phút giây)']];
+    if (coHang) ds = ds.concat([['hangPi', 'π'], ['hangE', 'e'], ['s:sin', 'sin⁻¹'], ['s:cos', 'cos⁻¹'], ['s:tan', 'tan⁻¹'], ['s:log', '10ˣ']]);
+    moDanhSach(coHang ? 'CATALOG' : 'FUNCTION', ds, function (m) { chenVao(m); });
+  }
+  function moCongCu() {
+    moDanhSach('TOOLS', [['mcong', 'M+  (cộng kết quả vào M)'], ['mtru', 'M−  (trừ kết quả khỏi M)'], ['xoaM', 'Xoá bộ nhớ M'], ['xoaBien', 'Xoá tất cả biến'], ['sd', 'S⇔D  (phân số ⇔ thập phân)']], function (m) {
+      if (m === 'mcong' || m === 'mtru') { var v = st.vuaTinh && st.kq != null ? st.kq : st.ans; st.bien.M += m === 'mtru' ? -v : v; thongBaoNho('M = ' + L.hienThi(st.bien.M).chu); veTrangThai(); return; }
+      if (m === 'xoaM') { st.bien.M = 0; thongBaoNho('Đã xoá M'); veTrangThai(); return; }
+      if (m === 'xoaBien') { Object.keys(st.bien).forEach(function (t) { st.bien[t] = 0; }); thongBaoNho('Đã xoá tất cả biến'); veTrangThai(); return; }
+      if (m === 'sd') { if (st.vuaTinh && st.kq != null) { st.dang = st.dang === 'thapPhan' ? 'chinh' : 'thapPhan'; veKetQua(); } }
+    });
   }
   function chen(ma, o) {
     o = o || mf; var lx = CHEN[ma]; if (lx == null) return false;
@@ -157,7 +215,7 @@ GI.mayTinh = (function () {
     chen(ma);
   }
   function tinhNgay() {
-    try { var v = L.tinh(mf.value, ngu()); st.kq = v; st.ans = v; st.loi = ''; st.vuaTinh = true; st.dang = 'chinh'; }
+    try { var v = L.tinh(mf.value, ngu()); st.kq = v; st.preAns = st.ans; st.ans = v; st.loi = ''; st.vuaTinh = true; st.dang = 'chinh'; }
     catch (e) { st.loi = e.mt ? e.message : 'Lỗi cú pháp'; st.vuaTinh = false; }
     veKetQua();
   }
@@ -166,21 +224,23 @@ GI.mayTinh = (function () {
 
   // ---------- MENU ----------
   function nhanMenu(k) {
-    var so = +k;
-    if (k === 'len' || k === 'trai') { chonMuc = (chonMuc + 4) % 5; veMan(); return; }
-    if (k === 'xuong' || k === 'phai') { chonMuc = (chonMuc + 1) % 5; veMan(); return; }
+    var so = +k, n = MUC_HOME.length;
+    if (k === 'trai') { chonMuc = (chonMuc + n - 1) % n; veMan(); return; }
+    if (k === 'phai') { chonMuc = (chonMuc + 1) % n; veMan(); return; }
+    if (k === 'len') { chonMuc = chonMuc >= 3 ? chonMuc - 3 : chonMuc; veMan(); return; }
+    if (k === 'xuong') { chonMuc = Math.min(n - 1, chonMuc + 3); veMan(); return; }
     if (k === 'bang') so = chonMuc + 1;
-    if (k === 'ac') { manHinh = st.cheDo === 'tinh' ? 'tinh' : manHinh; batDauCheDo(st.cheDo); return; }
-    if (so >= 1 && so <= 5) batDauCheDo(['tinh', 'tk', 'bang', 'pt', 'bpt'][so - 1]);
+    if (k === 'ac') { batDauCheDo(st.cheDo); return; }
+    if (so >= 1 && so <= n) batDauCheDo(MUC_HOME[so - 1][0]);
   }
   var dsChon = null;
-  function hoiChon(tieuDe, ds, xong) { dsChon = { tieuDe: tieuDe, ds: ds, xong: xong }; manHinh = 'danhSach'; chonMuc = 0; veMan(); }
+  function hoiChon(tieuDe, ds, xong) { dsChon = { tieuDe: tieuDe, ds: ds, xong: xong, quayVe: 'menu' }; manHinh = 'danhSach'; chonMuc = 0; veMan(); }
   function nhanDanhSach(k) {
     var n = dsChon.ds.length, so = +k;
     if (k === 'len' || k === 'trai') { chonMuc = (chonMuc + n - 1) % n; veMan(); return; }
     if (k === 'xuong' || k === 'phai') { chonMuc = (chonMuc + 1) % n; veMan(); return; }
     if (k === 'bang') so = chonMuc + 1;
-    if (k === 'ac') { manHinh = 'menu'; veMan(); return; }
+    if (k === 'ac') { quayLai(); return; }
     if (so >= 1 && so <= n) dsChon.xong(dsChon.ds[so - 1][0]);
   }
   function batDauCheDo(cd) {
@@ -259,7 +319,7 @@ GI.mayTinh = (function () {
       if (i >= soHang) { if (g.themHang) { g.o.push(g.o[0].map(function (_, c) { return g.tk === 1 && c === 1 ? { latex: '1', gt: 1 } : oTrong(); })); } else { i = soHang - 1; j = soCot - 1; } }
       g.chon = [i, j]; veMan(); return;
     }
-    if (k === 'sto' || k === 'sd' || k === 'mcong' || k === 'menu' || k === 'setup') return;
+    if (k === 'format') return;
     chen(ma, oSua);
   }
   function giaTriLuoi() { return luoi.o.map(function (h) { return h.map(function (o) { return o.gt; }); }); }
