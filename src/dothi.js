@@ -65,8 +65,11 @@ GI.doThi = (function () {
     // vạch số
     c.font = (15 * px) + 'px ' + FONT; c.lineWidth = 1.2 * px;
     var bx = buoc(x1 - x0), by = buoc(y1 - y0);
-    for (var i = Math.ceil(x0 / bx) * bx; i <= x1 + 1e-9; i += bx) { if (Math.abs(i) < 1e-9) continue; c.beginPath(); c.moveTo(X(i), Y(0) - 3.5 * px); c.lineTo(X(i), Y(0) + 3.5 * px); c.stroke(); c.textAlign = 'center'; c.fillText(so(i), X(i), Y(0) + 15 * px); }
-    for (var j = Math.ceil(y0 / by) * by; j <= y1 + 1e-9; j += by) { if (Math.abs(j) < 1e-9) continue; c.beginPath(); c.moveTo(X(0) - 3.5 * px, Y(j)); c.lineTo(X(0) + 3.5 * px, Y(j)); c.stroke(); c.textAlign = 'right'; c.fillText(so(j), X(0) - 7 * px, Y(j)); }
+    var chiem = [];   // ô chữ đã có quanh trục (để số ghi thêm không đè lên)
+    function oChu(t, cx, cy) { var w = rongChu(c, t) / 2 + 2 * px, h = (PS.test(t) ? 14 : 8) * px; return { x0: cx - w, x1: cx + w, y0: cy - h, y1: cy + h }; }
+    var wO = c.measureText('O').width; chiem.push({ x0: X(0) - 8 * px - wO, x1: X(0) - 4 * px, y0: Y(0) + 4 * px, y1: Y(0) + 24 * px });
+    for (var i = Math.ceil(x0 / bx) * bx; i <= x1 + 1e-9; i += bx) { if (Math.abs(i) < 1e-9) continue; c.beginPath(); c.moveTo(X(i), Y(0) - 3.5 * px); c.lineTo(X(i), Y(0) + 3.5 * px); c.stroke(); c.textAlign = 'center'; c.fillText(so(i), X(i), Y(0) + 15 * px); chiem.push(oChu(so(i), X(i), Y(0) + 15 * px)); }
+    for (var j = Math.ceil(y0 / by) * by; j <= y1 + 1e-9; j += by) { if (Math.abs(j) < 1e-9) continue; c.beginPath(); c.moveTo(X(0) - 3.5 * px, Y(j)); c.lineTo(X(0) + 3.5 * px, Y(j)); c.stroke(); c.textAlign = 'right'; c.fillText(so(j), X(0) - 7 * px, Y(j)); var wj = c.measureText(so(j)).width; chiem.push(oChu(so(j), X(0) - 7 * px - wj / 2, Y(j))); }
     // các đồ thị (cắt trong khung Ox, Oy đã chọn)
     var nhanPT = [];
     (o.ds || []).forEach(function (d, k) {
@@ -88,6 +91,11 @@ GI.doThi = (function () {
     var daDat = [], vachX = {}, vachY = {};
     if (o.giong !== false) {
       var bx0 = buoc(x1 - x0), by0 = buoc(y1 - y0);
+      function datSo(t, ds) {   // chọn chỗ ít đè nhất trong các chỗ thử
+        var tot = null, it = 1e9;
+        ds.forEach(function (d) { var h = oChu(t, d[0], d[1]), n = 0; chiem.forEach(function (k) { if (h.x0 < k.x1 && k.x0 < h.x1 && h.y0 < k.y1 && k.y0 < h.y1) n++; }); if (n < it) { it = n; tot = { d: d, h: h }; } });
+        chiem.push(tot.h); veO(c, t, tot.d[0], tot.d[1], px);
+      }
       (o.bang || []).forEach(function (b) {
         var d = o.ds[b.i] || o.ds[0]; if (!d) return; var f = ham(d); if (!f) return;
         var mauD = d.mau || MAU[(b.i || 0) % MAU.length];
@@ -99,8 +107,8 @@ GI.doThi = (function () {
           c.stroke(); c.restore();
           // số chưa có vạch trên trục (như 1/2, 2,5…) thì ghi thêm
           var kx = so(x), ky = so(y);
-          if (Math.abs(x) > 1e-9 && Math.abs(x / bx0 - Math.round(x / bx0)) > 1e-9 && !vachX[kx]) { vachX[kx] = 1; c.save(); c.fillStyle = mau; c.strokeStyle = mau; c.lineWidth = 1.2 * px; c.beginPath(); c.moveTo(X(x), Y(0) - 3.5 * px); c.lineTo(X(x), Y(0) + 3.5 * px); c.stroke(); c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; veO(c, kx, X(x), Y(0) + (PS.test(kx) ? 22 : 15) * px, px); c.restore(); }
-          if (Math.abs(y) > 1e-9 && Math.abs(y / by0 - Math.round(y / by0)) > 1e-9 && !vachY[ky]) { vachY[ky] = 1; c.save(); c.fillStyle = mau; c.strokeStyle = mau; c.lineWidth = 1.2 * px; c.beginPath(); c.moveTo(X(0) - 3.5 * px, Y(y)); c.lineTo(X(0) + 3.5 * px, Y(y)); c.stroke(); c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'right'; c.textBaseline = 'middle'; c.save(); c.textAlign = 'center'; veO(c, ky, X(0) - 7 * px - rongChu(c, ky) / 2, Y(y), px); c.restore(); c.restore(); }
+          if (Math.abs(x) > 1e-9 && Math.abs(x / bx0 - Math.round(x / bx0)) > 1e-9 && !vachX[kx]) { vachX[kx] = 1; c.save(); c.fillStyle = mau; c.strokeStyle = mau; c.lineWidth = 1.2 * px; c.beginPath(); c.moveTo(X(x), Y(0) - 3.5 * px); c.lineTo(X(x), Y(0) + 3.5 * px); c.stroke(); c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; var dx = (PS.test(kx) ? 22 : 15) * px; datSo(kx, [[X(x), Y(0) + dx], [X(x), Y(0) - dx]]); c.restore(); }
+          if (Math.abs(y) > 1e-9 && Math.abs(y / by0 - Math.round(y / by0)) > 1e-9 && !vachY[ky]) { vachY[ky] = 1; c.save(); c.fillStyle = mau; c.strokeStyle = mau; c.lineWidth = 1.2 * px; c.beginPath(); c.moveTo(X(0) - 3.5 * px, Y(y)); c.lineTo(X(0) + 3.5 * px, Y(y)); c.stroke(); c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'right'; c.textBaseline = 'middle'; c.save(); c.textAlign = 'center'; var dy = 7 * px + rongChu(c, ky) / 2; datSo(ky, [[X(0) - dy, Y(y)], [X(0) + dy, Y(y)]]); c.restore(); c.restore(); }
           daDat.push({ x0: X(x) - 6 * px, x1: X(x) + 6 * px, y0: Y(y) - 6 * px, y1: Y(y) + 6 * px, diem: { x: X(x), y: Y(y), mau: mauD } });
         });
       });
@@ -133,7 +141,7 @@ GI.doThi = (function () {
     // bảng giá trị ngay dưới hình
     var kh = { x0: X(x0 - du) - 24 * px, y0: Y(y1 + du) - 12 * px, x1: X(x1 + du) + 16 * px, y1: Y(y0 - du) + 22 * px };
     var yb = kh.y1 + 14 * px;
-    (o.hienBang === false ? [] : o.bang || []).forEach(function (b) {
+    (!o.hienBang ? [] : o.bang || []).forEach(function (b) {
       var d = o.ds[b.i] || o.ds[0]; if (!d) return; var f = ham(d), xs = docX(b.xs); if (!xs.length) return;
       var hang = [['x'].concat(xs.map(so)), [d._ve || 'y'].concat(xs.map(function (x) { return f ? so(f(x, {})) : '—'; }))];
       c.font = (17 * px) + 'px ' + FONT;
@@ -167,6 +175,13 @@ GI.doThi = (function () {
     if (d2.every(function (t) { return Math.abs(t - d2[0]) < 1e-9; })) return 'bac2';
     return 'khac';
   }
-  function xMacDinh(bt) { return dang(bt) === 'bac1' ? '-1; 0; 1' : '-2; -1; 0; 1; 2'; }
+  // bậc nhất: 2 điểm kiểu SGK — x = 0 (y = b) và y = 0 (x = −b/a); b = 0 thì lấy x = 0; 1
+  function xMacDinh(bt) {
+    if (dang(bt) !== 'bac1') return '-2; -1; 0; 1; 2';
+    var f = GI.bieuThuc.doc(bt).f, b = f(0, {}), a = f(1, {}) - b;
+    if (Math.abs(a) < 1e-12 || Math.abs(b) < 1e-12 || Math.abs(b / a) > 20) return '0; 1';
+    var x = so(-b / a).replace('−', '-');
+    return /,/.test(x) ? '0; 1' : '0; ' + x;
+  }
   return { dang: dang, xMacDinh: xMacDinh, ve: ve, docX: docX, so: so, MAU: MAU, ham: ham };
 })();

@@ -2708,9 +2708,9 @@
   function moHopDoThi(o) {
     dtSua = o; var h = $('#hop-do-thi'); $('#dt-loi').textContent = '';
     $('#dt-tieu-de').textContent = o ? 'Sửa đồ thị hàm số' : 'Đồ thị hàm số'; $('#dt-ve').textContent = o ? 'Cập nhật' : 'Vẽ đồ thị';
-    var g = o || { xMin: -4, xMax: 4, yMin: -3, yMax: 5, ds: [{ bt: '2x + 1' }], bang: [{ i: 0, xs: '-1; 0; 1', tu: true }], luoi: false, ghiPT: true };
+    var g = o || { xMin: -4, xMax: 4, yMin: -3, yMax: 5, ds: [{ bt: '2x + 1' }], bang: [{ i: 0, xs: '0; -1/2', tu: true }], luoi: false, ghiPT: true };
     $('#dt-x0').value = GI.doThi.so(g.xMin).replace('−', '-'); $('#dt-x1').value = GI.doThi.so(g.xMax).replace('−', '-'); $('#dt-y0').value = GI.doThi.so(g.yMin).replace('−', '-'); $('#dt-y1').value = GI.doThi.so(g.yMax).replace('−', '-');
-    $('#dt-luoi').checked = !!g.luoi; $('#dt-pt').checked = g.ghiPT !== false; $('#dt-giong').checked = g.giong !== false; $('#dt-hien-bang').checked = g.hienBang !== false;
+    $('#dt-luoi').checked = !!g.luoi; $('#dt-pt').checked = g.ghiPT !== false; $('#dt-giong').checked = g.giong !== false; $('#dt-hien-bang').checked = !!g.hienBang;
     $('#dt-ds').innerHTML = ''; g.ds.forEach(function (d) { themDongDT(d); });
     $('#dt-bang').innerHTML = ''; (g.bang || []).forEach(function (b) { themDongBang(b); });
     h.classList.remove('an'); xemTruocDT(); setTimeout(function () { var i = $('#dt-ds input.dt-bt'); if (i) i.focus(); xemTruocDT(); }, 30);
