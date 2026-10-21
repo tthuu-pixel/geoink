@@ -557,22 +557,27 @@
       c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
       function net(an) { c.strokeStyle = mau; c.lineWidth = an ? Math.max(1.3 * px, w * 0.75) : w; c.setLineDash(an ? [7 * px, 5 * px] : []); }
       function keS() { if (sg) { c.save(); c.setLineDash([]); c.strokeStyle = 'rgba(249,115,22,.38)'; c.lineWidth = w + 9 * px; c.stroke(); c.restore(); } c.stroke(); }
-      if (o.toMat && v.mat) {   // tô các mặt (xa trước, gần sau), trong suốt để vẫn thấy nét khuất
-        c.save(); c.globalAlpha = o.doTrong == null ? 0.28 : o.doTrong; c.fillStyle = o.mauMat || '#60A5FA';
-        v.mat.forEach(function (f) { c.beginPath(); f.pts.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); }); c.closePath(); c.fill(); });
+      var toBen = o.toBen != null ? o.toBen : !!o.toMat, toDay = o.toDay != null ? o.toDay : !!o.toMat;
+      if ((toBen || toDay) && v.mat) {   // tô mặt bên / mặt đáy (xa trước, gần sau), trong suốt để vẫn thấy nét khuất
+        c.save(); c.globalAlpha = o.doTrong == null ? 0.28 : o.doTrong;
+        v.mat.forEach(function (f) {
+          if (f.day ? !toDay : !toBen) return;
+          c.fillStyle = f.day ? (o.mauDay || MAU_DAY) : (o.mauBen || o.mauMat || MAU_BEN);
+          c.beginPath(); f.pts.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); }); c.closePath(); c.fill();
+        });
         c.restore();
       }
       v.canh.forEach(function (e) {
         if (e.an && o.netKhuat === 'an' && !e.phu) return; if (e.phu && o.hienCao === false) return;
         c.beginPath(); c.moveTo(e.p.x, e.p.y); c.lineTo(e.q.x, e.q.y); net(e.an); keS();
       });
-      v.cong.forEach(function (k) { c.beginPath(); k.pts.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); }); net(k.an); keS(); });
+      v.cong.forEach(function (k) { if (k.an && o.netKhuat === 'an') return; c.beginPath(); k.pts.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); }); net(k.an); keS(); });
       c.setLineDash([]); c.lineWidth = 1.4 * px; c.strokeStyle = mau;
       v.vuong.forEach(function (q, iq) { if (o.hienCao === false && iq === v.vuong.length - 1 && /^tuDoChop$/.test(o.dang)) return; var k = 15 * px; c.beginPath(); c.moveTo(q.o.x + q.u1.x * k, q.o.y + q.u1.y * k); c.lineTo(q.o.x + (q.u1.x + q.u2.x) * k, q.o.y + (q.u1.y + q.u2.y) * k); c.lineTo(q.o.x + q.u2.x * k, q.o.y + q.u2.y * k); c.stroke(); });
       var gx = (v.khung.x0 + v.khung.x1) / 2, gy = (v.khung.y0 + v.khung.y1) / 2;
       v.dinh.forEach(function (d) {
         if (d.phu && o.hienCao === false) return;
-        c.beginPath(); c.arc(d.P.x, d.P.y, 3.6 * px, 0, Math.PI * 2); c.fillStyle = d.an ? '#3F4A57' : '#2457C5'; c.fill();
+        if (o.hienDiem !== false) { c.beginPath(); c.arc(d.P.x, d.P.y, 3.6 * px, 0, Math.PI * 2); c.fillStyle = d.an ? '#3F4A57' : '#2457C5'; c.fill(); }
         if (o.hienTen !== false) {
           var ux = d.P.x - gx, uy = d.P.y - gy, L = Math.hypot(ux, uy) || 1; ux /= L; uy /= L;
           c.save(); c.font = 'italic ' + (21 * px) + 'px ' + FONT_TEN; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = o.mau || mauChu;
@@ -791,6 +796,9 @@
     var ds = nhom.filter(function (x) { return x.h; }); if (ds.length !== 1 || nhom.length !== 1) return null;
     var o = timTheoId(ds[0].h); return o && o.loai === 'khoi' ? o : null;
   }
+  var MAU_BEN = '#60A5FA', MAU_DAY = '#FBBF24';
+  // hình cũ dùng một nút "Tô mặt" chung: tách thành mặt bên / mặt đáy
+  function tachToMat(x) { if (x.toBen == null) x.toBen = !!x.toMat; if (x.toDay == null) x.toDay = !!x.toMat; if (x.mauMat && !x.mauBen) x.mauBen = x.mauMat; delete x.toMat; }
   function capNhatThanhKhoi() {
     var el = $('#thanh-khoi'); if (!el) return;
     var o = khoiDangChon();
@@ -803,10 +811,12 @@
       '<button data-tk="tuQuay" title="Tự quay chậm quanh trục đứng">Tự quay</button><i class="tk-ke"></i>' +
       '<label title="Quay quanh trục đứng">Quay <input type="range" data-tk="xoay" min="-180" max="180" step="1"></label>' +
       (tron ? '' : '<label title="Nghiêng lên / xuống">Nghiêng <input type="range" data-tk="nghieng" min="-85" max="85" step="1"></label>') +
-      '<label title="Góc vẽ xiên chiều sâu">Xiên <input type="range" data-tk="alpha" min="15" max="75" step="1"></label><i class="tk-ke"></i>' +
-      (tron ? '' : '<button data-tk="toMat" title="Tô màu các mặt">Tô mặt</button><input type="color" data-tk="mauMat" title="Màu mặt"><label title="Độ đậm của màu tô">Đậm <input type="range" data-tk="doTrong" min="0.05" max="0.8" step="0.05"></label><i class="tk-ke"></i>') +
-      '<button data-tk="netKhuat" title="Nét khuất: nét đứt hoặc ẩn">Khuất: <span></span></button>' +
-      '<button data-tk="hienTen" title="Hiện / ẩn tên đỉnh">Tên đỉnh</button>' +
+      '<label title="Góc vẽ xiên chiều sâu">Xiên <input type="range" data-tk="alpha" min="15" max="75" step="1"></label><i class="tk-xuong"></i>' +
+      (tron ? '' : '<span class="tk-nhan">Tô</span><button data-tk="toBen" title="Tô màu các mặt bên">Mặt bên</button><input type="color" data-tk="mauBen" title="Màu mặt bên">' +
+        '<button data-tk="toDay" title="Tô màu mặt đáy">Mặt đáy</button><input type="color" data-tk="mauDay" title="Màu mặt đáy"><label title="Độ đậm của màu tô">Đậm <input type="range" data-tk="doTrong" min="0.05" max="0.8" step="0.05"></label><i class="tk-ke"></i>') +
+      '<span class="tk-nhan">Ẩn</span><button data-tk="anTen" title="Ẩn / hiện tên các đỉnh">Tên đỉnh</button>' +
+      '<button data-tk="anDiem" title="Ẩn / hiện chấm điểm ở các đỉnh">Điểm đỉnh</button>' +
+      '<button data-tk="netKhuat" title="Ẩn / hiện các nét đứt (cạnh khuất)">Nét đứt</button><i class="tk-ke"></i>' +
       '<button data-tk="hienCao" title="Hiện / ẩn ' + (coCao ? 'đường cao' : 'đường phụ') + '">' + (coCao ? 'Đường cao' : 'Đường phụ') + '</button>';
     el.querySelectorAll('[data-tk]').forEach(function (n) {
       var k = n.dataset.tk;
@@ -814,15 +824,16 @@
         var x = khoiDangChon(); if (!x) return; ghiLichSu();
         if (k === 'chuan') { x.xoay = 0; x.nghieng = 0; x.alpha = 40; x.tuQuay = undefined; }
         else if (k === 'tuQuay') { x.tuQuay = x.tuQuay ? undefined : true; if (x.tuQuay) chayTuQuay(); }
-        else if (k === 'toMat') x.toMat = x.toMat ? undefined : true;
+        else if (k === 'toBen' || k === 'toDay') { tachToMat(x); x[k] = !x[k]; }
         else if (k === 'netKhuat') x.netKhuat = x.netKhuat === 'an' ? undefined : 'an';
-        else if (k === 'hienTen') x.hienTen = x.hienTen === false ? undefined : false;
+        else if (k === 'anTen') x.hienTen = x.hienTen === false ? undefined : false;
+        else if (k === 'anDiem') x.hienDiem = x.hienDiem === false ? undefined : false;
         else if (k === 'hienCao') x.hienCao = x.hienCao === false ? undefined : false;
         canVe();
       };
       else n.oninput = function () {
         var x = khoiDangChon(); if (!x) return; ghiLichSuGop('khoi:' + x.id + ':' + k);
-        if (k === 'mauMat') { x.mauMat = n.value; x.toMat = true; } else x[k] = +n.value;
+        if (k === 'mauBen' || k === 'mauDay') { tachToMat(x); x[k] = n.value; x[k === 'mauBen' ? 'toBen' : 'toDay'] = true; } else x[k] = +n.value;
         canVe();
       };
     });
@@ -832,10 +843,10 @@
     var el = $('#thanh-khoi');
     function bat(k, v) { var b = el.querySelector('[data-tk="' + k + '"]'); if (b) b.classList.toggle('bat', !!v); }
     function gt(k, v) { var n = el.querySelector('[data-tk="' + k + '"]'); if (n && document.activeElement !== n) n.value = v; }
-    bat('tuQuay', o.tuQuay); bat('toMat', o.toMat); bat('hienTen', o.hienTen !== false); bat('hienCao', o.hienCao !== false);
-    var nk = el.querySelector('[data-tk="netKhuat"] span'); if (nk) nk.textContent = o.netKhuat === 'an' ? 'ẩn' : 'nét đứt';
+    bat('tuQuay', o.tuQuay); bat('toBen', o.toBen != null ? o.toBen : o.toMat); bat('toDay', o.toDay != null ? o.toDay : o.toMat);
+    bat('anTen', o.hienTen === false); bat('anDiem', o.hienDiem === false); bat('netKhuat', o.netKhuat === 'an'); bat('hienCao', o.hienCao !== false);
     var xv = ((o.xoay || 0) % 360 + 540) % 360 - 180;
-    gt('xoay', xv); gt('nghieng', o.nghieng || 0); gt('alpha', o.alpha == null ? 40 : o.alpha); gt('mauMat', o.mauMat || '#60A5FA'); gt('doTrong', o.doTrong == null ? 0.28 : o.doTrong);
+    gt('xoay', xv); gt('nghieng', o.nghieng || 0); gt('alpha', o.alpha == null ? 40 : o.alpha); gt('mauBen', o.mauBen || o.mauMat || MAU_BEN); gt('mauDay', o.mauDay || MAU_DAY); gt('doTrong', o.doTrong == null ? 0.28 : o.doTrong);
   }
   // tự quay: xoay dần các hình đang bật Tự quay
   var dangTuQuay = false;

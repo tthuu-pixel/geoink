@@ -60,7 +60,7 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 
 **Thước parabol**: hai đầu trên và dưới đều dùng để vẽ. Bấm một đầu thì đầu đó hiện xanh và thành điểm cố định; kéo đầu còn lại để xoay, nghiêng thước quanh điểm cố định. Bấm lại để bỏ cố định.
 
-**Xoay hình 3D**: nút *Dựng hình chóp* / *Dựng hình lăng trụ* (nhóm hình không gian) — bấm lần lượt các đỉnh đáy, bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh trên → thành khối 3D. Kéo núm ↻ để xoay ngang / nghiêng. Thanh hiệu chỉnh dưới bảng: góc xoay, góc nghiêng, tô mặt, độ trong, nét khuất (đứt / ẩn), đường cao, tự quay; nút *Góc nhìn chuẩn* đưa về hình vẽ SGK, hình đã xoay vẫn giữ nguyên khi tắt thanh.
+**Xoay hình 3D**: nút *Dựng hình chóp* / *Dựng hình lăng trụ* (nhóm hình không gian) — bấm lần lượt các đỉnh đáy, bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh trên → thành khối 3D. Kéo núm ↻ để xoay ngang / nghiêng. Thanh hiệu chỉnh dưới bảng (2 dòng): góc xoay, góc nghiêng, góc xiên, tự quay; *Tô* mặt bên và mặt đáy riêng, mỗi loại một màu, chỉnh độ đậm; *Ẩn* tên đỉnh, điểm đỉnh, nét đứt (cạnh khuất); đường cao / đường phụ; nút *Góc nhìn chuẩn* đưa về hình vẽ SGK, hình đã xoay vẫn giữ nguyên khi tắt thanh.
 
 **Cắt hình** (nút cây kéo, cạnh hai nút TeX): kéo khung quanh hình trên bảng → vùng đó được vẽ lại nét gấp 3 lần màn hình (≈ 300 dpi), nền trắng không dòng kẻ, tự chép vào clipboard để mở Word bấm Ctrl+V; có nút *Lưu ra tệp PNG*. Esc hoặc chuột phải để huỷ. Muốn lấy hình từ bên ngoài vào bảng: dùng công cụ cắt của Windows (Win+Shift+S) rồi Ctrl+V trên bảng; ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ, lưu trong tệp .geoink.
 

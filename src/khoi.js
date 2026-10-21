@@ -96,7 +96,8 @@ GI.khoi = (function () {
       M.phu.forEach(function (e) { var p1 = e.a === 'O' || e.a === 'H' ? Oc : P[e.a], q1 = e.b === 'O' || e.b === 'H' ? Oc : P[e.b]; ds.push({ p: p1, q: q1, an: true, phu: true }); });
     }
     // các mặt (để tô màu): sắp xa → gần theo chiều nhìn
-    var mat = M.mat.map(function (f, fi) { var sau = vh(tam(f.map(function (i) { return R[i]; })), B.huong); return { pts: f.map(function (i) { return P[i]; }), thay: thay[fi], sau: sau }; });
+    var soDay = d === 'tuDoLang' || /^(hop|lapPhuong|lang3|lang4)$/.test(d) ? 2 : 1;   // lăng trụ: 2 đáy (mặt 0, 1); chóp: 1 đáy (mặt 0)
+    var mat = M.mat.map(function (f, fi) { var sau = vh(tam(f.map(function (i) { return R[i]; })), B.huong); return { pts: f.map(function (i) { return P[i]; }), thay: thay[fi], sau: sau, day: fi < soDay }; });
     mat.sort(function (u, w) { return w.sau - u.sau; });
     var n = M.dinh.length, vuong = [];
     if (M.vuong) { var nn = n / 2; vuong.push({ o: P[0], u1: donVi(P[1], P[0]), u2: donVi(P[nn], P[0]) }); }
