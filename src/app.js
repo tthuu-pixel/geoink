@@ -2087,8 +2087,12 @@
     vt.forEach(function (r, i) {
       if (r.y > vn.y1 || r.y + r.h < vn.y0 || r.x > vn.x1 || r.x + r.w < vn.x0) return;
       thay[pdf.id + '|' + i] = 1;
+      // từng đoạn trang là một tờ giấy trắng; dải trống chèn giữa trang để lộ nền bảng (giấy kẻ, ô li…)
+      var doan = [], a0 = 0, lech0 = 0;
+      r.cat.concat([{ y: r.hGoc, cao: 0 }]).forEach(function (g) { var b = Math.min(g.y, r.hGoc); if (b > a0) doan.push({ y: r.y + a0 + lech0, h: b - a0 }); a0 = b; lech0 += g.cao; });
       c.save(); if (!xuat) { c.shadowColor = 'rgba(15,23,42,.28)'; c.shadowBlur = 10; c.shadowOffsetY = 2; }
-      c.fillStyle = '#FFFFFF'; c.fillRect(r.x, r.y, r.w, r.h); c.restore();
+      c.fillStyle = '#FFFFFF'; doan.forEach(function (d) { c.fillRect(r.x, d.y, r.w, d.h); }); c.restore();
+      if (trang().nen === 'xam') { c.fillStyle = '#FFFFFF'; var lechG = 0; r.cat.forEach(function (g) { c.fillRect(r.x, r.y + g.y + lechG, r.w, g.cao); lechG += g.cao; }); }   // nền xám là mặt bàn: dải trống tô trắng như giấy
       var anh = xuat ? (boNhoPdf[pdf.id + '|' + i] && boNhoPdf[pdf.id + '|' + i].cv) || boNhoNho[pdf.id + '|' + i] : anhTrangPdf(pdf, i, r.w);
       if (anh) {   // vẽ từng đoạn giữa các chỗ cắt; dải trống để trắng
         c.save(); c.imageSmoothingQuality = 'high';

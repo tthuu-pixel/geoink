@@ -104,7 +104,7 @@ i { font-style: normal; }
 #menu i { width: 20px; height: 20px; flex: none; color: #4B5563; }
 #menu kbd { margin-left: auto; font: 12px var(--phong); color: var(--chu-phu); }
 #menu hr { border: 0; border-top: 1px solid var(--vien); margin: 6px 4px; }
-.tieu-de-menu { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--chu-phu); padding: 4px 10px; }
+.tieu-de-menu { font-family: "Segoe UI", Arial, sans-serif; font-size: 13px; font-weight: 700; color: var(--chu-phu); padding: 6px 10px 4px; }
 .nen-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px 6px 6px; }
 .nen-menu button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 4px; border: 2px solid transparent; border-radius: 10px; background: transparent; font-size: 12px; font-weight: 600; color: var(--chu); cursor: pointer; }
 .nen-menu button:hover { background: #F3F4F6; }
