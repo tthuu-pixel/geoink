@@ -1287,6 +1287,12 @@
     if (dangKeo && dangKeo.loai === 'khung') { var dsK = chonTrongKhung(dangKeo.a, dangKeo.b); if (dangKeo.them) dsK.forEach(function (x) { if (!trongNhom(x)) nhom.push(x); }); else nhom = dsK; capNhatChon(false); canVe();
       if (choXuatTex) { choXuatTex = false; capNhatGoiY(); var idsK = nhom.filter(function (x) { return x.h; }).map(function (x) { return x.h; }); if (idsK.length) xuatTexChon(idsK); else thongBao('Không có hình nào trong khung'); } }
     if (dangKeo && dangKeo.loai === 'laser') laser.forEach(function (l) { l.ketThuc = true; });
+    if (dangKeo && (dangKeo.loai === 'dauPB' || dangKeo.dauPB != null)) {   // chỉ bấm (không kéo) vào đầu thước parabol
+      var pT = toaDo(e), Mt = veTG(pT.x, pT.y), diChuyen = Math.hypot(Mt.x - dangKeo.M0.x, Mt.y - dangKeo.M0.y) * V.s > 4;
+      if (dangKeo.loai === 'dauPB') { dangKeo.dc.dauCoDinh = undefined; thongBao('Đã bỏ cố định: kéo thước để di chuyển'); }
+      else if (!diChuyen) { dangKeo.dc.dauCoDinh = dangKeo.dauPB; thongBao('Đã cố định đầu ' + (dangKeo.dauPB ? 'dưới' : 'trên') + ' (xanh) · kéo đầu còn lại để xoay, bấm lại điểm xanh để bỏ'); }
+      canVe();
+    }
     dangKeo = null; veNhap();
   }
   cv.addEventListener('pointerup', thaTay);
@@ -1983,6 +1989,10 @@
       var cfg = cc === 'but' ? butCfg : dqCfg, P = GI.dungCu.chieuMep(h, M);
       netDang = { loai: 'net', kieu: cc, mau: cfg.mau, co: cfg.co, pts: [[P.x, P.y, 0.6]], lucNhan: false, mep: h }; veNhap(); return true;
     }
+    if (h.phan === 'dauPB') {   // thước parabol: bấm để cố định / bỏ cố định một đầu; kéo đầu còn lại để xoay quanh đầu cố định
+      if (h.coDinh) { dangKeo = { loai: 'dauPB', dc: dc, i: h.i, M0: M }; return true; }
+      dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y, dauPB: h.i, M0: M }; canVe(); return true;
+    }
     if (h.phan === 'ghim') { dc.ghim = !dc.ghim; thongBao(dc.ghim ? 'Đã ghim: kéo dụng cụ sẽ quay quanh điểm đỏ' : 'Đã bỏ ghim: kéo để di chuyển dụng cụ'); canVe(); return true; }
     if (h.phan === 'xoay') { dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y }; canVe(); return true; }
     if (h.phan === 'butCompa') { dangKeo = { loai: 'butCompa', dc: dc }; return true; }
@@ -2665,5 +2675,5 @@
   } else {
     window.addEventListener('beforeunload', function (e) { if (daSua) { e.preventDefault(); e.returnValue = ''; } });
   }
-  window.GeoInk = { tl: function () { return tl; }, nhom: function () { return nhom.map(function (x) { return x.h || (x.n ? 'net' : 'mh'); }); }, V: function () { return V; }, chonCongCu: chonCongCu, chenMau: chenMau, lenh: LENH, giaTri: function () { return giaTri; } };   // để kiểm thử
+  window.GeoInk = { tl: function () { return tl; }, nhom: function () { return nhom.map(function (x) { return x.h || (x.n ? 'net' : 'mh'); }); }, V: function () { return V; }, chonCongCu: chonCongCu, chenMau: chenMau, lenh: LENH, giaTri: function () { return giaTri; }, dungCu: function () { return dungCuDS; } };   // để kiểm thử
 })();
