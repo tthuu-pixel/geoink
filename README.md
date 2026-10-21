@@ -64,7 +64,9 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 
 **Thư viện sổ** (nút *Thư viện* đầu thanh trên cùng): mọi bảng được lưu thành *sổ* ngay trên máy, ở thư mục **Tài liệu\GeoInk Thư viện**. Bảng mới tự thành một sổ (tên theo ngày giờ) khi có nội dung và tự lưu sau mỗi thay đổi, không cần bấm Lưu. Thư viện có: *Tất cả sổ*, *Không thuộc project*, danh sách **Project** (thư mục tự đặt, đếm số sổ), *+ Project mới*, *Thùng rác*. Mỗi sổ có ảnh bìa (trang 1) và nút ⋯: Mở, Đổi tên, Nhân bản, **Lịch sử phiên bản** (khoảng 10 phút giữ một bản, tối đa 30 bản, khôi phục được), Chuyển đến project, Xoá. Sổ và project bị xoá nằm trong Thùng rác 30 ngày, khôi phục được. Tệp .geoink mở bằng *Mở…* vẫn lưu như cũ; với sổ thư viện, *Lưu thành tệp khác* xuất một bản sao ra tệp.
 
-**Chèn khoảng trống** (nút hai đường kẻ có mũi tên, thanh trên cùng): bấm vào chỗ cần chèn rồi kéo xuống — nét viết, chữ, hình nằm dưới đường được dời xuống; kéo lên để thu bớt. Hình dựng chỉ dời khi cả hình nằm dưới đường (không bị kéo dãn).
+**Chèn khoảng trống** (nút hai đường kẻ có mũi tên, thanh trên cùng): bấm vào chỗ cần chèn rồi kéo xuống — nét viết, chữ, hình nằm dưới đường được dời xuống; kéo lên để thu bớt. Hình dựng chỉ dời khi cả hình nằm dưới đường (không bị kéo dãn). **Với tệp PDF:** bấm vào giữa trang PDF (giữa hai dòng) rồi kéo xuống — trang PDF bị cắt tại đó, phần dưới dời xuống, để lại dải giấy trắng để ghi lời giải; bấm vào dải trắng rồi kéo lên để thu nhỏ / bỏ dải.
+
+**Che đáp án** (nút tờ giấy có khung xanh, cạnh nút chèn khoảng trống): kéo khung trắng che lên chỗ cần giấu (đáp án trong PDF, lời giải…). Bấm đúp vào khung (con trỏ chọn) để mở đáp án, bấm đúp lần nữa để che lại. Khung kéo đi được, kéo ô vuông ở góc để đổi cỡ, Delete để xoá.
 
 **Phóng / thu**: hộp góc dưới phải có − , số % hiện tại, + và nút **M** về tỉ lệ mặc định 100% (phím M).
 
