@@ -541,7 +541,6 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 #thanh-khoi .tk-xuong { flex-basis: 100%; height: 0; }
 
 /* ----- Thư viện sổ ----- */
-.nut-thu-vien { width: auto !important; padding: 0 10px 0 7px !important; gap: 6px; display: inline-flex; align-items: center; font: 600 13px Arial, sans-serif; color: #1E293B; }
 #thu-vien { position: fixed; inset: 0; z-index: 60; background: #F4F4F5; display: flex; flex-direction: column; font-family: Arial, 'Segoe UI', sans-serif; color: #1F2937; }
 #thu-vien.an { display: none; }
 .tv-dau { display: flex; align-items: center; gap: 16px; padding: 14px 22px; background: #fff; border-bottom: 1px solid #E5E7EB; }
