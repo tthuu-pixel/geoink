@@ -54,7 +54,7 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
-**Ảnh, cắt hình**: nút *Cắt hình* (cây kéo, cạnh hai nút TeX) tạm ẩn GeoInk, chụp màn hình rồi cho kéo khung chọn vùng bất kỳ (trang web, đề thi, ảnh…), vùng chọn được dán lên bảng. Ctrl+V dán ảnh đã sao chép (kể cả ảnh chụp bằng Win+Shift+S). Ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ (giữ tỉ lệ), xoá bằng Delete; ảnh được lưu trong tệp .geoink.
+**Cắt hình** (nút cây kéo, cạnh hai nút TeX): kéo khung quanh hình trên bảng → vùng đó được vẽ lại nét gấp 3 lần màn hình (≈ 300 dpi), nền trắng không dòng kẻ, tự chép vào clipboard để mở Word bấm Ctrl+V; có nút *Lưu ra tệp PNG*. Esc hoặc chuột phải để huỷ. Muốn lấy hình từ bên ngoài vào bảng: dùng công cụ cắt của Windows (Win+Shift+S) rồi Ctrl+V trên bảng; ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ, lưu trong tệp .geoink.
 
 **Cuộn, phóng to**: lăn chuột để cuộn bảng lên xuống (Shift + lăn: cuộn ngang); thanh trượt bên phải để kéo nhanh; phóng to / thu nhỏ bằng Ctrl + lăn chuột (hoặc nút +/−).
 

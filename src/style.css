@@ -461,3 +461,13 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 #cuon-nut { position: absolute; left: 2px; right: 2px; top: 0; height: 40px; border-radius: 5px; background: rgba(71,85,105,.45); cursor: grab; }
 #cuon-doc:hover #cuon-nut { background: rgba(51,65,85,.6); }
 #cuon-doc.dang #cuon-nut { background: rgba(36,81,199,.75); cursor: grabbing; }
+/* Cắt hình trên bảng */
+#lop-cat { position: absolute; inset: 0; z-index: 8; cursor: crosshair; background: rgba(15,23,42,.06); touch-action: none; }
+#lop-cat.an { display: none; }
+#khung-cat { position: absolute; display: none; border: 2px solid #2563EB; background: rgba(255,255,255,.06); box-shadow: 0 0 0 9999px rgba(15,23,42,.28); pointer-events: none; }
+#co-cat { position: absolute; display: none; padding: 3px 8px; border-radius: 6px; background: #2451C7; color: #fff; font: 700 12px Arial, sans-serif; pointer-events: none; white-space: nowrap; }
+#the-cat { position: fixed; left: 50%; bottom: 70px; transform: translateX(-50%); z-index: 60; display: flex; gap: 14px; align-items: center; background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 12px 36px rgba(15,23,42,.22); padding: 12px 14px; font-family: Arial, sans-serif; max-width: calc(100vw - 40px); }
+#the-cat img { width: 110px; height: 72px; object-fit: contain; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; }
+#the-cat b { display: block; font-size: 15px; color: #0F172A; }
+#the-cat small { display: block; margin: 3px 0 8px; font-size: 13px; color: #64748B; }
+#the-cat span { display: flex; gap: 8px; }

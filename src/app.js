@@ -1486,10 +1486,7 @@
     truc: function () { ghiLichSu(); trang().truc = !trang().truc; if (trang().truc) { V.x = -W / 2 / V.s; V.y = -Hh / 2 / V.s; } capNhatNutBat(); canVe(); },
     soDo: function () { hienSo = !hienSo; capNhatNutBat(); canVe(); },
     nhapTex: function () { LENH.nhapTikz(); },
-    catHinh: function () {
-      if (!MT || !MT.catManHinh) return thongBao('Cắt hình chỉ dùng được trong app GeoInk');
-      MT.catManHinh().then(function (kq) { if (!kq) return; if (kq.loi) return thongBao('Không cắt được hình: ' + kq.loi); chenAnh(kq.duLieu, 'Ảnh cắt màn hình'); });
-    },
+    catHinh: function () { batDauCat(); },
     kiemTraCapNhat: function () { $('#menu').classList.add('an'); if (!MT || !MT.kiemTraCapNhat) return thongBao('Chỉ kiểm tra cập nhật được trong app đã cài'); capNhat.tay = true; thongBao('Đang kiểm tra bản mới…'); MT.kiemTraCapNhat(); },
     xuatTex: function () {
       var ids = nhom.filter(function (x) { return x.h; }).map(function (x) { return x.h; });
@@ -2528,6 +2525,66 @@
   });
   $('#nut-cap-nhat').onclick = function () { if (capNhat.dangTai) $('#the-cap-nhat').classList.remove('an'); else moiCapNhat(); };
   $('#tcn-dong').onclick = dongTheCapNhat;
+  // ----- Cắt hình trên bảng thành ảnh nét (dán sang Word) -----
+  // Kéo khung trên bảng → vẽ lại vùng đó ở độ phân giải gấp 3 màn hình (≈ 300 dpi), nền trắng không dòng kẻ → chép vào clipboard
+  var CAT_NET = 3, cat = null;
+  function batDauCat() {
+    var lop = $('#lop-cat'); lop.classList.remove('an'); $('#khung-cat').style.display = 'none'; $('#co-cat').style.display = 'none'; cat = { dau: null };
+    var el = $('#goi-y'); el.innerHTML = '<b>Cắt hình:</b> kéo khung quanh hình cần cắt · ảnh nét, nền trắng, tự chép để dán sang Word · Esc để huỷ'; el.classList.remove('an');
+  }
+  function huyCat() { if (!cat) return; cat = null; $('#lop-cat').classList.add('an'); capNhatGoiY(); }
+  (function () {
+    var lop = $('#lop-cat'), kh = $('#khung-cat'), co = $('#co-cat');
+    function vung(e) { var r = lop.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; return { x: Math.max(0, Math.min(r.width, x)), y: Math.max(0, Math.min(r.height, y)) }; }
+    function hcn() { var a = cat.dau, b = cat.cuoi; return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(b.x - a.x), h: Math.abs(b.y - a.y) }; }
+    lop.addEventListener('pointerdown', function (e) {
+      if (!cat) return; e.preventDefault();
+      if (e.button === 2) return huyCat();
+      lop.setPointerCapture(e.pointerId); cat.dau = cat.cuoi = vung(e); kh.style.display = 'block';
+    });
+    lop.addEventListener('pointermove', function (e) {
+      if (!cat || !cat.dau) return; cat.cuoi = vung(e); var r = hcn();
+      kh.style.left = r.x + 'px'; kh.style.top = r.y + 'px'; kh.style.width = r.w + 'px'; kh.style.height = r.h + 'px';
+      co.style.display = 'block'; co.textContent = Math.round(r.w * CAT_NET * (window.devicePixelRatio > 1 ? 1 : 1)) + ' × ' + Math.round(r.h * CAT_NET) + ' px'; co.style.left = r.x + 'px'; co.style.top = Math.max(0, r.y - 26) + 'px';
+    });
+    lop.addEventListener('pointerup', function () {
+      if (!cat || !cat.dau) return; var r = hcn(); cat.dau = null;
+      if (r.w < 6 || r.h < 6) { kh.style.display = 'none'; co.style.display = 'none'; return; }
+      huyCat(); xuatVungCat(r);
+    });
+    lop.addEventListener('contextmenu', function (e) { e.preventDefault(); huyCat(); });
+  })();
+  function xuatVungCat(r) {
+    var s = V.s, R = CAT_NET, vn = { x0: V.x + r.x / s, y0: V.y + r.y / s, x1: V.x + (r.x + r.w) / s, y1: V.y + (r.y + r.h) / s };
+    var c = document.createElement('canvas'); c.width = Math.round(r.w * R); c.height = Math.round(r.h * R);
+    var x2 = c.getContext('2d'), nen = kieuNen();
+    x2.fillStyle = nen.toi ? nen.mau : '#FFFFFF'; x2.fillRect(0, 0, c.width, c.height);   // nền trơn, không dòng kẻ / ô lưới
+    x2.setTransform(s * R, 0, 0, s * R, -vn.x0 * s * R, -vn.y0 * s * R);
+    veTrangPdf(x2, vn, s, true); if (coTruc()) veTruc(x2, vn, s);
+    veHinh(x2, vn, s, H.tinh(trang().hinh), {}); trang().moHinh.forEach(function (m) { veTheMoHinh(x2, m, false); });
+    trang().net.forEach(function (n) { veNet(x2, n); });
+    var url = c.toDataURL('image/png'), ten = 'GeoInk-hinh-' + new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.png';
+    function xong(ok) {
+      theCat(url, ten, c.width, c.height, ok);
+    }
+    if (MT && MT.chepAnh) MT.chepAnh(url).then(xong, function () { xong(false); });
+    else if (navigator.clipboard && window.ClipboardItem) c.toBlob(function (bl) { navigator.clipboard.write([new ClipboardItem({ 'image/png': bl })]).then(function () { xong(true); }, function () { xong(false); }); }, 'image/png');
+    else xong(false);
+  }
+  // thẻ nhỏ báo đã cắt: xem trước, lưu ra tệp PNG
+  function theCat(url, ten, w, h, daChep) {
+    var cu = $('#the-cat'); if (cu) cu.remove();
+    var el = document.createElement('div'); el.id = 'the-cat';
+    el.innerHTML = '<img alt=""><div><b>' + (daChep ? 'Đã chép ảnh vào clipboard' : 'Đã cắt ảnh') + '</b><small>' + w + ' × ' + h + ' px' + (daChep ? ' · mở Word bấm Ctrl+V để dán' : ' · bấm Lưu để lưu ra tệp') + '</small>' +
+      '<span><button class="nut chu" data-tc="luu">Lưu ra tệp PNG</button><button class="nut chu" data-tc="dong">Đóng</button></span></div>';
+    el.querySelector('img').src = url; document.body.appendChild(el);
+    el.querySelector('[data-tc="luu"]').onclick = function () {
+      if (MT) MT.xuatAnh(url, ten).then(function (kq) { if (kq.ten) thongBao('Đã lưu ảnh'); else if (kq.loi) thongBao('Không lưu được: ' + kq.loi); });
+      else { var a = document.createElement('a'); a.href = url; a.download = ten; a.click(); }
+    };
+    el.querySelector('[data-tc="dong"]').onclick = function () { el.remove(); };
+    clearTimeout(theCat.t); theCat.t = setTimeout(function () { if (el.parentNode) el.remove(); }, 12000);
+  }
   var choXuatTex = false;
   function xuatTexChon(ids) {
     var ma = null; try { ma = GI.xuatTex.xuat(trang().hinh, ids, giaTri); } catch (e) { return thongBao('Không xuất được mã: ' + (e.message || e)); }
@@ -2587,6 +2644,7 @@
       else if (k === 'v' && MT && MT.docClipboard) { e.preventDefault(); danTuMay(); }
       return;
     }
+    if (e.key === 'Escape' && cat) { huyCat(); return; }
     if (e.key === 'Escape') { choXuatTex = false; dongMenuPhai(); nhom = []; dongThuocTinh(); choChon = []; $$('.hop').forEach(function (h) { h.classList.add('an'); }); capNhatGoiY(); canVe(); }
     else if (e.key === 'PageDown') LENH.trangSau(); else if (e.key === 'PageUp') LENH.trangTruoc();
     else if (e.key === 'F11') { e.preventDefault(); LENH.toanManHinh(); }
