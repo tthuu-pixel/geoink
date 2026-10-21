@@ -539,3 +539,73 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 
 #thanh-khoi input[type=color] { width: 28px; height: 26px; padding: 1px 2px; border: 1px solid #CBD5E1; border-radius: 7px; background: #fff; cursor: pointer; flex: none; }
 #thanh-khoi .tk-xuong { flex-basis: 100%; height: 0; }
+
+/* ----- Thư viện sổ ----- */
+.nut-thu-vien { width: auto !important; padding: 0 10px 0 7px !important; gap: 6px; display: inline-flex; align-items: center; font: 600 13px Arial, sans-serif; color: #1E293B; }
+#thu-vien { position: fixed; inset: 0; z-index: 60; background: #F4F4F5; display: flex; flex-direction: column; font-family: Arial, 'Segoe UI', sans-serif; color: #1F2937; }
+#thu-vien.an { display: none; }
+.tv-dau { display: flex; align-items: center; gap: 16px; padding: 14px 22px; background: #fff; border-bottom: 1px solid #E5E7EB; }
+.tv-dau h1 { margin: 0; font-size: 24px; color: #7F1D1D; }
+.tv-dau .gian { flex: 1; }
+.tv-ve, .tv-nut { height: 36px; padding: 0 14px; border: 1px solid #E5E7EB; border-radius: 18px; background: #fff; font-size: 14px; cursor: pointer; color: #374151; }
+.tv-ve:hover, .tv-nut:hover { background: #F3F4F6; }
+.tv-than { flex: 1; display: flex; min-height: 0; }
+.tv-trai { width: 300px; flex: none; background: #fff; border-right: 1px solid #E5E7EB; padding: 16px 12px; overflow: auto; display: flex; flex-direction: column; gap: 4px; }
+.tv-muc { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 1.5px solid transparent; border-radius: 12px; background: none; font-size: 15px; color: #374151; cursor: pointer; text-align: left; }
+.tv-muc svg { width: 22px; height: 22px; flex: none; fill: none; stroke: #4B5563; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.tv-muc span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-muc b { min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: #F3F4F6; color: #6B7280; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+.tv-muc:hover { background: #F9FAFB; }
+.tv-muc.bat { background: #FCE7E7; border-color: #E0A92B; color: #111827; }
+.tv-muc.bat b { background: #fff; }
+.tv-nhom { margin: 16px 12px 6px; font-size: 13px; font-weight: 700; color: #6B7280; letter-spacing: .04em; }
+.tv-them-prj { color: #4B5563; }
+.tv-gian { flex: 1; min-height: 16px; }
+.tv-phai { flex: 1; padding: 22px 30px; overflow: auto; }
+.tv-phai h2 { margin: 0 0 18px; font-size: 26px; display: flex; align-items: baseline; gap: 10px; }
+.tv-phai h2 small { font-size: 15px; font-weight: 400; color: #6B7280; }
+.tv-ba { border: none; background: none; font-size: 20px; line-height: 1; color: #6B7280; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.tv-ba:hover { background: #E5E7EB; }
+.tv-ba.lon { margin-left: 4px; }
+.tv-luoi { display: grid; grid-template-columns: repeat(auto-fill, 220px); gap: 26px 28px; }
+.tv-so-moi { width: 220px; height: 300px; border: none; background: none; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; font-size: 16px; color: #374151; cursor: pointer; padding: 0; }
+.tv-so-moi span { width: 64px; height: 84px; margin: 6px 0 0; border: 2px dashed #D1D5DB; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #fff; }
+.tv-so-moi svg { width: 34px; height: 34px; fill: none; stroke: #9F1239; stroke-width: 2; }
+.tv-so-moi:hover span { border-color: #9F1239; }
+.tv-so { width: 220px; cursor: pointer; }
+.tv-bia { position: relative; width: 220px; height: 293px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 6px 18px rgba(0,0,0,.06); overflow: hidden; }
+.tv-bia img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tv-cho { position: absolute; inset: 0; background: repeating-linear-gradient(#fff 0 23px, #E0E7FF 23px 24px); }
+.tv-so:hover .tv-bia { box-shadow: 0 0 0 2px #E0A92B, 0 6px 18px rgba(0,0,0,.1); }
+.tv-so.dang-mo .tv-bia { box-shadow: 0 0 0 2px #2563EB, 0 6px 18px rgba(0,0,0,.1); }
+.tv-nhan { position: absolute; left: 8px; top: 8px; background: #2563EB; color: #fff; font: 600 11.5px Arial; font-style: normal; padding: 3px 8px; border-radius: 10px; }
+.tv-dong { display: flex; align-items: flex-start; gap: 6px; margin-top: 10px; }
+.tv-dong > div { flex: 1; min-width: 0; }
+.tv-dong b { display: block; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tv-dong small { display: block; margin-top: 4px; color: #6B7280; font-size: 14px; }
+.tv-chu-y { margin-top: 36px; color: #6B7280; font-size: 15px; }
+.tv-prj-rac { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.tv-prj-rac > div { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 8px 12px; }
+.tv-prj-rac span { flex: 1; display: flex; align-items: center; gap: 8px; }
+.tv-prj-rac svg { width: 20px; height: 20px; fill: none; stroke: #4B5563; stroke-width: 1.6; }
+.tv-prj-rac small { color: #6B7280; }
+.tv-prj-rac button, .tv-ds-ban button, .tv-hop-chan button { height: 30px; padding: 0 12px; border: 1px solid #D1D5DB; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; }
+.tv-prj-rac button.do { color: #B91C1C; border-color: #FCA5A5; }
+.tv-menu { position: fixed; z-index: 80; min-width: 210px; background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.16); padding: 6px; display: flex; flex-direction: column; }
+.tv-menu button { text-align: left; border: none; background: none; padding: 9px 12px; border-radius: 7px; font-size: 14px; cursor: pointer; color: #1F2937; }
+.tv-menu button:hover:not([disabled]) { background: #F3F4F6; }
+.tv-menu button[disabled] { color: #9CA3AF; font-size: 12.5px; cursor: default; padding: 6px 12px 2px; }
+.tv-menu button.do { color: #B91C1C; }
+.tv-menu hr { border: none; border-top: 1px solid #F3F4F6; margin: 4px 0; }
+.tv-hop { position: fixed; inset: 0; z-index: 90; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; }
+.tv-hop-nd { width: min(520px, 92vw); max-height: 80vh; overflow: auto; background: #fff; border-radius: 16px; padding: 22px 24px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.tv-hop-nd h3 { margin: 0 0 8px; font-size: 19px; }
+.tv-mo-ta { color: #6B7280; font-size: 14px; margin: 0 0 14px; }
+.tv-ds-ban > div { display: flex; align-items: center; justify-content: space-between; padding: 8px 4px; border-bottom: 1px solid #F3F4F6; font-size: 14.5px; }
+.tv-hop-chan { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+#tl-phan-tram { min-width: 46px; text-align: center; font: 700 13.5px Arial, sans-serif; color: #334155; align-self: center; }
+#thu-phong .nut-m { font: 800 16px Arial, sans-serif; color: #7F1D1D; }
+
+.hop-but label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; font-size: 14.5px; }
+.hop-but select { height: 34px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 8px; font-size: 14px; min-width: 250px; }

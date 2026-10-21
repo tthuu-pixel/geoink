@@ -11,12 +11,14 @@
 <!-- Hàng trên: tệp, hoàn tác, trang -->
 <header id="hang-dau" class="hang">
   <button class="nut" id="nut-menu" title="Menu"><i data-bt="menu"></i></button>
+  <button class="nut nut-thu-vien" data-lenh="thuVien" title="Thư viện sổ (lưu trên máy)"><i data-bt="thuVien"></i><span>Thư viện</span></button>
   <button class="nut" data-lenh="mo" title="Mở bảng (Ctrl+O)"><i data-bt="mo"></i></button>
   <button class="nut" data-lenh="luu" title="Lưu (Ctrl+S)"><i data-bt="luu"></i></button>
   <button class="nut" data-lenh="hoanTac" title="Hoàn tác (Ctrl+Z)"><i data-bt="hoanTac"></i></button>
   <button class="nut" data-lenh="lamLai" title="Làm lại (Ctrl+Y)"><i data-bt="lamLai"></i></button>
   <button class="nut" data-lenh="nhapPdf" title="Nhập tệp PDF"><i data-bt="pdf"></i></button>
   <button class="nut" data-lenh="themTrang" title="Thêm trang"><i data-bt="themTrang"></i></button>
+  <button class="nut" data-lenh="chenKhoang" title="Chèn khoảng trống: bấm vào chỗ cần chèn rồi kéo xuống (kéo lên để thu bớt) · Esc để thôi"><i data-bt="chenKhoang"></i></button>
   <div class="gian"></div>
   <span id="thong-tin" title="Bấm để về 100%">1 / 1 · 100%</span>
   <div class="gian"></div>
@@ -62,16 +64,20 @@
   <div id="lop-cat" class="an"><div id="khung-cat"></div><div id="co-cat"></div></div>
   <div id="cuon-doc" title="Kéo để cuộn bảng lên / xuống"><div id="cuon-nut"></div></div>
   <div id="thu-phong">
-    <button class="nut nho" data-lenh="thuNho" title="Thu nhỏ"><i data-bt="thuNho"></i></button>
-    <button class="nut nho" data-lenh="phongTo" title="Phóng to"><i data-bt="phongTo"></i></button>
+    <button class="nut nho" data-lenh="thuNho" title="Thu nhỏ (Ctrl −)"><i data-bt="thuNho"></i></button>
+    <span id="tl-phan-tram" title="Tỉ lệ phóng / thu hiện tại">100%</span>
+    <button class="nut nho" data-lenh="phongTo" title="Phóng to (Ctrl +)"><i data-bt="phongTo"></i></button>
+    <button class="nut nho nut-m" data-lenh="tiLeMacDinh" title="Về tỉ lệ mặc định 100% (phím M)">M</button>
   </div>
 </main>
 
 <footer id="tab-trang"></footer>
+<div id="thu-vien" class="an"></div>
 
 <!-- Menu ☰ -->
 <div id="menu" class="an" role="menu">
   <button data-lenh="moi"><i data-bt="moi"></i>Bảng mới<kbd>Ctrl+N</kbd></button>
+  <button data-lenh="thuVien"><i data-bt="thuVien"></i>Thư viện sổ</button>
   <button data-lenh="mo"><i data-bt="mo"></i>Mở…<kbd>Ctrl+O</kbd></button>
   <button data-lenh="luu"><i data-bt="luu"></i>Lưu<kbd>Ctrl+S</kbd></button>
   <button data-lenh="luuThanh"><i data-bt="luu"></i>Lưu thành tệp khác…<kbd>Ctrl+⇧+S</kbd></button>
@@ -87,6 +93,7 @@
   <button data-lenh="xoaTrangNay"><i data-bt="xoa"></i>Xoá trang này</button>
   <hr>
   <button data-lenh="toanManHinh"><i data-bt="toanManHinh"></i>Toàn màn hình<kbd>F11</kbd></button>
+  <button data-lenh="caiDatBut"><i data-bt="caiDatBut"></i>Bút cảm ứng (nút bút, phím tắt)…</button>
   <button data-lenh="kiemTraCapNhat"><i data-bt="capNhat"></i>Kiểm tra cập nhật</button>
   <div class="phien-ban" id="phien-ban">GeoInk</div>
 </div>
@@ -254,6 +261,7 @@
 <script src="hinh.js"></script>
 <script src="dothi.js"></script>
 <script src="taikhoan.js"></script>
+<script src="thuvien.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
