@@ -19,8 +19,59 @@ GI.dungCu = (function () {
     return o;
   }
   // ---- toạ độ cục bộ ↔ thế giới ----
-  function raTG(dc, lx, ly) { var c = Math.cos(dc.goc), s = Math.sin(dc.goc); return { x: dc.x + lx * c - ly * s, y: dc.y + lx * s + ly * c }; }
-  function veCB(dc, P) { var c = Math.cos(dc.goc), s = Math.sin(dc.goc), dx = P.x - dc.x, dy = P.y - dc.y; return { x: dx * c + dy * s, y: -dx * s + dy * c }; }
+  // dc.k: tỉ lệ phóng to / thu nhỏ của dụng cụ (1 = 100%, đúng kích thước thật)
+  function tl(dc) { return dc.k || 1; }
+  function raTG(dc, lx, ly) { var k = tl(dc), c = Math.cos(dc.goc), s = Math.sin(dc.goc); lx *= k; ly *= k; return { x: dc.x + lx * c - ly * s, y: dc.y + lx * s + ly * c }; }
+  function veCB(dc, P) { var k = tl(dc), c = Math.cos(dc.goc), s = Math.sin(dc.goc), dx = P.x - dc.x, dy = P.y - dc.y; return { x: (dx * c + dy * s) / k, y: (-dx * s + dy * c) / k }; }
+  // ---- phóng to / thu nhỏ ----
+  var MUC_TL = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+  // chỗ đặt nút "− 100% +" (toạ độ cục bộ, chưa nhân tỉ lệ): chỗ trống trên / cạnh thân dụng cụ
+  function choNutTL(dc) {
+    if (dc.loai === 'thuoc') return { x: 10 * CM, y: 3 * CM, duoi: true };
+    if (dc.loai === 'doDo') return { x: 0, y: DAY_DO, duoi: true };
+    if (dc.loai === 'eke30' || dc.loai === 'eke45') { var e = cacEke(dc.loai); return { x: e.L1 * 0.36, y: -e.L2 * 0.36 }; }
+    if (dc.loai === 'parabol') return { x: 0, y: 6.5 * CM };
+    return null;
+  }
+  function viTriNutTL(dc, px) {
+    var P;
+    if (dc.loai === 'compa') { var C = compa(dc); P = { x: (C.K.x + C.P.x) / 2, y: (C.K.y + C.P.y) / 2 + 48 * px }; }
+    else { var q = choNutTL(dc); P = raTG(dc, q.x, q.y); if (q.duoi) { var c = Math.cos(dc.goc), s = Math.sin(dc.goc); P = { x: P.x - s * 20 * px, y: P.y + c * 20 * px }; } }
+    return { x: P.x, y: P.y, w: 104 * px, h: 26 * px };
+  }
+  // đổi tỉ lệ, giữ nguyên tâm dụng cụ trên bảng
+  function doiTiLe(dc, kMoi) {
+    kMoi = Math.max(MUC_TL[0], Math.min(MUC_TL[MUC_TL.length - 1], Math.round(kMoi * 100) / 100));
+    if (dc.loai === 'compa') { dc.k = kMoi; dc.r = Math.min(dc.r, CHAN_COMPA * kMoi * 1.94); return kMoi; }
+    var H = hinhDang(dc), T0 = raTG(dc, H.tam.x, H.tam.y); dc.k = kMoi;
+    var T1 = raTG(dc, H.tam.x, H.tam.y); dc.x += T0.x - T1.x; dc.y += T0.y - T1.y;
+    return kMoi;
+  }
+  function buocTiLe(dc, huong) {
+    var k = tl(dc), i;
+    if (huong > 0) { for (i = 0; i < MUC_TL.length && MUC_TL[i] <= k + 1e-6; i++); return doiTiLe(dc, MUC_TL[Math.min(i, MUC_TL.length - 1)]); }
+    for (i = MUC_TL.length - 1; i >= 0 && MUC_TL[i] >= k - 1e-6; i--); return doiTiLe(dc, MUC_TL[Math.max(i, 0)]);
+  }
+  function timNutTL(ds, M, px) {
+    for (var i = ds.length - 1; i >= 0; i--) {
+      var b = viTriNutTL(ds[i], px), dx = M.x - b.x, dy = M.y - b.y;
+      if (Math.abs(dx) <= b.w / 2 && Math.abs(dy) <= b.h / 2 + 2 * px) return { dc: ds[i], phan: 'tiLe', huong: dx < -b.w / 6 ? -1 : dx > b.w / 6 ? 1 : 0 };
+    }
+    return null;
+  }
+  function veNutTL(c, dc, px) {
+    var b = viTriNutTL(dc, px), x0 = b.x - b.w / 2, y0 = b.y - b.h / 2, r = b.h / 2;
+    c.save(); c.setLineDash([]);
+    c.beginPath(); c.moveTo(x0 + r, y0); c.arcTo(x0 + b.w, y0, x0 + b.w, y0 + b.h, r); c.arcTo(x0 + b.w, y0 + b.h, x0, y0 + b.h, r); c.arcTo(x0, y0 + b.h, x0, y0, r); c.arcTo(x0, y0, x0 + b.w, y0, r); c.closePath();
+    c.fillStyle = 'rgba(255,255,255,.95)'; c.fill(); c.strokeStyle = '#2457C5'; c.lineWidth = 1.3 * px; c.stroke();
+    c.strokeStyle = '#2457C5'; c.lineWidth = 2 * px; c.lineCap = 'round';
+    var a = 5 * px, xt = x0 + b.w / 6, xp = x0 + b.w * 5 / 6;
+    c.beginPath(); c.moveTo(xt - a, b.y); c.lineTo(xt + a, b.y); c.moveTo(xp - a, b.y); c.lineTo(xp + a, b.y); c.moveTo(xp, b.y - a); c.lineTo(xp, b.y + a); c.stroke();
+    c.lineWidth = 1 * px; c.strokeStyle = 'rgba(36,87,197,.3)'; c.beginPath(); c.moveTo(x0 + b.w / 3, y0 + 5 * px); c.lineTo(x0 + b.w / 3, y0 + b.h - 5 * px); c.moveTo(x0 + b.w * 2 / 3, y0 + 5 * px); c.lineTo(x0 + b.w * 2 / 3, y0 + b.h - 5 * px); c.stroke();
+    c.font = '700 ' + (13 * px) + 'px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = tl(dc) === 1 ? '#1F2937' : '#C2410C';
+    c.fillText(Math.round(tl(dc) * 100) + '%', b.x, b.y + 0.5 * px);
+    c.restore();
+  }
   function cacEke(loai) { var L1 = loai === 'eke45' ? 8 * CM : 10.4 * CM, L2 = loai === 'eke45' ? 8 * CM : 6 * CM; return { L1: L1, L2: L2 }; }
   // Thước parabol: đường viền, khe cong và lỗ tròn dò trực tiếp từ ảnh thước thật (đơn vị cm, gốc = đỉnh trên).
   var PB_VIEN = [0,-0.085,0.062,-0.083,0.124,-0.078,0.185,-0.069,0.247,-0.056,0.309,-0.04,0.37,-0.02,0.432,0.004,0.493,0.031,0.555,0.061,0.616,0.095,0.677,0.133,0.739,0.174,0.8,0.219,0.86,0.267,0.921,0.318,0.982,0.373,1.042,0.431,1.102,0.492,1.162,0.557,1.22,0.625,1.275,0.696,1.326,0.77,1.373,0.847,1.417,0.927,1.458,1.01,1.495,1.095,1.528,1.184,1.559,1.276,1.586,1.37,1.612,1.467,1.634,1.566,1.655,1.668,1.674,1.772,1.691,1.879,1.707,1.988,1.721,2.099,1.733,2.212,1.744,2.327,1.754,2.444,1.763,2.564,1.771,2.685,1.778,2.807,1.782,2.932,1.783,3.058,1.782,3.185,1.779,3.314,1.773,3.444,1.764,3.575,1.756,3.708,1.746,3.841,1.737,3.976,1.728,4.111,1.718,4.247,1.709,4.384,1.7,4.521,1.69,4.659,1.678,4.797,1.665,4.935,1.649,5.074,1.633,5.212,1.617,5.351,1.602,5.49,1.588,5.628,1.573,5.766,1.558,5.904,1.543,6.041,1.526,6.178,1.509,6.314,1.492,6.449,1.475,6.584,1.458,6.717,1.44,6.85,1.422,6.981,1.402,7.111,1.381,7.24,1.36,7.367,1.339,7.493,1.318,7.618,1.297,7.74,1.275,7.861,1.254,7.98,1.233,8.098,1.211,8.213,1.188,8.326,1.165,8.437,1.141,8.546,1.118,8.653,1.095,8.757,1.072,8.859,1.05,8.958,1.028,9.055,1.006,9.149,0.982,9.241,0.958,9.33,0.933,9.415,0.906,9.498,0.878,9.578,0.847,9.655,0.815,9.729,0.78,9.8,0.742,9.868,0.704,9.933,0.665,9.994,0.627,10.052,0.588,10.107,0.549,10.158,0.511,10.206,0.472,10.251,0.433,10.292,0.394,10.33,0.354,10.364,0.315,10.394,0.276,10.421,0.237,10.445,0.197,10.465,0.158,10.481,0.118,10.494,0.079,10.503,0.039,10.508,0,10.51,-0.039,10.508,-0.079,10.503,-0.118,10.494,-0.158,10.481,-0.197,10.465,-0.237,10.445,-0.276,10.421,-0.315,10.394,-0.354,10.364,-0.394,10.33,-0.433,10.292,-0.472,10.251,-0.511,10.206,-0.549,10.158,-0.588,10.107,-0.627,10.052,-0.665,9.994,-0.704,9.933,-0.742,9.868,-0.78,9.8,-0.815,9.729,-0.847,9.655,-0.878,9.578,-0.906,9.498,-0.933,9.415,-0.958,9.33,-0.982,9.241,-1.006,9.149,-1.028,9.055,-1.05,8.958,-1.072,8.859,-1.095,8.757,-1.118,8.653,-1.141,8.546,-1.165,8.437,-1.188,8.326,-1.211,8.213,-1.233,8.098,-1.254,7.98,-1.275,7.861,-1.297,7.74,-1.318,7.618,-1.339,7.493,-1.36,7.367,-1.381,7.24,-1.402,7.111,-1.422,6.981,-1.44,6.85,-1.458,6.717,-1.475,6.584,-1.492,6.449,-1.509,6.314,-1.526,6.178,-1.543,6.041,-1.558,5.904,-1.573,5.766,-1.588,5.628,-1.602,5.49,-1.617,5.351,-1.633,5.212,-1.649,5.074,-1.665,4.935,-1.678,4.797,-1.69,4.659,-1.7,4.521,-1.709,4.384,-1.718,4.247,-1.728,4.111,-1.737,3.976,-1.746,3.841,-1.756,3.708,-1.764,3.575,-1.773,3.444,-1.779,3.314,-1.782,3.185,-1.783,3.058,-1.782,2.932,-1.778,2.807,-1.771,2.685,-1.763,2.564,-1.754,2.444,-1.744,2.327,-1.733,2.212,-1.721,2.099,-1.707,1.988,-1.691,1.879,-1.674,1.772,-1.655,1.668,-1.634,1.566,-1.612,1.467,-1.586,1.37,-1.559,1.276,-1.528,1.184,-1.495,1.095,-1.458,1.01,-1.417,0.927,-1.373,0.847,-1.326,0.77,-1.275,0.696,-1.22,0.625,-1.162,0.557,-1.102,0.492,-1.042,0.431,-0.982,0.373,-0.921,0.318,-0.86,0.267,-0.8,0.219,-0.739,0.174,-0.677,0.133,-0.616,0.095,-0.555,0.061,-0.493,0.031,-0.432,0.004,-0.37,-0.02,-0.309,-0.04,-0.247,-0.056,-0.185,-0.069,-0.124,-0.078,-0.062,-0.083];   // nửa phải lấy đều từ ảnh thước thật, làm trơn, đối xứng
@@ -64,14 +115,15 @@ GI.dungCu = (function () {
   function compa(dc) {
     var K = { x: dc.x, y: dc.y }, P = { x: dc.x + dc.r * Math.cos(dc.goc), y: dc.y + dc.r * Math.sin(dc.goc) };
     var M = { x: (K.x + P.x) / 2, y: (K.y + P.y) / 2 }, n = { x: Math.sin(dc.goc), y: -Math.cos(dc.goc) }; if (n.y > 0) n = { x: -n.x, y: -n.y };
-    var h = Math.sqrt(Math.max(CHAN_COMPA * CHAN_COMPA - dc.r * dc.r / 4, (0.6 * CM) * (0.6 * CM)));
+    var k = tl(dc), L = CHAN_COMPA * k, h = Math.sqrt(Math.max(L * L - dc.r * dc.r / 4, (0.6 * CM * k) * (0.6 * CM * k)));
     var H = { x: M.x + n.x * h, y: M.y + n.y * h };
-    return { K: K, P: P, H: H, N: { x: H.x + n.x * 1.5 * CM, y: H.y + n.y * 1.5 * CM }, n: n };
+    return { K: K, P: P, H: H, N: { x: H.x + n.x * 1.5 * CM * k, y: H.y + n.y * 1.5 * CM * k }, n: n };
   }
 
   // ---- tìm phần dụng cụ dưới con trỏ ----
   //   ve: true khi đang cầm bút (để mép thước hút nét vẽ)
   function tim(ds, M, px, ve) {
+    var nt = timNutTL(ds, M, px); if (nt) return nt;
     // nút xoay và núm compa được ưu tiên (kể cả khi dụng cụ khác đè lên)
     for (var k = ds.length - 1; k >= 0; k--) {
       var d0 = ds[k];
@@ -101,6 +153,7 @@ GI.dungCu = (function () {
       if (X && Math.hypot(M.x - X.x, M.y - X.y) < 15 * px) return { dc: dc, phan: 'xoay', tam: raTG(dc, H.tam.x, H.tam.y) };
       if (ve) {   // gần mép (kể cả phía ngoài) → vẽ bám mép
         var tot = null, d0 = 18 * px;
+        var kk0 = tl(dc); d0 /= kk0;
         H.mep.forEach(function (m) { var Q = chieuDoan(m[0], m[1], L), dd = Math.hypot(Q.x - L.x, Q.y - L.y); if (dd < d0) { d0 = dd; tot = { dc: dc, phan: 'mep', A: m[0], B: m[1] }; } });
         if (H.cong) { var Qc = ganCong(H.cong, L), dc2 = Math.hypot(Qc.x - L.x, Qc.y - L.y); if (dc2 < d0) { d0 = dc2; tot = { dc: dc, phan: 'mep', cong: H.cong }; } }
         if (tot) return tot;
@@ -122,9 +175,9 @@ GI.dungCu = (function () {
   function soVN(x) { return String(x).replace('.', ','); }
   function ve(c, dc, px, dangXoay) {
     c.save(); c.setLineDash([]); c.lineJoin = 'round';
-    if (dc.loai === 'compa') { veCompa(c, dc, px); c.restore(); return; }
-    var H = hinhDang(dc);
-    c.translate(dc.x, dc.y); c.rotate(dc.goc);
+    if (dc.loai === 'compa') { veCompa(c, dc, px); c.restore(); veNutTL(c, dc, px); return; }
+    var H = hinhDang(dc), px0 = px;
+    c.translate(dc.x, dc.y); c.rotate(dc.goc); c.scale(tl(dc), tl(dc)); px = px / tl(dc);
     // thân trong suốt màu vàng nhạt
     c.beginPath(); H.than.forEach(function (P, i) { i ? c.lineTo(P.x, P.y) : c.moveTo(P.x, P.y); }); c.closePath();
     c.fillStyle = MAU_THAN; c.fill(); c.strokeStyle = MAU_VIEN; c.lineWidth = 1.4 * px; c.stroke();
@@ -193,7 +246,8 @@ GI.dungCu = (function () {
       c.beginPath(); c.arc(H.xoay.x, H.xoay.y, 13 * px, 0, Math.PI * 2); c.fillStyle = '#FFFFFF'; c.fill(); c.strokeStyle = '#2457C5'; c.lineWidth = 1.5 * px; c.stroke();
       c.beginPath(); c.arc(H.xoay.x, H.xoay.y, 7 * px, -Math.PI * 0.85, Math.PI * 0.55); c.lineWidth = 1.8 * px; c.stroke();
     }
-    c.restore();
+    c.restore(); px = px0;
+    veNutTL(c, dc, px);
     if (dangXoay) {   // số đo góc quay
       var X0 = raTG(dc, viTriSo.x, viTriSo.y), deg = ((dc.goc * 180 / Math.PI) % 360 + 360) % 360;
       c.save(); c.font = '700 ' + (15 * px) + 'px Arial'; var txt = soVN(Math.round(deg * 10) / 10) + '°', w = c.measureText(txt).width + 14 * px;
@@ -201,18 +255,18 @@ GI.dungCu = (function () {
     }
   }
   function veCompa(c, dc, px) {
-    var C = compa(dc);
+    var C = compa(dc), k = tl(dc);
     // chân kim (xám) và chân bút (xanh, đầu bút chì)
     c.lineCap = 'round';
-    c.strokeStyle = '#64748B'; c.lineWidth = 0.32 * CM; c.beginPath(); c.moveTo(C.H.x, C.H.y); c.lineTo(C.K.x + (C.H.x - C.K.x) * 0.12, C.K.y + (C.H.y - C.K.y) * 0.12); c.stroke();
-    c.strokeStyle = '#94A3B8'; c.lineWidth = 0.1 * CM; c.beginPath(); c.moveTo(C.K.x + (C.H.x - C.K.x) * 0.12, C.K.y + (C.H.y - C.K.y) * 0.12); c.lineTo(C.K.x, C.K.y); c.stroke();
-    c.strokeStyle = '#2563EB'; c.lineWidth = 0.32 * CM; c.beginPath(); c.moveTo(C.H.x, C.H.y); c.lineTo(C.P.x + (C.H.x - C.P.x) * 0.22, C.P.y + (C.H.y - C.P.y) * 0.22); c.stroke();
-    c.strokeStyle = '#F5C451'; c.lineWidth = 0.22 * CM; c.beginPath(); c.moveTo(C.P.x + (C.H.x - C.P.x) * 0.22, C.P.y + (C.H.y - C.P.y) * 0.22); c.lineTo(C.P.x + (C.H.x - C.P.x) * 0.05, C.P.y + (C.H.y - C.P.y) * 0.05); c.stroke();
-    c.strokeStyle = '#1F2937'; c.lineWidth = 0.1 * CM; c.beginPath(); c.moveTo(C.P.x + (C.H.x - C.P.x) * 0.05, C.P.y + (C.H.y - C.P.y) * 0.05); c.lineTo(C.P.x, C.P.y); c.stroke();
+    c.strokeStyle = '#64748B'; c.lineWidth = 0.32 * CM * k; c.beginPath(); c.moveTo(C.H.x, C.H.y); c.lineTo(C.K.x + (C.H.x - C.K.x) * 0.12, C.K.y + (C.H.y - C.K.y) * 0.12); c.stroke();
+    c.strokeStyle = '#94A3B8'; c.lineWidth = 0.1 * CM * k; c.beginPath(); c.moveTo(C.K.x + (C.H.x - C.K.x) * 0.12, C.K.y + (C.H.y - C.K.y) * 0.12); c.lineTo(C.K.x, C.K.y); c.stroke();
+    c.strokeStyle = '#2563EB'; c.lineWidth = 0.32 * CM * k; c.beginPath(); c.moveTo(C.H.x, C.H.y); c.lineTo(C.P.x + (C.H.x - C.P.x) * 0.22, C.P.y + (C.H.y - C.P.y) * 0.22); c.stroke();
+    c.strokeStyle = '#F5C451'; c.lineWidth = 0.22 * CM * k; c.beginPath(); c.moveTo(C.P.x + (C.H.x - C.P.x) * 0.22, C.P.y + (C.H.y - C.P.y) * 0.22); c.lineTo(C.P.x + (C.H.x - C.P.x) * 0.05, C.P.y + (C.H.y - C.P.y) * 0.05); c.stroke();
+    c.strokeStyle = '#1F2937'; c.lineWidth = 0.1 * CM * k; c.beginPath(); c.moveTo(C.P.x + (C.H.x - C.P.x) * 0.05, C.P.y + (C.H.y - C.P.y) * 0.05); c.lineTo(C.P.x, C.P.y); c.stroke();
     // khớp và núm cầm
-    c.fillStyle = '#334155'; c.beginPath(); c.arc(C.H.x, C.H.y, 0.32 * CM, 0, Math.PI * 2); c.fill();
-    c.strokeStyle = '#334155'; c.lineWidth = 0.18 * CM; c.beginPath(); c.moveTo(C.H.x, C.H.y); c.lineTo(C.N.x, C.N.y); c.stroke();
-    c.fillStyle = '#7A1E1E'; c.beginPath(); c.arc(C.N.x, C.N.y, 0.36 * CM, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#334155'; c.beginPath(); c.arc(C.H.x, C.H.y, 0.32 * CM * k, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#334155'; c.lineWidth = 0.18 * CM * k; c.beginPath(); c.moveTo(C.H.x, C.H.y); c.lineTo(C.N.x, C.N.y); c.stroke();
+    c.fillStyle = '#7A1E1E'; c.beginPath(); c.arc(C.N.x, C.N.y, 0.36 * CM * k, 0, Math.PI * 2); c.fill();
     // đầu kim, đầu bút: vòng tròn tay nắm; bán kính
     c.lineWidth = 1.4 * px; c.strokeStyle = '#2457C5'; c.setLineDash([]);
     [C.K, C.P].forEach(function (Q) { c.beginPath(); c.arc(Q.x, Q.y, 7 * px, 0, Math.PI * 2); c.stroke(); });
@@ -221,5 +275,5 @@ GI.dungCu = (function () {
     c.font = '700 ' + (14 * px) + 'px Arial'; var w = c.measureText(txt).width + 12 * px, Mx = (C.K.x + C.P.x) / 2 - w / 2, My = (C.K.y + C.P.y) / 2 + 10 * px;
     c.fillStyle = 'rgba(255,255,255,.9)'; c.fillRect(Mx, My, w, 22 * px); c.fillStyle = '#1D4ED8'; c.textBaseline = 'middle'; c.fillText(txt, Mx + 6 * px, My + 11 * px);
   }
-  return { TEN: TEN, CM: CM, tao: tao, tim: tim, chieuMep: chieuMep, ve: ve, compa: compa, CHAN: CHAN_COMPA };
+  return { TEN: TEN, CM: CM, tao: tao, tim: tim, chieuMep: chieuMep, ve: ve, compa: compa, CHAN: CHAN_COMPA, doiTiLe: doiTiLe, buocTiLe: buocTiLe, tiLe: tl };
 })();

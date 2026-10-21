@@ -972,11 +972,11 @@
   function layDiem(M) {
     var d = timDiem(M); if (d) return d.id;
     var g = timGiaoGan(M);
-    if (g) return themHinh({ id: idMoi('d'), loai: 'giao', o1: g.o1, o2: g.o2, k: g.k, ten: tenDiemMoi() }).id;
+    if (g) return themHinh({ id: idMoi('d'), loai: 'giao', o1: g.o1, o2: g.o2, k: g.k, ten: tenDiemMoi(), hienTen: false }).id;
     var tren = timDoiTuong(M, laDuongTron);
-    if (tren) return themHinh({ id: idMoi('d'), loai: 'diemTren', tren: tren.id, t: H.thamSo(giaTri[tren.id], M), ten: tenDiemMoi() }).id;
+    if (tren) return themHinh({ id: idMoi('d'), loai: 'diemTren', tren: tren.id, t: H.thamSo(giaTri[tren.id], M), ten: tenDiemMoi(), hienTen: false }).id;
     var P = batLuoi(M);
-    return themHinh({ id: idMoi('d'), loai: 'diem', x: P.x, y: P.y, ten: tenDiemMoi() }).id;
+    return themHinh({ id: idMoi('d'), loai: 'diem', x: P.x, y: P.y, ten: tenDiemMoi(), hienTen: false }).id;   // điểm mới: ẩn tên (bấm đúp để đặt tên)
   }
 
   /* =====================================================================
@@ -1008,11 +1008,11 @@
   // Danh sách công cụ: [tên, các bước, gợi ý từng bước, hàm tạo (ids) → có thể trả Promise]
   var CONG_CU = {
     diem: { buoc: ['diem'], goiY: ['Bấm để đặt điểm (bấm lên đường thẳng, đường tròn để đặt điểm trên đó)'], tao: function () {} },
-    diemTren: { buoc: ['duongTron'], goiY: ['Bấm lên đường thẳng hoặc đường tròn để đặt điểm thuộc đối tượng'], tao: function (ids, M) { themHinh({ id: idMoi('d'), loai: 'diemTren', tren: ids[0], t: H.thamSo(giaTri[ids[0]], M), ten: tenDiemMoi() }); } },
+    diemTren: { buoc: ['duongTron'], goiY: ['Bấm lên đường thẳng hoặc đường tròn để đặt điểm thuộc đối tượng'], tao: function (ids, M) { themHinh({ id: idMoi('d'), loai: 'diemTren', tren: ids[0], t: H.thamSo(giaTri[ids[0]], M), ten: tenDiemMoi(), hienTen: false }); } },
     giao: { buoc: ['duongTron', 'duongTron'], goiY: ['Chọn đối tượng thứ nhất', 'Chọn đối tượng thứ hai'], tao: function (ids) {
       var c2 = H.catNhau(giaTri[ids[0]], giaTri[ids[1]]); if (!c2.length) return thongBao('Hai đối tượng này không cắt nhau');
-      c2.forEach(function (P, k) { themHinh({ id: idMoi('d'), loai: 'giao', o1: ids[0], o2: ids[1], k: k, ten: tenDiemMoi() }); }); } },
-    trungDiem: { buoc: ['diem', 'diem'], goiY: ['Chọn hai điểm (hoặc bấm vào một đoạn thẳng / đường tròn để lấy trung điểm / tâm)', 'Chọn điểm thứ hai'], tao: function (ids) { themHinh({ id: idMoi('d'), loai: 'trungDiem', a: ids[0], b: ids[1], ten: tenDiemMoi() }); } },
+      c2.forEach(function (P, k) { themHinh({ id: idMoi('d'), loai: 'giao', o1: ids[0], o2: ids[1], k: k, ten: tenDiemMoi(), hienTen: false }); }); } },
+    trungDiem: { buoc: ['diem', 'diem'], goiY: ['Chọn hai điểm (hoặc bấm vào một đoạn thẳng / đường tròn để lấy trung điểm / tâm)', 'Chọn điểm thứ hai'], tao: function (ids) { themHinh({ id: idMoi('d'), loai: 'trungDiem', a: ids[0], b: ids[1], ten: tenDiemMoi(), hienTen: false }); } },
     duong: { buoc: ['diem', 'diem'], goiY: ['Chọn điểm thứ nhất', 'Chọn điểm thứ hai'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'duong', a: ids[0], b: ids[1] }); } },
     doan: { buoc: ['diem', 'diem'], goiY: ['Chọn điểm đầu', 'Chọn điểm cuối'], tao: function (ids) { themHinh({ id: idMoi('h'), loai: 'doan', a: ids[0], b: ids[1] }); } },
     doanCoDinh: { buoc: ['diem'], goiY: ['Chọn điểm đầu của đoạn thẳng'], tao: function (ids) {
@@ -1400,12 +1400,14 @@
   function doiTenHinh(o) {
     if (!o) return;
     hoi({ tieuDe: 'Đổi tên ' + tenLoai(o).toLowerCase(), nhan: 'Tên mới', macDinh: o.ten || '', van: true }).then(function (ten) {
-      if (ten == null) return; ten = String(ten).trim(); if (!ten || ten === o.ten) return;
+      if (ten == null) return; ten = String(ten).trim(); if (!ten || (ten === o.ten && hienTenCua(o))) return;
       ghiLichSu(); o.ten = ten; o.hienTen = true; daSua = true; capNhatTieuDe(); if (chonId) veThuocTinh(); canVe();
     });
   }
   cv.addEventListener('dblclick', function (e) {   // bấm đúp: vào tên điểm / đường → đổi tên; vào chữ / công thức → sửa
     var p = toaDo(e), M = veTG(p.x, p.y);
+    var hdc = dungCuDS.length && GI.dungCu.tim(dungCuDS, M, 1 / V.s, false);   // bấm đúp vào dụng cụ: về 100%
+    if (hdc) { dangKeo = null; if (GI.dungCu.tiLe(hdc.dc) !== 1) { GI.dungCu.doiTiLe(hdc.dc, 1); thongBao(GI.dungCu.TEN[hdc.dc.loai] + ': 100%'); canVe(); } return; }
     if (cc === 'chon' || cc === 'keo') {
       var tenR = timTen(M); if (tenR && tenR.o) { dangKeo = null; return doiTenHinh(tenR.o); }
     }
@@ -2094,6 +2096,10 @@
       if (h.coDinh) { dangKeo = { loai: 'dauPB', dc: dc, i: h.i, M0: M }; return true; }
       dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y, dauPB: h.i, M0: M }; canVe(); return true;
     }
+    if (h.phan === 'tiLe') {   // nút − 100% +: phóng to / thu nhỏ dụng cụ, bấm vào số % để về 100%
+      var kq = h.huong ? GI.dungCu.buocTiLe(dc, h.huong) : GI.dungCu.doiTiLe(dc, 1);
+      thongBao(GI.dungCu.TEN[dc.loai] + ': ' + Math.round(kq * 100) + '%' + (kq !== 1 ? ' · bấm đúp vào dụng cụ để về 100%' : '')); canVe(); return true;
+    }
     if (h.phan === 'ghim') { dc.ghim = !dc.ghim; thongBao(dc.ghim ? 'Đã ghim: kéo dụng cụ sẽ quay quanh điểm đỏ' : 'Đã bỏ ghim: kéo để di chuyển dụng cụ'); canVe(); return true; }
     if (h.phan === 'xoay') { dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y }; canVe(); return true; }
     if (h.phan === 'butCompa') { dangKeo = { loai: 'butCompa', dc: dc }; return true; }
@@ -2107,7 +2113,7 @@
   function keoDungCu(k, M) {
     var dc = k.dc;
     if (k.loai === 'doiDC') { dc.x = M.x - k.dx; dc.y = M.y - k.dy; return; }
-    if (k.loai === 'butCompa') { dc.r = Math.max(0.3 * DV, Math.min(GI.dungCu.CHAN * 1.94, Math.hypot(M.x - dc.x, M.y - dc.y))); dc.goc = Math.atan2(M.y - dc.y, M.x - dc.x); return; }
+    if (k.loai === 'butCompa') { dc.r = Math.max(0.3 * DV, Math.min(GI.dungCu.CHAN * GI.dungCu.tiLe(dc) * 1.94, Math.hypot(M.x - dc.x, M.y - dc.y))); dc.goc = Math.atan2(M.y - dc.y, M.x - dc.x); return; }
     // xoay quanh tâm dụng cụ; gần bội 15° thì hút về
     var a = Math.atan2(M.y - k.tam.y, M.x - k.tam.x) - k.a0, g = k.goc0 + a, deg = g * 180 / Math.PI, gan = Math.round(deg / 15) * 15;
     if (Math.abs(deg - gan) < 1.5) { g = gan * Math.PI / 180; a = g - k.goc0; }
