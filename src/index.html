@@ -133,6 +133,19 @@
   </div>
 </div>
 
+<div id="hop-do-thi" class="hop an" role="dialog" aria-label="Đồ thị hàm số">
+  <div class="hop-noi-dung rong">
+    <h2 id="dt-tieu-de">Đồ thị hàm số</h2>
+    <div class="dt-nhom"><div class="dt-nhan">Hàm số</div><div id="dt-ds"></div><button class="nut chu dt-them" id="dt-them">+ Thêm đồ thị</button></div>
+    <div class="dt-nhom"><div class="dt-nhan">Giới hạn hệ trục</div>
+      <div class="dt-hang"><span class="dt-truc"><i>Ox</i> từ <input id="dt-x0" value="-4"> đến <input id="dt-x1" value="4"></span><span class="dt-truc"><i>Oy</i> từ <input id="dt-y0" value="-3"> đến <input id="dt-y1" value="5"></span>
+        <label class="dt-tich"><input type="checkbox" id="dt-luoi"> Lưới ô vuông</label><label class="dt-tich"><input type="checkbox" id="dt-pt" checked> Ghi phương trình cạnh đồ thị</label></div></div>
+    <div class="dt-nhom"><div class="dt-nhan">Bảng giá trị <small>(chỉ nhập các giá trị x, cách nhau bằng dấu ; )</small></div><div id="dt-bang"></div><button class="nut chu dt-them" id="dt-them-bang">+ Thêm bảng giá trị</button></div>
+    <div class="loi" id="dt-loi"></div>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="dt-ve">Vẽ đồ thị</button></div>
+  </div>
+</div>
+
 <div id="hop-xuat-tex" class="hop an" role="dialog" aria-label="Mã TikZ của hình">
   <div class="hop-noi-dung rong">
     <h2>Mã TikZ của hình</h2>
@@ -236,6 +249,7 @@
 <script src="tikz.js"></script>
 <script src="xuattex.js"></script>
 <script src="hinh.js"></script>
+<script src="dothi.js"></script>
 <script src="taikhoan.js"></script>
 <script src="app.js"></script>
 </body>

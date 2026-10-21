@@ -156,7 +156,8 @@ GI.hinh = (function () {
           if (!o._f || o._bt !== o.bt || o._kb !== khoaBien) { try { var r = GI.bieuThuc.doc(o.bt, Object.keys(bien)); o._f = r.f; o._ve = r.ve; o._bt = o.bt; o._kb = khoaBien; } catch (e) { return null; } }
           var fh = o._f; return { k: 'ham', f: function (x) { return fh(x, bien); }, ve: o._ve };
         }
-        case 'anh': return { k: 'anh', x: o.x, y: o.y, w: o.w, h: o.h };   // ảnh dán / cắt từ màn hình
+        case 'anh': return { k: 'anh', x: o.x, y: o.y, w: o.w, h: o.h };
+        case 'doThi': return { k: 'doThi', x: o.x, y: o.y };   // đồ thị hàm số (hệ trục + đồ thị + bảng giá trị)   // ảnh dán / cắt từ màn hình
         case 'diemTZ': case 'nhanTZ': {   // điểm / nhãn dựng từ mã TikZ (biểu thức theo toạ độ TikZ, gốc là điểm o.goc)
           var G = diem(o.goc); if (!G || !GI.tikz) return null; var Dk = DV * (o.kt || 1);
           var Pz = GI.tikz.tinh(o.bt, function (id) { var Q = diem(id); return Q ? { x: (Q.x - G.x) / Dk, y: -(Q.y - G.y) / Dk } : null; });

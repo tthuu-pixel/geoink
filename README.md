@@ -56,6 +56,12 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 - Bấm lên đường thẳng / đường tròn để đặt điểm nằm trên đó; bấm gần chỗ hai hình cắt nhau để lấy giao điểm.
 - Dùng công cụ **Chọn / kéo** để kéo điểm: mọi hình dựng từ điểm đó tự đổi theo.
 
+**Đồ thị hàm số** (nút hệ trục có đường thẳng và parabol, hàng 2): nhập *Đồ thị 1: y = …* (ví dụ `2x + 1`, `1/2x^2`, `-x^2`), bấm *+ Thêm đồ thị* để có Đồ thị 2, 3…; mỗi đồ thị chọn màu và độ dày. Chọn giới hạn hệ trục *Ox từ … đến …*, *Oy từ … đến …*, bật/tắt lưới ô vuông và nhãn phương trình. *Bảng giá trị*: chỉ nhập các giá trị x (cách nhau bằng dấu ;), chọn bảng của đồ thị nào, bấm *+ Thêm bảng giá trị* cho đồ thị khác — giá trị y tự tính, phân số viết chồng kiểu LaTeX. Hình vẽ kiểu LaTeX: trục có mũi tên, nhãn O, x, y, vạch số, chữ in nghiêng. Kéo để di chuyển, bấm đúp để sửa, cắt hình để đưa sang Word.
+
+**Thước parabol**: hai đầu trên và dưới đều dùng để vẽ. Bấm một đầu thì đầu đó hiện xanh và thành điểm cố định; kéo đầu còn lại để xoay, nghiêng thước quanh điểm cố định. Bấm lại để bỏ cố định.
+
+**Xoay hình 3D**: nút *Dựng hình chóp* / *Dựng hình lăng trụ* (nhóm hình không gian) — bấm lần lượt các đỉnh đáy, bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh trên → thành khối 3D. Kéo núm ↻ để xoay ngang / nghiêng. Thanh hiệu chỉnh dưới bảng: góc xoay, góc nghiêng, tô mặt, độ trong, nét khuất (đứt / ẩn), đường cao, tự quay; nút *Góc nhìn chuẩn* đưa về hình vẽ SGK, hình đã xoay vẫn giữ nguyên khi tắt thanh.
+
 **Cắt hình** (nút cây kéo, cạnh hai nút TeX): kéo khung quanh hình trên bảng → vùng đó được vẽ lại nét gấp 3 lần màn hình (≈ 300 dpi), nền trắng không dòng kẻ, tự chép vào clipboard để mở Word bấm Ctrl+V; có nút *Lưu ra tệp PNG*. Esc hoặc chuột phải để huỷ. Muốn lấy hình từ bên ngoài vào bảng: dùng công cụ cắt của Windows (Win+Shift+S) rồi Ctrl+V trên bảng; ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ, lưu trong tệp .geoink.
 
 **Cuộn, phóng to**: lăn chuột để cuộn bảng lên xuống (Shift + lăn: cuộn ngang); thanh trượt bên phải để kéo nhanh; phóng to / thu nhỏ bằng Ctrl + lăn chuột (hoặc nút +/−).

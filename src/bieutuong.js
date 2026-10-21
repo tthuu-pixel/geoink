@@ -178,6 +178,8 @@ window.GI = window.GI || {};
   B32.k_dungChop = NL('M13 3L3 18M13 3l10 9M13 3l-2 16M3 18l8 1 12-7') + ND('M3 18l12-6h8') + d2(13, 3) + d2(3, 18) + d2(11, 19) + d2(23, 12) + muiXoay();
   B32.k_dungLang = NL('M3 7l7 4 11-4M3 7v11l7 4 11-4V7M10 11v11') + ND('M3 18l11-4 7 0M14 3v11') + NL('M3 7l11-4 7 4') + d2(3, 7) + d2(10, 11) + d2(21, 7) + muiXoay();
   B32.k_cau = C(16, 16, 12, K, 1.9) + NL('M4 16a12 4 0 0 0 24 0') + ND('M4 16a12 4 0 0 1 24 0M16 16h12') + d2(16, 16);
+  // đồ thị hàm số: hệ trục có mũi tên, đường thẳng xanh, parabol đỏ
+  B32.doThi = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M4 28L26 6', X, 2.3) + P('M4 7.5Q10 34 17 7.5', R, 2.3);
   // ----- Nhóm đường tròn -----
   function d3(x, y, m) { return D(x, y, m || X, 2.3); }
   B32.m_noiTiep = C(16, 16, 12, K, 1.8) + NL('M12.9 4.4L5.6 22 26.4 22z') + d3(12.9, 4.4) + d3(5.6, 22) + d3(26.4, 22) + d3(16, 16, '#3A3F47');
