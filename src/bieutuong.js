@@ -173,6 +173,10 @@ window.GI = window.GI || {};
   B32.k_chop4 = NL('M15 3L3 26M15 3l5 23M15 3l13 15M3 26h17l8-8') + ND('M3 26l8-8h17M15 3l-4 15') + d2(15, 3) + d2(3, 26) + d2(20, 26);
   B32.k_tru = '<ellipse cx="16" cy="8" rx="10" ry="3.6" fill="none" stroke="' + K + '" stroke-width="1.9"/>' + NL('M6 8v17M26 8v17M6 25a10 3.6 0 0 0 20 0') + ND('M6 25a10 3.6 0 0 1 20 0M16 8v17h10') + d2(16, 8) + d2(16, 25);
   B32.k_non = NL('M16 4L5 24M16 4l11 20M5 24a11 4 0 0 0 22 0') + ND('M5 24a11 4 0 0 1 22 0M16 4v20h11') + d2(16, 4) + d2(16, 24);
+  // dựng tự do (bấm đỉnh), có mũi tên xoay
+  function muiXoay() { return P('M22 27.5a5.5 5.5 0 1 0 -5 -3', K, 1.5) + P('M15.4 22.2l1.8 2.6 2.4-1.9', K, 1.5); }
+  B32.k_dungChop = NL('M13 3L3 18M13 3l10 9M13 3l-2 16M3 18l8 1 12-7') + ND('M3 18l12-6h8') + d2(13, 3) + d2(3, 18) + d2(11, 19) + d2(23, 12) + muiXoay();
+  B32.k_dungLang = NL('M3 7l7 4 11-4M3 7v11l7 4 11-4V7M10 11v11') + ND('M3 18l11-4 7 0M14 3v11') + NL('M3 7l11-4 7 4') + d2(3, 7) + d2(10, 11) + d2(21, 7) + muiXoay();
   B32.k_cau = C(16, 16, 12, K, 1.9) + NL('M4 16a12 4 0 0 0 24 0') + ND('M4 16a12 4 0 0 1 24 0M16 16h12') + d2(16, 16);
   // ----- Nhóm đường tròn -----
   function d3(x, y, m) { return D(x, y, m || X, 2.3); }
