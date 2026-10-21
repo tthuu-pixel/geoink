@@ -31,6 +31,11 @@ window.GI = window.GI || {};
     chon: '<path d="M5.5 3.5L18 11.6l-5.7 1.5 3.4 6-2.4 1.4-3.4-6-4.4 4z" fill="#fff" stroke="#111827" stroke-width="1.6" stroke-linejoin="round"/>',
     keo: '<path d="M8 13V5.6a1.4 1.4 0 0 1 2.8 0V11M10.8 10.6V4.4a1.4 1.4 0 0 1 2.8 0v6.2M13.6 10.8V5.6a1.4 1.4 0 0 1 2.8 0v5.2M16.4 11.2V8.2a1.4 1.4 0 0 1 2.8 0v6.3c0 4-2.8 7-6.6 7-2.9 0-4.4-1.4-5.8-3.6L4.9 14.4a1.5 1.5 0 0 1 2.5-1.6L8 13.6" fill="#FDE7C8" stroke="#9A5B1F" stroke-width="1.4" stroke-linejoin="round"/>',
     toanManHinh: p('M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', DEN, 2),
+    // thư viện: ba cuốn sổ trên giá
+    thuVien: '<rect x="3" y="4" width="4.2" height="16" rx=".8" fill="#2563EB"/><rect x="8" y="4" width="4.2" height="16" rx=".8" fill="#F59E0B"/><path d="M13.6 6.3l3.9-1.1 4 14.6-3.9 1.1z" fill="#DC2626"/><path d="M4.2 8h1.8M9.2 8h1.8" stroke="#fff" stroke-width="1.2"/><path d="M2 21h20" stroke="#334155" stroke-width="1.6" stroke-linecap="round"/>',
+    // chèn khoảng trống: hai đường kẻ tách ra, mũi tên lên / xuống
+    chenKhoang: p('M3 4.5h18M3 19.5h18', '#334155', 1.8) + p('M3 12h4M10 12h4M17 12h4', '#94A3B8', 1.6) + p('M12 6.5v3.2M12 14.3v3.2', '#2563EB', 2) + p('M9.8 8.4L12 6.2l2.2 2.2M9.8 15.6L12 17.8l2.2-2.2', '#2563EB', 2),
+    caiDatBut: p('M4 20l3.5-1 10-10-2.5-2.5-10 10z', '#2563EB', 1.8) + p('M15 6.5l2.5 2.5', '#2563EB', 1.8) + '<circle cx="18.5" cy="18.5" r="2.6" fill="none" stroke="#334155" stroke-width="1.5"/><path d="M18.5 14.6v1.3M18.5 21.1v1.3M14.6 18.5h1.3M21.1 18.5h1.3" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>',
     thuNho: tron(11, 11, 7, DEN, 2) + p('M8 11h6M21 21l-5-5', DEN, 2),
     phongTo: tron(11, 11, 7, DEN, 2) + p('M8 11h6M11 8v6M21 21l-5-5', DEN, 2),
     moi: '<path d="M6 2.5h8.5L19 7v14.5H6z" fill="#fff" stroke="#2563EB" stroke-width="1.6" stroke-linejoin="round"/>' + p('M12.5 10.5v7M9 14h7', LA, 2.2),

@@ -102,6 +102,23 @@ ipcMain.handle('xuat-anh', async (e, { duLieu, ten }) => {
   try { fs.writeFileSync(kq.filePath, Buffer.from(duLieu.split(',')[1], 'base64')); return { ten: kq.filePath }; } catch (err) { return { loi: String(err.message || err) }; }
 });
 
+// ---- Thư viện sổ trên máy: Tài liệu\GeoInk Thư viện (chỉ đọc / ghi trong thư mục này) ----
+function thuMucThuVien() { return path.join(app.getPath('documents'), 'GeoInk Thư viện'); }
+function duongThuVien(tuongDoi) {
+  if (typeof tuongDoi !== 'string' || !/^[A-Za-z0-9_\-./]+$/.test(tuongDoi) || tuongDoi.split('/').some((p) => p === '..' || p === '')) throw new Error('Đường dẫn không hợp lệ');
+  return path.join(thuMucThuVien(), ...tuongDoi.split('/'));
+}
+ipcMain.handle('thu-vien', (e, { hd, duong, noiDung }) => {
+  try {
+    if (hd === 'moThuMuc') { fs.mkdirSync(thuMucThuVien(), { recursive: true }); shell.openPath(thuMucThuVien()); return { ok: true }; }
+    const f = duongThuVien(duong);
+    if (hd === 'doc') return fs.existsSync(f) ? { ok: true, noiDung: fs.readFileSync(f, 'utf8') } : { ok: true, noiDung: null };
+    if (hd === 'ghi') { fs.mkdirSync(path.dirname(f), { recursive: true }); const tam = f + '.tam'; fs.writeFileSync(tam, noiDung, 'utf8'); fs.renameSync(tam, f); return { ok: true }; }
+    if (hd === 'xoa') { fs.rmSync(f, { recursive: true, force: true }); return { ok: true }; }
+    if (hd === 'ds') return { ok: true, ds: fs.existsSync(f) ? fs.readdirSync(f) : [] };
+    return { ok: false, loi: 'Lệnh không hợp lệ' };
+  } catch (err) { return { ok: false, loi: String(err.message || err) }; }
+});
 ipcMain.handle('mo-link', (e, url) => { if (/^https?:\/\//.test(url)) shell.openExternal(url); return true; });
 ipcMain.handle('toan-man-hinh', () => { if (cuaSo) cuaSo.setFullScreen(!cuaSo.isFullScreen()); return cuaSo ? cuaSo.isFullScreen() : false; });
 ipcMain.handle('phien-ban', () => app.getVersion());

@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld('mayTinh', {
   dongThat: () => ipcRenderer.send('dong-that'),
   chepAnh: (duLieu) => ipcRenderer.invoke('chep-anh', duLieu),
   docClipboard: () => ipcRenderer.invoke('doc-clipboard'),
+  // thư viện sổ trên máy
+  thuVien: (hd, duong, noiDung) => ipcRenderer.invoke('thu-vien', { hd, duong, noiDung }),
   // tài khoản GeoLab
   taiKhoan: (hd, duLieu) => ipcRenderer.invoke('tai-khoan', { hd, duLieu }),
   // tự cập nhật

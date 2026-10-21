@@ -62,6 +62,14 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 
 **Xoay hình 3D**: nút *Dựng hình chóp* / *Dựng hình lăng trụ* (nhóm hình không gian) — bấm lần lượt các đỉnh đáy, bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh trên → thành khối 3D. Kéo núm ↻ để xoay ngang / nghiêng. Thanh hiệu chỉnh dưới bảng (2 dòng): góc xoay, góc nghiêng, góc xiên, tự quay; *Tô* mặt bên và mặt đáy riêng, mỗi loại một màu, chỉnh độ đậm; *Ẩn* tên đỉnh, điểm đỉnh, nét đứt (cạnh khuất); đường cao / đường phụ; nút *Góc nhìn chuẩn* đưa về hình vẽ SGK, hình đã xoay vẫn giữ nguyên khi tắt thanh.
 
+**Thư viện sổ** (nút *Thư viện* đầu thanh trên cùng): mọi bảng được lưu thành *sổ* ngay trên máy, ở thư mục **Tài liệu\GeoInk Thư viện**. Bảng mới tự thành một sổ (tên theo ngày giờ) khi có nội dung và tự lưu sau mỗi thay đổi, không cần bấm Lưu. Thư viện có: *Tất cả sổ*, *Không thuộc project*, danh sách **Project** (thư mục tự đặt, đếm số sổ), *+ Project mới*, *Thùng rác*. Mỗi sổ có ảnh bìa (trang 1) và nút ⋯: Mở, Đổi tên, Nhân bản, **Lịch sử phiên bản** (khoảng 10 phút giữ một bản, tối đa 30 bản, khôi phục được), Chuyển đến project, Xoá. Sổ và project bị xoá nằm trong Thùng rác 30 ngày, khôi phục được. Tệp .geoink mở bằng *Mở…* vẫn lưu như cũ; với sổ thư viện, *Lưu thành tệp khác* xuất một bản sao ra tệp.
+
+**Chèn khoảng trống** (nút hai đường kẻ có mũi tên, thanh trên cùng): bấm vào chỗ cần chèn rồi kéo xuống — nét viết, chữ, hình nằm dưới đường được dời xuống; kéo lên để thu bớt. Hình dựng chỉ dời khi cả hình nằm dưới đường (không bị kéo dãn).
+
+**Phóng / thu**: hộp góc dưới phải có − , số % hiện tại, + và nút **M** về tỉ lệ mặc định 100% (phím M).
+
+**Bút cảm ứng** (Menu → Bút cảm ứng…): gắn việc cho nút bên dưới (chuột phải), nút bên trên (chuột giữa) và đầu tẩy phía sau bút Wacom — Tẩy, Kéo bảng, Con trỏ, Hoàn tác hoặc Menu chuột phải. Mặc định: nút dưới = tẩy, nút trên = kéo bảng, đầu tẩy = tẩy. Phím tắt để gán cho phím trên bảng vẽ (GAOMON, Wacom…): B/P bút, E tẩy, V/T con trỏ, H kéo bảng, giữ Space kéo bảng tạm, [ ] nhỏ/to nét, Ctrl+Z/Ctrl+Y, Ctrl +/−, M, R, Esc.
+
 **Cắt hình** (nút cây kéo, cạnh hai nút TeX): kéo khung quanh hình trên bảng → vùng đó được vẽ lại nét gấp 3 lần màn hình (≈ 300 dpi), nền trắng không dòng kẻ, tự chép vào clipboard để mở Word bấm Ctrl+V; có nút *Lưu ra tệp PNG*. Esc hoặc chuột phải để huỷ. Muốn lấy hình từ bên ngoài vào bảng: dùng công cụ cắt của Windows (Win+Shift+S) rồi Ctrl+V trên bảng; ảnh kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ, lưu trong tệp .geoink.
 
 **Cuộn, phóng to**: lăn chuột để cuộn bảng lên xuống (Shift + lăn: cuộn ngang); thanh trượt bên phải để kéo nhanh; phóng to / thu nhỏ bằng Ctrl + lăn chuột (hoặc nút +/−).
@@ -98,6 +106,8 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 **Tên điểm:** điểm mới tạo (công cụ Điểm, điểm khi vẽ đoạn / đường thẳng, giao điểm, trung điểm…) mặc định không hiện tên; bấm đúp vào điểm hoặc bật *Hiển thị tên* để đặt tên.
 
 ## Phím tắt
+
+*Esc*: về con trỏ chọn (thôi công cụ đang dùng).
 
 | Phím | Việc |
 |---|---|
