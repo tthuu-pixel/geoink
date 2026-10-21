@@ -2708,18 +2708,26 @@
   function moHopDoThi(o) {
     dtSua = o; var h = $('#hop-do-thi'); $('#dt-loi').textContent = '';
     $('#dt-tieu-de').textContent = o ? 'Sửa đồ thị hàm số' : 'Đồ thị hàm số'; $('#dt-ve').textContent = o ? 'Cập nhật' : 'Vẽ đồ thị';
-    var g = o || { xMin: -4, xMax: 4, yMin: -3, yMax: 5, ds: [{ bt: '2x + 1' }], bang: [], luoi: false, ghiPT: true };
+    var g = o || { xMin: -4, xMax: 4, yMin: -3, yMax: 5, ds: [{ bt: '2x + 1' }], bang: [{ i: 0, xs: '-1; 0; 1', tu: true }], luoi: false, ghiPT: true };
     $('#dt-x0').value = GI.doThi.so(g.xMin).replace('−', '-'); $('#dt-x1').value = GI.doThi.so(g.xMax).replace('−', '-'); $('#dt-y0').value = GI.doThi.so(g.yMin).replace('−', '-'); $('#dt-y1').value = GI.doThi.so(g.yMax).replace('−', '-');
-    $('#dt-luoi').checked = !!g.luoi; $('#dt-pt').checked = g.ghiPT !== false;
+    $('#dt-luoi').checked = !!g.luoi; $('#dt-pt').checked = g.ghiPT !== false; $('#dt-giong').checked = g.giong !== false; $('#dt-hien-bang').checked = g.hienBang !== false;
     $('#dt-ds').innerHTML = ''; g.ds.forEach(function (d) { themDongDT(d); });
     $('#dt-bang').innerHTML = ''; (g.bang || []).forEach(function (b) { themDongBang(b); });
-    h.classList.remove('an'); setTimeout(function () { var i = $('#dt-ds input.dt-bt'); if (i) i.focus(); }, 30);
+    h.classList.remove('an'); xemTruocDT(); setTimeout(function () { var i = $('#dt-ds input.dt-bt'); if (i) i.focus(); xemTruocDT(); }, 30);
   }
   function capNhatSoDT() {
     $$('#dt-ds .dt-dong').forEach(function (r, i) { r.querySelector('.dt-ten').textContent = 'Đồ thị ' + (i + 1) + ':'; });
     var n = $$('#dt-ds .dt-dong').length;
-    $$('#dt-bang .dt-dong select').forEach(function (s) { var v = +s.value || 0; s.innerHTML = Array.from({ length: n }, function (_, i) { return '<option value="' + i + '"' + (i === v ? ' selected' : '') + '>Đồ thị ' + (i + 1) + '</option>'; }).join(''); });
+    $$('#dt-bang .dt-dong select').forEach(function (s) { var v = Math.min(+s.value || 0, n - 1); s.innerHTML = Array.from({ length: n }, function (_, i) { return '<option value="' + i + '"' + (i === v ? ' selected' : '') + '>Đồ thị ' + (i + 1) + '</option>'; }).join(''); });
     $('#dt-them').disabled = n >= 5;
+  }
+  // bảng chưa tự sửa thì số giá trị x theo loại hàm: bậc nhất 3 điểm, bậc hai 5 điểm
+  function tuDienX() {
+    var bts = $$('#dt-ds .dt-bt').map(function (i) { return i.value.trim().replace(/^y\s*=\s*/i, ''); });
+    $$('#dt-bang .dt-dong').forEach(function (r) {
+      if (!r.dataset.tu) return; var bt = bts[+r.querySelector('select').value || 0]; if (!bt) return;
+      var x = GI.doThi.xMacDinh(bt); if (r.querySelector('.dt-xs').value !== x) r.querySelector('.dt-xs').value = x;
+    });
   }
   function themDongDT(d) {
     var n = $$('#dt-ds .dt-dong').length; d = d || { bt: n === 1 ? 'x^2' : '' };
@@ -2728,40 +2736,83 @@
       '<label>Độ dày <select class="dt-rong"><option value="1.6">Mảnh</option><option value="2.4">Vừa</option><option value="3.4">Đậm</option><option value="4.6">Rất đậm</option></select></label><button class="dt-xoa" title="Xoá đồ thị này">×</button>';
     r.querySelector('.dt-bt').value = d.bt || ''; r.querySelector('.dt-mau').value = d.mau || GI.doThi.MAU[n % GI.doThi.MAU.length];
     r.querySelector('.dt-rong').value = String(d.rong || 2.4);
-    r.querySelector('.dt-xoa').onclick = function () { if ($$('#dt-ds .dt-dong').length > 1) { r.remove(); capNhatSoDT(); } };
+    r.querySelector('.dt-xoa').onclick = function () {
+      if ($$('#dt-ds .dt-dong').length <= 1) return;
+      var k = $$('#dt-ds .dt-dong').indexOf(r); r.remove();
+      $$('#dt-bang .dt-dong').forEach(function (b) { var s = b.querySelector('select'), v = +s.value || 0; if (v === k) b.remove(); else if (v > k) s.value = String(v - 1); });
+      capNhatSoDT(); xemTruocDT();
+    };
     r.querySelector('.dt-bt').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); veDoThiTuHop(); } });
     $('#dt-ds').appendChild(r); capNhatSoDT();
   }
   function themDongBang(b) {
-    b = b || { i: Math.min(1, $$('#dt-ds .dt-dong').length - 1) && $$('#dt-bang .dt-dong').length ? 1 : 0, xs: '-2; -1; 0; 1; 2' };
+    if (!b) {   // bảng mới: cho đồ thị chưa có bảng, x tự điền theo loại hàm
+      var co = $$('#dt-bang select').map(function (s) { return +s.value || 0; }), n = $$('#dt-ds .dt-dong').length, i = 0;
+      while (i < n - 1 && co.indexOf(i) >= 0) i++;
+      b = { i: i, xs: '', tu: true };
+    }
     var r = document.createElement('div'); r.className = 'dt-dong';
     r.innerHTML = '<b>Bảng của</b><select></select><span class="dt-y"><i>x</i> =</span><input class="dt-xs" spellcheck="false" placeholder="-2; -1; 0; 1; 2"><button class="dt-xoa" title="Xoá bảng này">×</button>';
-    r.querySelector('.dt-xs').value = String(b.xs || '').replace(/−/g, '-');
-    r.querySelector('.dt-xoa').onclick = function () { r.remove(); };
+    r.querySelector('.dt-xs').value = String(b.xs || '').replace(/−/g, '-'); if (b.tu) r.dataset.tu = '1';
+    r.querySelector('.dt-xs').addEventListener('input', function () { delete r.dataset.tu; });
+    r.querySelector('.dt-xoa').onclick = function () { r.remove(); xemTruocDT(); };
     $('#dt-bang').appendChild(r); capNhatSoDT(); r.querySelector('select').value = String(b.i || 0);
+    if (b.tu) tuDienX();
   }
-  $('#dt-them').onclick = function () { themDongDT(null); var ds = $$('#dt-ds input.dt-bt'); ds[ds.length - 1].focus(); };
-  $('#dt-them-bang').onclick = function () { themDongBang(null); };
+  $('#dt-them').onclick = function () { themDongDT(null); var ds = $$('#dt-ds input.dt-bt'); ds[ds.length - 1].focus(); xemTruocDT(); };
+  $('#dt-them-bang').onclick = function () { themDongBang(null); xemTruocDT(); };
   function soNhap(id) { var v = parseFloat(String($(id).value).replace(',', '.').replace(/[−–]/g, '-')); return v; }
-  function veDoThiTuHop() {
-    var loi = $('#dt-loi'), ds = [], bang = [];
+  // đọc hộp → { g } hoặc { loi }
+  function docHopDT() {
+    var ds = [], bang = [], sai = null;
     var g = { xMin: soNhap('#dt-x0'), xMax: soNhap('#dt-x1'), yMin: soNhap('#dt-y0'), yMax: soNhap('#dt-y1') };
-    if (![g.xMin, g.xMax, g.yMin, g.yMax].every(isFinite)) return (loi.textContent = 'Giới hạn hệ trục phải là số');
-    if (g.xMin >= g.xMax || g.yMin >= g.yMax) return (loi.textContent = 'Giới hạn: số “từ” phải nhỏ hơn số “đến”');
-    if (g.xMax - g.xMin > 60 || g.yMax - g.yMin > 60) return (loi.textContent = 'Khoảng hệ trục quá rộng (tối đa 60 đơn vị)');
-    var sai = null;
+    if (![g.xMin, g.xMax, g.yMin, g.yMax].every(isFinite)) return { loi: 'Giới hạn hệ trục phải là số' };
+    if (g.xMin >= g.xMax || g.yMin >= g.yMax) return { loi: 'Giới hạn: số “từ” phải nhỏ hơn số “đến”' };
+    if (g.xMax - g.xMin > 60 || g.yMax - g.yMin > 60) return { loi: 'Khoảng hệ trục quá rộng (tối đa 60 đơn vị)' };
+    var soCu = [];
     $$('#dt-ds .dt-dong').forEach(function (r, i) {
-      var bt = r.querySelector('.dt-bt').value.trim().replace(/^y\s*=\s*/i, ''); if (!bt) return;
+      var bt = r.querySelector('.dt-bt').value.trim().replace(/^y\s*=\s*/i, ''); soCu.push(bt ? ds.length : -1); if (!bt || sai) return;
       try { GI.bieuThuc.doc(bt); } catch (e) { sai = 'Đồ thị ' + (i + 1) + ': ' + e.message; return; }
       ds.push({ bt: bt, mau: r.querySelector('.dt-mau').value, rong: +r.querySelector('.dt-rong').value });
     });
-    if (sai) return (loi.textContent = sai);
-    if (!ds.length) return (loi.textContent = 'Hãy nhập ít nhất một hàm số y = …');
-    $$('#dt-bang .dt-dong').forEach(function (r) { var xs = r.querySelector('.dt-xs').value; if (GI.doThi.docX(xs).length) bang.push({ i: Math.min(+r.querySelector('select').value || 0, ds.length - 1), xs: xs }); });
+    if (sai) return { loi: sai };
+    if (!ds.length) return { loi: 'Hãy nhập ít nhất một hàm số y = …' };
+    $$('#dt-bang .dt-dong').forEach(function (r) {
+      var xs = r.querySelector('.dt-xs').value, k = soCu[+r.querySelector('select').value || 0];
+      if (k >= 0 && k != null && GI.doThi.docX(xs).length) bang.push({ i: k, xs: xs, tu: !!r.dataset.tu });
+    });
+    return { g: Object.assign(g, { ds: ds, bang: bang, luoi: $('#dt-luoi').checked, ghiPT: $('#dt-pt').checked, giong: $('#dt-giong').checked, hienBang: $('#dt-hien-bang').checked }) };
+  }
+  // khung xem trước bên phải: vẽ lại ngay khi gõ
+  var henXemId = 0;
+  function xemTruocDT() {
+    var cv = $('#dt-xem'); if (!cv || $('#hop-do-thi').classList.contains('an')) return;
+    tuDienX();
+    var kq = docHopDT(), hop = cv.parentNode, W0 = hop.clientWidth, H0 = hop.clientHeight, tl = window.devicePixelRatio || 1;
+    cv.width = Math.round(W0 * tl); cv.height = Math.round(H0 * tl); cv.style.width = W0 + 'px'; cv.style.height = H0 + 'px';
+    var c = cv.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#fff'; c.fillRect(0, 0, cv.width, cv.height);
+    $('#dt-xem-loi').textContent = kq.loi || ''; if (kq.loi) return;
+    var o = Object.assign({ loai: 'doThi', x: 0, y: 0, dv: DV }, kq.g);
+    o.ds.forEach(function (d) { d._bt = null; });
+    // đo khung rồi co cho vừa; chữ co ít hơn hình để vẫn đọc được (đo lại với cỡ chữ đó)
+    var nhap = document.createElement('canvas').getContext('2d'), p = 1, k = 1, kh, w, hh;
+    for (var lan = 0; lan < 4; lan++) {
+      kh = GI.doThi.ve(nhap, o, p, '#111827', false); w = kh.x1 - kh.x0; hh = kh.y1 - kh.y0;
+      k = Math.min((W0 - 16) / w, (H0 - 16) / hh, 1.6); p = Math.min(1 / k, 1.25);
+    }
+    c.setTransform(tl * k, 0, 0, tl * k, tl * (W0 / 2 - (kh.x0 + w / 2) * k), tl * (H0 / 2 - (kh.y0 + hh / 2) * k));
+    GI.doThi.ve(c, o, p, '#111827', false);
+  }
+  function henXemDT() { clearTimeout(henXemId); henXemId = setTimeout(xemTruocDT, 60); }
+  $('#hop-do-thi').addEventListener('input', henXemDT); $('#hop-do-thi').addEventListener('change', henXemDT);
+  window.addEventListener('resize', henXemDT);
+  function veDoThiTuHop() {
+    var loi = $('#dt-loi'), kq = docHopDT(); if (kq.loi) return (loi.textContent = kq.loi);
+    var g = kq.g;
     ghiLichSu();
     var o = dtSua || { id: idMoi('h'), loai: 'doThi', dv: DV };
-    Object.assign(o, g, { ds: ds, bang: bang, luoi: $('#dt-luoi').checked, ghiPT: $('#dt-pt').checked });
-    if (!dtSua) { var tam = veTG(W / 2, Hh / 2); o.x = tam.x - (g.xMin + g.xMax) / 2 * DV; o.y = tam.y + (g.yMin + g.yMax) / 2 * DV - (bang.length ? 40 : 0); trang().hinh.push(o); }
+    Object.assign(o, g);
+    if (!dtSua) { var tam = veTG(W / 2, Hh / 2); o.x = tam.x - (g.xMin + g.xMax) / 2 * DV; o.y = tam.y + (g.yMin + g.yMax) / 2 * DV - (g.bang.length && g.hienBang ? 40 : 0); trang().hinh.push(o); }
     giaTri = H.tinh(trang().hinh);
     $('#hop-do-thi').classList.add('an'); chonCongCu('chon'); nhom = [{ h: o.id }]; capNhatChon(false); canVe();
     thongBao(dtSua ? 'Đã cập nhật đồ thị' : 'Đã vẽ đồ thị · bấm đúp vào đồ thị để sửa, kéo để di chuyển');

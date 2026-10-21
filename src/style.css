@@ -508,7 +508,15 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 body.co-thanh-khoi #thong-bao { bottom: 110px; }
 
 /* ----- Hộp đồ thị hàm số ----- */
-#hop-do-thi .hop-noi-dung { width: min(720px, 94vw); max-height: 90vh; overflow: auto; }
+#hop-do-thi .hop-noi-dung { width: min(1180px, 96vw); max-width: none; max-height: 92vh; overflow: auto; }
+.dt-khung { display: flex; gap: 16px; align-items: stretch; }
+.dt-trai { flex: 1 1 600px; min-width: 0; }
+.dt-phai { flex: 0 0 440px; display: flex; flex-direction: column; margin: 10px 0; }
+.dt-xem-hop { position: relative; flex: 1; min-height: 420px; border: 1px solid #E2E8F0; border-radius: 10px; background: #fff; overflow: hidden; }
+#dt-xem { position: absolute; inset: 0; }
+#dt-xem-loi { position: absolute; left: 12px; right: 12px; top: 12px; color: #B91C1C; font-size: 13px; }
+.dt-hang-duoi { margin-top: 8px; }
+@media (max-width: 960px) { .dt-khung { flex-direction: column; } .dt-phai { flex-basis: auto; } }
 .dt-nhom { border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; margin: 10px 0; background: #FAFBFD; }
 .dt-nhan { font-weight: 600; font-size: 13.5px; color: #334155; margin-bottom: 8px; }
 .dt-nhan small { font-weight: 400; color: #64748B; }
