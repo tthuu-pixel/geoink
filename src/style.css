@@ -642,3 +642,6 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 #hop-do-thi.chi-truc #dt-nhom-ham, #hop-do-thi.chi-truc #dt-nhom-bang, #hop-do-thi.chi-truc .dt-tich:has(#dt-pt) { display: none; }
 #hop-diem-td .hop-noi-dung { width: min(620px, 94vw); }
 #hop-diem-td .dt-dong { margin: 8px 0; }
+
+#ds-trang-pdf .them-to { width: 100%; margin: 6px 0 10px; height: 34px; border: 1.5px dashed #CBD5E1; border-radius: 8px; background: #fff; color: #334155; font: 600 13px Arial, sans-serif; cursor: pointer; }
+#ds-trang-pdf .them-to:hover { border-color: #2563EB; color: #2563EB; }
