@@ -190,6 +190,8 @@ window.GI = window.GI || {};
   B32.k_cau = C(16, 16, 12, K, 1.9) + NL('M4 16a12 4 0 0 0 24 0') + ND('M4 16a12 4 0 0 1 24 0M16 16h12') + d2(16, 16);
   // đồ thị hàm số: hệ trục có mũi tên, đường thẳng xanh, parabol đỏ
   B32.doThi = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M4 28L26 6', X, 2.3) + P('M4 7.5Q10 34 17 7.5', R, 2.3);
+  B32.heTruc = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M3 15h25M3 8h25M17 4v25M24 4v25M3 4v25', XAM, 0.8, null, '1.5 2') + T(5, 30, 'O', K, 7, 'nghieng');
+  B32.diemTD = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M22 10v12M10 10h12', XAM, 1.3, null, '2 2') + D(22, 10, R, 3.2) + T(14, 7, 'A', R, 9, 'nghieng');
   // ----- Nhóm đường tròn -----
   function d3(x, y, m) { return D(x, y, m || X, 2.3); }
   B32.m_noiTiep = C(16, 16, 12, K, 1.8) + NL('M12.9 4.4L5.6 22 26.4 22z') + d3(12.9, 4.4) + d3(5.6, 22) + d3(26.4, 22) + d3(16, 16, '#3A3F47');
@@ -270,7 +272,10 @@ window.GI = window.GI || {};
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + kt * 2 + '" height="' + kt * 2 + '">' + svg + '</svg>');
   }
   // bút chì: đầu ngòi ở góc dưới trái
-  taoConTro('but', '<g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g>', 48, 5, 42, 'crosshair');
+  taoConTro('but', '<g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g>', 64, 7, 56, 'crosshair');
+  // ảnh bút chì để app tự vẽ ở đầu nét khi viết bằng bút / tay (Windows giấu con trỏ chuột lúc đầu bút chạm màn hình)
+  GI.ANH_BUT = new Image(); GI.ANH_BUT_DIEM = [7, 56, 64];
+  GI.ANH_BUT.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="128" height="128"><g transform="translate(-1.5 1.5)">' + BUT_CHI + '</g></svg>');
   taoConTro('dq', '<g transform="translate(1 -1)">' + B.dq.replace(/<path d="M2\.5 21\.8.*$/, '') + '</g>', 32, 7, 26, 'crosshair');
   // chữ thập đen viền trắng (dễ thấy trên nền trắng lẫn nền tối)
   var THAP = '<path d="M12 2v8M12 14v8M2 12h8M14 12h8" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M12 2.5v7.5M12 14v7.5M2.5 12h7.5M14 12h7.5" stroke="#111827" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1.3" fill="#111827" stroke="#fff" stroke-width=".8"/>';

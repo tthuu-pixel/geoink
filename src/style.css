@@ -629,3 +629,16 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 #tn-ds.tn-ds-mau { flex-direction: row; flex-wrap: wrap; width: 176px; min-width: 0; }
 #tn-ds.tn-ds-mau button { padding: 6px; }
 #tn-ds.tn-ds-mau .tn-mau { width: 20px; height: 20px; }
+
+.hop-tl .tl-kieu { display: flex; gap: 10px; margin: 6px 0 14px; }
+.hop-tl .tl-kieu label { flex: 1; display: flex; flex-direction: column; gap: 3px; border: 1.5px solid #E2E8F0; border-radius: 10px; padding: 10px 12px; cursor: pointer; font-size: 14px; }
+.hop-tl .tl-kieu label:has(input:checked) { border-color: #2563EB; background: #EFF6FF; }
+.hop-tl .tl-kieu small { color: #64748B; font-size: 12.5px; }
+.hop-tl .tl-truot { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; font-size: 14px; }
+.hop-tl .tl-truot span { color: #2563EB; font-weight: 600; }
+.hop-tl .tl-tich { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 4px; font-size: 14px; }
+.hop-tl .tl-tich.mo { opacity: .45; pointer-events: none; }
+
+#hop-do-thi.chi-truc #dt-nhom-ham, #hop-do-thi.chi-truc #dt-nhom-bang, #hop-do-thi.chi-truc .dt-tich:has(#dt-pt) { display: none; }
+#hop-diem-td .hop-noi-dung { width: min(620px, 94vw); }
+#hop-diem-td .dt-dong { margin: 8px 0; }
