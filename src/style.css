@@ -608,3 +608,24 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 
 .hop-but label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; font-size: 14.5px; }
 .hop-but select { height: 34px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 8px; font-size: 14px; min-width: 250px; }
+
+/* ----- Thanh tuỳ chọn nổi ----- */
+#thanh-nhanh { position: absolute; z-index: 8; display: flex; align-items: center; gap: 2px; padding: 4px 6px; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,23,42,.16); white-space: nowrap; max-width: calc(100% - 16px); overflow-x: auto; font: 12.5px Arial, sans-serif; }
+#thanh-nhanh.an { display: none; }
+#thanh-nhanh button { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 8px; border: none; border-radius: 8px; background: none; color: #1F2937; font: 600 12.5px Arial, sans-serif; cursor: pointer; }
+#thanh-nhanh button:hover { background: #F1F5F9; }
+#thanh-nhanh button.bat { background: #EEF2FF; color: #3730A3; }
+#thanh-nhanh i[data-bt] svg, #thanh-nhanh i[data-bt] { width: 18px; height: 18px; display: inline-flex; }
+#thanh-nhanh .tn-a { font: italic 700 15px "Times New Roman", serif; color: #2451C7; }
+#thanh-nhanh .tn-ke { width: 1px; height: 20px; background: #E2E8F0; margin: 0 3px; }
+#thanh-nhanh .tn-nhan { color: #64748B; font-weight: 600; margin: 0 4px 0 2px; }
+#thanh-nhanh .tn-so { background: #F1F5F9; border-radius: 6px; padding: 2px 6px; color: #0F172A; font-weight: 700; }
+.tn-mau { width: 16px; height: 16px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.15); }
+.tn-to { width: 16px; height: 13px; border-radius: 3px; display: inline-block; border: 1.6px solid #2563EB; }
+.tn-to.bat { background: rgba(59,130,246,.35); }
+#tn-ds { position: absolute; z-index: 9; background: #fff; border: 1px solid #E2E8F0; border-radius: 10px; box-shadow: 0 10px 28px rgba(15,23,42,.18); padding: 4px; display: flex; flex-direction: column; min-width: 150px; }
+#tn-ds button { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: none; background: none; border-radius: 7px; cursor: pointer; font: 13px Arial, sans-serif; color: #1F2937; text-align: left; }
+#tn-ds button:hover { background: #F1F5F9; } #tn-ds button.bat { background: #EEF2FF; }
+#tn-ds.tn-ds-mau { flex-direction: row; flex-wrap: wrap; width: 176px; min-width: 0; }
+#tn-ds.tn-ds-mau button { padding: 6px; }
+#tn-ds.tn-ds-mau .tn-mau { width: 20px; height: 20px; }

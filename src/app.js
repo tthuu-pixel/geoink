@@ -248,6 +248,7 @@
     $$('[data-cc]').forEach(function (b) { b.classList.toggle('bat', b.dataset.cc === cc); });
     capNhatNhom(); capNhatTuyChonBut(); capNhatGoiY(); canVe(); veNhap();
     cv.style.cursor = conTroCC();
+    if (typeof capNhatThanhNhanh === 'function') try { capNhatThanhNhanh(); } catch (e) { }
   }
   function capNhatGoiY() {
     var cu = CONG_CU[cc], s2;
@@ -261,7 +262,11 @@
       if (/^k_dung/.test(cc)) s2 = '<b>' + (cc === 'k_dungChop' ? 'Dựng hình chóp' : 'Dựng hình lăng trụ') + ':</b> ' + (!dungKhoi.dong ? (dungKhoi.pts.length < 3 ? 'bấm lần lượt các đỉnh đáy (vẽ như nhìn xiên trong sách)' : 'bấm tiếp đỉnh đáy, hoặc bấm lại đỉnh đầu để khép đáy') : (cc === 'k_dungChop' ? 'bấm vị trí đỉnh S (bấm thẳng trên một đỉnh đáy nếu cạnh bên vuông góc với đáy)' : 'bấm vị trí đỉnh A′ của đáy trên (thẳng phía trên A: lăng trụ đứng)'));
       if (cc === 'ganDiem') s2 = '<b>Dán / huỷ dán điểm:</b> ' + (choChon.length ? 'Chọn đường thẳng hoặc đường tròn để dán điểm vào' : 'Chọn điểm tự do để dán, hoặc điểm thuộc đối tượng để huỷ dán');
     }
-    var el = $('#goi-y'); el.innerHTML = s2 || ''; el.classList.toggle('an', !s2);
+    var el = $('#goi-y');
+    if ((s2 || '') !== capNhatGoiY.cu) {   // nội dung mới: hiện 4 giây rồi tự ẩn cho đỡ che bảng
+      capNhatGoiY.cu = s2 || ''; el.innerHTML = s2 || ''; el.classList.toggle('an', !s2);
+      clearTimeout(capNhatGoiY.t); if (s2) capNhatGoiY.t = setTimeout(function () { el.classList.add('an'); if (typeof datViTriThanhNhanh === 'function') datViTriThanhNhanh(); }, 4000);
+    }
   }
   // Khay màu bút, độ dày, màu dạ quang trên hàng 1; cỡ tẩy hiện nổi khi chọn Tẩy
   function capNhatTuyChonBut() {
@@ -775,6 +780,7 @@
 
   var giaTri = {};   // toạ độ đã tính của trang hiện tại
   function ve() {
+    if (typeof capNhatThanhNhanh === 'function') { try { capNhatThanhNhanh(); } catch (e) { } }
     var t = trang(), vn = vungNhin(), s = V.s;
     ctx.setTransform(dpr * s, 0, 0, dpr * s, -V.x * s * dpr, -V.y * s * dpr);
     veNen(ctx, vn, s);
@@ -969,7 +975,9 @@
   }
   function themHinh(o) {
     if (!o.ten && (H.LA_THANG[o.loai] || H.LA_TRON[o.loai] || H.LA_CUNG[o.loai] || o.loai === 'gapKhuc' || H.LA_CONIC[o.loai])) o.ten = tenDuongMoi();
-    trang().hinh.push(o); giaTri = H.tinh(trang().hinh); return o;
+    trang().hinh.push(o); giaTri = H.tinh(trang().hinh);
+    if (CONG_CU[cc] && !/^d_|^k_/.test(cc) && typeof apDungMacDinh === 'function') apDungMacDinh(o);   // dựng bằng công cụ: theo kiểu mặc định trên thanh nổi
+    return o;
   }
   function tenDuongMoi() {   // tên chữ thường cho đường thẳng, đoạn, tia, đường tròn (ẩn tên theo mặc định)
     var dung = {}; trang().hinh.forEach(function (o) { if (o.ten) dung[o.ten] = 1; });
@@ -1247,20 +1255,38 @@
   //   đầu tẩy phía sau bút (Wacom) gửi button 5. Mỗi nút gắn một việc, chỉnh trong Menu → Bút cảm ứng.
   var NUT_BUT_MD = { nut1: 'tay', nut2: 'keo', dauTay: 'tay' }, nutBut = Object.assign({}, NUT_BUT_MD), chanMenuLuc = 0, ccTam = null, giuSpace = false;
   try { Object.assign(nutBut, JSON.parse(localStorage.getItem('geoink_nut_but') || '{}')); } catch (e) { }
+  //   Nhiều driver (GAOMON, XP-Pen… khi tắt Windows Ink) gửi nút bút như chuột thường, nên nhận cả pointerType 'mouse'.
+  //   Nút "chuột phải": bấm nhả tại chỗ → menu chuột phải như cũ; bấm giữ rồi rê → làm việc đã gắn (tẩy, kéo…).
+  var choNutPhai = null;
   function viecNutBut(e) {
-    if (e.pointerType !== 'pen') return null;
-    if (e.button === 5 || (e.buttons & 32)) return nutBut.dauTay;
-    if (e.button === 2 || (e.buttons & 2)) return nutBut.nut1;
-    if (e.button === 1 || (e.buttons & 4)) return nutBut.nut2;
+    if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return null;
+    if (e.pointerType === 'pen' && (e.button === 5 || (e.buttons & 32))) return nutBut.dauTay;
+    if (e.button === 2) return nutBut.nut1;
+    if (e.button === 1) return nutBut.nut2;
     return null;
   }
+  function batViecNutBut(viec, e, p) {   // bắt đầu việc của nút bút tại điểm p (toạ độ màn hình của bảng)
+    chanMenuLuc = Date.now();
+    if (viec === 'hoanTac') { hoanTac(); return; }
+    if (viec === 'keo') { dangKeo = { loai: 'trang', p: p, V: { x: V.x, y: V.y } }; cv.style.cursor = 'grabbing'; return; }
+    if (viec === 'tay' || viec === 'chon') {
+      ccTam = cc; cc = viec; var r = cv.getBoundingClientRect();
+      cv.dispatchEvent(new PointerEvent('pointerdown', { pointerId: e.pointerId, pointerType: 'pen', clientX: p.x + r.left, clientY: p.y + r.top, button: 0, buttons: 1, pressure: 0.5, bubbles: true }));
+    }
+  }
+  cv.addEventListener('pointermove', function (e) {   // nút phải đang giữ: rê quá 5px thì mới bắt đầu việc đã gắn
+    if (!choNutPhai || e.pointerId !== choNutPhai.id) return;
+    var p = toaDo(e); if (Math.hypot(p.x - choNutPhai.p.x, p.y - choNutPhai.p.y) < 5) return;
+    var c0 = choNutPhai; choNutPhai = null; batViecNutBut(c0.viec, e, c0.p);
+  }, true);
+  cv.addEventListener('pointerup', function (e) { if (choNutPhai && e.pointerId === choNutPhai.id) choNutPhai = null; }, true);
   cv.addEventListener('pointerdown', function (e) {
     var nb = e.button, viec = viecNutBut(e);
     if (viec && viec !== 'menu') {
-      chanMenuLuc = Date.now();
-      if (viec === 'hoanTac') { e.preventDefault(); hoanTac(); return; }
-      if (viec === 'tay' || viec === 'chon') { ccTam = cc; cc = viec; nb = 0; }
-      else if (viec === 'keo') nb = 1;
+      if (nb === 2 && (viec === 'tay' || viec === 'chon' || viec === 'keo')) { try { cv.setPointerCapture(e.pointerId); } catch (er) { } choNutPhai = { id: e.pointerId, p: toaDo(e), viec: viec }; return; }   // chờ xem có rê không
+      if (nb === 2 && viec === 'hoanTac') { chanMenuLuc = Date.now(); hoanTac(); return; }
+      if (nb === 5 || (e.buttons & 32)) { batViecNutBut(viec, e, toaDo(e)); return; }   // đầu tẩy Wacom: dùng ngay
+      if (nb === 1) { batViecNutBut(viec, e, toaDo(e)); return; }                    // nút giữa
     }
     if (nb === 2) return;   // chuột phải: để menu chuột phải xử lí
     dongMenuPhai();
@@ -1459,7 +1485,8 @@
     if (o.loai === 'chu') moSoanChu(o, false); else if (o.loai === 'congThuc') moHopCongThuc(o);
   });
   cv.addEventListener('contextmenu', function (e) {   // chuột phải vào hình → menu nhanh
-    e.preventDefault(); if (Date.now() - chanMenuLuc < 1500) return;   // nút bút đã dùng để tẩy / kéo… var p = toaDo(e), M = veTG(p.x, p.y), muc = timMuc(M);
+    e.preventDefault(); if (Date.now() - chanMenuLuc < 1500) return;   // nút bút đã dùng để tẩy / kéo…
+    var p = toaDo(e), M = veTG(p.x, p.y), muc = timMuc(M);
     if (!muc) { dongMenuPhai(); return; }
     if (!trongNhom(muc)) nhom = [muc];
     capNhatChon(false); moMenuPhai(e.clientX, e.clientY);
@@ -2092,7 +2119,19 @@
       r.cat.concat([{ y: r.hGoc, cao: 0 }]).forEach(function (g) { var b = Math.min(g.y, r.hGoc); if (b > a0) doan.push({ y: r.y + a0 + lech0, h: b - a0 }); a0 = b; lech0 += g.cao; });
       c.save(); if (!xuat) { c.shadowColor = 'rgba(15,23,42,.28)'; c.shadowBlur = 10; c.shadowOffsetY = 2; }
       c.fillStyle = '#FFFFFF'; doan.forEach(function (d) { c.fillRect(r.x, d.y, r.w, d.h); }); c.restore();
-      if (trang().nen === 'xam') { c.fillStyle = '#FFFFFF'; var lechG = 0; r.cat.forEach(function (g) { c.fillRect(r.x, r.y + g.y + lechG, r.w, g.cao); lechG += g.cao; }); }   // nền xám là mặt bàn: dải trống tô trắng như giấy
+      var lechG = 0;   // dải trống: ô lưới / kẻ dòng / trắng, hoặc theo nền trang (nền xám là mặt bàn → tô trắng)
+      r.cat.forEach(function (g) {
+        var y0 = r.y + g.y + lechG, kieu = g.nen || 'nen'; lechG += g.cao;
+        if (kieu === 'nen' && trang().nen !== 'xam') return;
+        c.save(); c.fillStyle = '#FFFFFF'; c.fillRect(r.x, y0, r.w, g.cao);
+        if (kieu === 'luoi' || kieu === 'ke') {
+          c.beginPath(); c.rect(r.x, y0, r.w, g.cao); c.clip(); var mong = 1 / s;
+          var ke = function (buoc, mau, rong, doc) { c.beginPath(); for (var yy = y0 + buoc; yy < y0 + g.cao; yy += buoc) { c.moveTo(r.x, yy); c.lineTo(r.x + r.w, yy); } if (doc) for (var xx = r.x + buoc; xx < r.x + r.w; xx += buoc) { c.moveTo(xx, y0); c.lineTo(xx, y0 + g.cao); } c.strokeStyle = mau; c.lineWidth = rong * mong; c.stroke(); };
+          if (kieu === 'luoi') { if (DV / 2 * s > 4) ke(DV / 2, '#E1E9F6', 1, true); ke(DV, '#C5D4EC', 1, true); }
+          else ke(32, '#C7D7F1', 1, false);
+        }
+        c.restore();
+      });
       var anh = xuat ? (boNhoPdf[pdf.id + '|' + i] && boNhoPdf[pdf.id + '|' + i].cv) || boNhoNho[pdf.id + '|' + i] : anhTrangPdf(pdf, i, r.w);
       if (anh) {   // vẽ từng đoạn giữa các chỗ cắt; dải trống để trắng
         c.save(); c.imageSmoothingQuality = 'high';
@@ -2589,9 +2628,10 @@
   function capNhatChon(moBang) {
     nhom.forEach(function (x) { delete x.o; });
     var hs = nhom.filter(function (x) { return x.h && timTheoId(x.h); });
-    if (!hs.length) { if (chonId) dongThuocTinh(); canVe(); return; }
+    if (!hs.length) { if (chonId) dongThuocTinh(); canVe(); capNhatThanhNhanh(); return; }
     var id = hs[hs.length - 1].h;
     if (moBang || !$('#thuoc-tinh').classList.contains('an')) moThuocTinh(id); else { chonId = id; canVe(); }
+    capNhatThanhNhanh();
   }
   function chonTatCa() {
     if (cc !== 'chon') chonCongCu('chon');
@@ -2637,7 +2677,7 @@
     var net = t.net.filter(function (n) { return khungNet(n).y0 >= y0; });
     var mh = t.moHinh.filter(function (m) { return m.y >= y0; });
     var pdf = t.pdf, cho = pdf && M.x >= pdf.x0 - 40 && M.x <= pdf.x0 + RONG_PDF + 40 ? viTriTrongPdf(pdf, y0) : null, dai = null;
-    if (cho) { pdf.chen = pdf.chen || []; dai = cho.dai || { i: cho.i, y: cho.y, cao: 0 }; }
+    if (cho) { pdf.chen = pdf.chen || []; dai = cho.dai || { i: cho.i, y: cho.y, cao: 0, nen: macDinh.daiTrong }; }
     dangKeo = { loai: 'chenKhoang', y0: y0, cuoi: y0, dy: 0, hinh: hinh, net: net, mh: mh, daGhi: false, pdf: cho ? pdf : null, dai: dai, cao0: dai ? dai.cao : 0 };
   }
   function keoChenKhoang(dy) {
@@ -2719,6 +2759,175 @@
   }
   function coTen(o) { return ['doDai', 'goc', 'dienTich', 'gocVuong', 'chu', 'congThuc', 'anh', 'che', 'doThi'].indexOf(o.loai) < 0; }
   function dongMenuPhai() { var m = $('#menu-phai'); if (m) m.remove(); }
+  /* =====================================================================
+     THANH TUỲ CHỌN NỔI
+     - Khi chọn hình (con trỏ): hiện ngay trên hình — tên, chấm điểm, cỡ điểm, kiểu / độ dày nét, màu, tô, độ dài,
+       ẩn, sao chép, nhân bản, cắt, xoá, thuộc tính.
+     - Khi cầm công cụ dựng hình: chỉnh kiểu mặc định cho hình sắp vẽ (nhớ cho lần sau).
+     - Khi cầm công cụ chèn khoảng trống: chọn kiểu dải trống (ô lưới, kẻ dòng, trắng, theo nền trang).
+     ===================================================================== */
+  function svgNetNho(kieu, w) { var k = KIEU_NET[kieu] || KIEU_NET.lien; w = w || 34; return '<svg width="' + w + '" height="12"><line x1="2" y1="6" x2="' + (w - 2) + '" y2="6" stroke="#111827" stroke-width="2.2" stroke-linecap="' + (kieu === 'cham' || kieu === 'gachCham' ? 'round' : 'butt') + '" stroke-dasharray="' + k.dash.map(function (x) { return x * 0.8; }).join(' ') + '"/></svg>'; }
+  var MD_HINH = { tenDiem: false, cham: true, coDiem: 5, kieuNet: 'lien', rong: 0, mau: '', to: true, daiTrong: 'luoi' };
+  var macDinh = Object.assign({}, MD_HINH);
+  try { Object.assign(macDinh, JSON.parse(localStorage.getItem('geoink_md_hinh') || '{}')); } catch (e) { }
+  function luuMD() { try { localStorage.setItem('geoink_md_hinh', JSON.stringify(macDinh)); } catch (e) { } }
+  var LA_SO_DO = { doDai: 1, goc: 1, dienTich: 1, gocVuong: 1 };
+  function laToDuoc(o, v) { v = v || giaTri[o.id] || {}; return v.k === 'daGiac' || (v.k === 'cung' && v.quat) || o.loai === 'banNguyet'; }
+  function laNet(o, v) { v = v || giaTri[o.id] || {}; return v.k !== 'diem' && !LA_SO_DO[o.loai] && ['chu', 'congThuc', 'thanhTruot', 'anh', 'che', 'doThi', 'khoi'].indexOf(o.loai) < 0; }
+  function apDungMacDinh(o) {   // hình vừa dựng bằng công cụ: theo kiểu mặc định đang chọn trên thanh
+    var v = giaTri[o.id]; if (!v || LA_SO_DO[o.loai]) return;
+    if (v.k === 'diem') {
+      if (macDinh.tenDiem) delete o.hienTen;
+      if (!macDinh.cham) o.chamAn = true;
+      if (macDinh.coDiem !== 5) o.rong = macDinh.coDiem;
+    } else if (laNet(o, v)) {
+      if (macDinh.kieuNet !== 'lien') o.kieuNet = macDinh.kieuNet;
+      if (macDinh.rong) o.rong = macDinh.rong;
+      if (laToDuoc(o, v) && !macDinh.to) o.doMo = 0;
+    } else return;
+    if (macDinh.mau) o.mau = macDinh.mau;
+  }
+  var CO_DIEM = [[3.5, 'Nhỏ'], [5, 'Vừa'], [7, 'To']], DO_DAY = [[1.6, 'Mảnh'], [2.6, 'Vừa'], [4, 'Đậm'], [6, 'Rất đậm']];
+  var MAU_NHANH = ['#111827', '#2451C7', '#DC2626', '#16A34A', '#F97316', '#9333EA', '#0891B2', '#DB2777', '#6B7280'];
+  var DAI_TRONG = [['luoi', 'Ô lưới'], ['ke', 'Kẻ dòng'], ['trang', 'Trắng'], ['nen', 'Theo nền trang']];
+  var tnKhoa = '', tnMo = null;   // tnMo: ô chọn đang mở (danh sách thả xuống)
+  function hinhDangChon() { return cc === 'chon' ? nhom.filter(function (x) { return x.h; }).map(function (x) { return timTheoId(x.h); }).filter(function (o) { return o && giaTri[o.id] && !o.an; }) : []; }
+  function nutTN(k, html, bat, tieuDe) { return '<button data-tn="' + k + '"' + (bat ? ' class="bat"' : '') + (tieuDe ? ' title="' + tieuDe + '"' : '') + '>' + html + '</button>'; }
+  function svgCham(r) { return '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="' + r + '" fill="#2451C7"/></svg>'; }
+  function svgDay(w) { return '<svg viewBox="0 0 30 12" width="30" height="12"><path d="M2 6h26" stroke="#111827" stroke-width="' + w + '" stroke-linecap="round"/></svg>'; }
+  function capNhatThanhNhanh() {
+    var el = $('#thanh-nhanh'); if (!el) return;
+    var hs = hinhDangChon(), net = cc === 'chon' ? nhom.filter(function (x) { return x.n; }) : [], h = '', cheDo = '';
+    if (hs.length || net.length) {
+      cheDo = 'chon';
+      var diem = hs.filter(laDiemO), duong = hs.filter(function (o) { return laNet(o); }), to = hs.filter(function (o) { return laToDuoc(o); }), coT = hs.filter(coTen);
+      if (coT.length) { var hienT = coT.every(function (o) { return o.loai === 'hamSo' ? o.hienTen !== false : hienTenCua(o); }); h += nutTN('ten', '<b class="tn-a">A</b>' + (hienT ? 'Ẩn tên' : 'Hiện tên'), hienT, 'Hiện / ẩn tên'); }
+      if (diem.length) {
+        var anC = diem.every(function (o) { return o.chamAn; });
+        h += nutTN('cham', svgCham(4) + (anC ? 'Hiện chấm' : 'Ẩn chấm'), !anC, 'Hiện / ẩn chấm tròn của điểm');
+        h += nutTN('coDiem', svgCham(diem[0].rong ? Math.min(7, diem[0].rong) : 5) + 'Cỡ điểm ▾');
+      }
+      if (duong.length) { h += nutTN('kieuNet', svgNetNho(duong[0].kieuNet || 'lien') + 'Kiểu nét ▾'); h += nutTN('rong', svgDay(Math.min(5, duong[0].rong || 2.6)) + 'Độ dày ▾'); }
+      if (hs.length) h += nutTN('mau', '<i class="tn-mau" style="background:' + (hs[0].mau || mauMacDinh(hs[0])) + '"></i>Màu ▾');
+      if (to.length) { var coTo = to.some(function (o) { return o.doMo !== 0; }); h += nutTN('to', '<i class="tn-to' + (coTo ? ' bat' : '') + '"></i>' + (coTo ? 'Bỏ tô' : 'Tô màu'), coTo, 'Tô / không tô phần trong'); }
+      if (hs.length === 1 && giaTri[hs[0].id].k === 'thang' && giaTri[hs[0].id].loai === 'doan' && hs[0].a && hs[0].b) {
+        var vD = giaTri[hs[0].id], dai = Math.hypot(vD.q.x - vD.p.x, vD.q.y - vD.p.y) / DV, coDo = timDoDai(hs[0]);
+        h += nutTN('doDai', '<span class="tn-so">' + soVN(dai, 1) + ' cm</span>' + (coDo ? 'Ẩn độ dài' : 'Ghi độ dài'), !!coDo, 'Ghi / ẩn số đo độ dài trên hình');
+      }
+      h += '<i class="tn-ke"></i>';
+      if (hs.length) h += nutTN('an', '<i data-bt="an"></i>Ẩn', false, 'Ẩn hình (mở lại trong bảng Thuộc tính → danh sách)');
+      h += nutTN('chep', '<i data-bt="chep"></i>Sao chép', false, 'Sao chép (Ctrl+C) rồi Ctrl+V để dán') + nutTN('nhanBan', '<i data-bt="nhanBan"></i>Nhân bản', false, 'Nhân bản (Ctrl+D)') +
+        nutTN('cat', '<i data-bt="cat"></i>Cắt', false, 'Cắt (Ctrl+X)') + nutTN('xoa', '<i data-bt="xoa"></i>Xoá', false, 'Xoá (Delete)');
+      if (hs.length) h += nutTN('thuocTinh', '⋯', false, 'Thuộc tính');
+    } else if (cc === 'chenKhoang') {
+      cheDo = 'cong';
+      h = '<span class="tn-nhan">Dải trống chèn vào trang PDF:</span>' + DAI_TRONG.map(function (k) { return nutTN('daiTrong:' + k[0], k[1], macDinh.daiTrong === k[0]); }).join('');
+    } else if (CONG_CU[cc] && !/^d_|^k_/.test(cc) && !LA_SO_DO[cc] && cc !== 'ganDiem' && cc !== 'chu' && cc !== 'thanhTruot') {
+      cheDo = 'cong';
+      var veTo = ['daGiac', 'daGiacDeu', 'quatTam', 'quat3Diem', 'banNguyet'].indexOf(cc) >= 0;
+      h = '<span class="tn-nhan">Hình mới:</span>' +
+        nutTN('md:tenDiem', '<b class="tn-a">A</b>' + (macDinh.tenDiem ? 'Có tên điểm' : 'Không tên điểm'), macDinh.tenDiem, 'Điểm mới có hiện tên không') +
+        nutTN('md:cham', svgCham(4) + (macDinh.cham ? 'Có chấm' : 'Không chấm'), macDinh.cham, 'Điểm mới có chấm tròn không') +
+        nutTN('md:coDiem', svgCham(Math.min(7, macDinh.coDiem)) + 'Cỡ điểm ▾') +
+        (cc === 'diem' ? '' : nutTN('md:kieuNet', svgNetNho(macDinh.kieuNet) + 'Kiểu nét ▾') + nutTN('md:rong', svgDay(Math.min(5, macDinh.rong || 2.6)) + 'Độ dày ▾')) +
+        nutTN('md:mau', '<i class="tn-mau" style="background:' + (macDinh.mau || 'linear-gradient(135deg,#2451C7 50%,#111827 50%)') + '"></i>Màu ▾') +
+        (veTo ? nutTN('md:to', '<i class="tn-to' + (macDinh.to ? ' bat' : '') + '"></i>' + (macDinh.to ? 'Có tô' : 'Không tô'), macDinh.to, 'Đa giác, hình quạt mới có tô phần trong không') : '');
+    }
+    var khoa = cheDo + '|' + h;
+    if (khoa !== tnKhoa) { tnKhoa = khoa; el.innerHTML = h; el.querySelectorAll('i[data-bt]').forEach(function (i) { i.innerHTML = GI.bieuTuong(i.dataset.bt); }); dongDsTN(); }
+    el.classList.toggle('an', !h); el.dataset.cheDo = cheDo;
+    datViTriThanhNhanh();
+  }
+  function datViTriThanhNhanh() {
+    var el = $('#thanh-nhanh'); if (!el || el.classList.contains('an')) return;
+    if (dangKeo && dangKeo.loai !== 'trang') { el.style.visibility = 'hidden'; return; } el.style.visibility = '';
+    var bang = $('#bang'), wB = bang.clientWidth, w = el.offsetWidth, hEl = el.offsetHeight, x, y;
+    if (el.dataset.cheDo === 'chon') {
+      var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity }, them = function (P) { var q = raMH(P); b.x0 = Math.min(b.x0, q.x); b.y0 = Math.min(b.y0, q.y); b.x1 = Math.max(b.x1, q.x); b.y1 = Math.max(b.y1, q.y); };
+      hinhDangChon().forEach(function (o) { (diemDaiDien(o, giaTri[o.id]) || []).forEach(them); });
+      nhom.forEach(function (x) { if (x.n) { var k = khungNet(x.n); them({ x: k.x0, y: k.y0 }); them({ x: k.x1, y: k.y1 }); } });
+      if (!isFinite(b.x0)) { el.classList.add('an'); return; }
+      x = (b.x0 + b.x1) / 2 - w / 2; y = b.y0 - hEl - 22; if (y < 8) y = b.y1 + 22;
+      y = Math.min(y, bang.clientHeight - hEl - 70);
+    } else { x = wB / 2 - w / 2; var gy = $('#goi-y'); y = gy && !gy.classList.contains('an') ? gy.offsetTop + gy.offsetHeight + 8 : 10; }
+    el.style.left = Math.max(8, Math.min(wB - w - 8, x)) + 'px'; el.style.top = Math.max(8, y) + 'px';
+  }
+  function dongDsTN() { var d = $('#tn-ds'); if (d) d.remove(); tnMo = null; }
+  function moDsTN(nut, k, ds, chon) {   // danh sách thả xuống dưới một nút của thanh
+    if (tnMo === k) return dongDsTN(); dongDsTN(); tnMo = k;
+    var d = document.createElement('div'); d.id = 'tn-ds'; d.className = k.indexOf('mau') >= 0 ? 'tn-ds-mau' : '';
+    d.innerHTML = ds.map(function (m, i) { return '<button data-i="' + i + '"' + (m.bat ? ' class="bat"' : '') + (m.title ? ' title="' + m.title + '"' : '') + '>' + m.html + '</button>'; }).join('');
+    $('#bang').appendChild(d);
+    var r = nut.getBoundingClientRect(), rb = $('#bang').getBoundingClientRect();
+    d.style.left = Math.max(4, Math.min(rb.width - d.offsetWidth - 4, r.left - rb.left)) + 'px'; d.style.top = (r.bottom - rb.top + 4) + 'px';
+    d.onclick = function (e) { var b = e.target.closest('[data-i]'); if (!b) return; chon(ds[+b.dataset.i].gt); dongDsTN(); capNhatThanhNhanh(); };
+  }
+  function dsNet(hien) { return Object.keys(KIEU_NET).map(function (k) { return { gt: k, html: svgNetNho(k, 70) + '<span>' + KIEU_NET[k].ten + '</span>', bat: hien === k }; }); }
+  function dsDay(hien) { return DO_DAY.map(function (d) { return { gt: d[0], html: svgDay(Math.min(6, d[0])) + '<span>' + d[1] + '</span>', bat: hien === d[0] }; }); }
+  function dsCo(hien) { return CO_DIEM.map(function (d) { return { gt: d[0], html: svgCham(d[0]) + '<span>' + d[1] + '</span>', bat: hien === d[0] }; }); }
+  function dsMau(hien, coMD) { return (coMD ? [{ gt: '', html: '<i class="tn-mau" style="background:linear-gradient(135deg,#2451C7 50%,#111827 50%)"></i>', title: 'Màu mặc định', bat: !hien }] : []).concat(MAU_NHANH.map(function (m) { return { gt: m, html: '<i class="tn-mau" style="background:' + m + '"></i>', title: m, bat: hien === m }; })); }
+  function timDoDai(o) { return trang().hinh.filter(function (x) { return x.loai === 'doDai' && ((x.a === o.a && x.b === o.b) || (x.a === o.b && x.b === o.a)); })[0]; }
+  function suaChon(f) { ghiLichSu(); hinhDangChon().forEach(f); daSua = true; giaTri = H.tinh(trang().hinh); canVe(); if (chonId && !$('#thuoc-tinh').classList.contains('an')) veThuocTinh(); capNhatThanhNhanh(); }
+  $('#thanh-nhanh').addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  $('#thanh-nhanh').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tn]'); if (!b) return; var k = b.dataset.tn, hs = hinhDangChon();
+    if (k.indexOf('daiTrong:') === 0) { macDinh.daiTrong = k.split(':')[1]; luuMD(); return capNhatThanhNhanh(); }
+    if (k.indexOf('md:') === 0) {
+      var m = k.slice(3);
+      if (m === 'tenDiem' || m === 'cham' || m === 'to') { macDinh[m] = !macDinh[m]; luuMD(); return capNhatThanhNhanh(); }
+      var dsM = m === 'coDiem' ? dsCo(macDinh.coDiem) : m === 'kieuNet' ? dsNet(macDinh.kieuNet) : m === 'rong' ? dsDay(macDinh.rong || 2.6) : dsMau(macDinh.mau, true);
+      return moDsTN(b, k, dsM, function (gt) { macDinh[m] = gt; luuMD(); });
+    }
+    if (k === 'ten') { var coT = hs.filter(coTen), bat = !coT.every(hienTenCua); return suaChon(function (o) { if (!coTen(o)) return; o.hienTen = bat; if (bat && !o.ten && o.loai !== 'hamSo' && o.loai !== 'khoi') o.ten = laDiemO(o) ? tenDiemMoi() : tenDuongMoi(); }); }
+    if (k === 'cham') { var anHet = hs.filter(laDiemO).every(function (o) { return o.chamAn; }); return suaChon(function (o) { if (laDiemO(o)) o.chamAn = anHet ? undefined : true; }); }
+    if (k === 'coDiem') return moDsTN(b, k, dsCo((hs.filter(laDiemO)[0] || {}).rong || 5), function (gt) { suaChon(function (o) { if (laDiemO(o)) o.rong = gt === 5 ? undefined : gt; }); });
+    if (k === 'kieuNet') return moDsTN(b, k, dsNet((hs.filter(function (o) { return laNet(o); })[0] || {}).kieuNet || 'lien'), function (gt) { suaChon(function (o) { if (laNet(o)) o.kieuNet = gt === 'lien' ? undefined : gt; }); });
+    if (k === 'rong') return moDsTN(b, k, dsDay((hs.filter(function (o) { return laNet(o); })[0] || {}).rong || 2.6), function (gt) { suaChon(function (o) { if (laNet(o)) o.rong = gt; }); });
+    if (k === 'mau') return moDsTN(b, k, dsMau(hs[0] && hs[0].mau, true), function (gt) { suaChon(function (o) { if (gt) o.mau = gt; else delete o.mau; }); });
+    if (k === 'to') { var coTo = hs.filter(function (o) { return laToDuoc(o); }).some(function (o) { return o.doMo !== 0; }); return suaChon(function (o) { if (laToDuoc(o)) { if (coTo) o.doMo = 0; else delete o.doMo; } }); }
+    if (k === 'doDai') { var o1 = hs[0], dd = timDoDai(o1); ghiLichSu(); if (dd) trang().hinh = trang().hinh.filter(function (x) { return x !== dd; }); else themHinh({ id: idMoi('h'), loai: 'doDai', a: o1.a, b: o1.b }); giaTri = H.tinh(trang().hinh); daSua = true; canVe(); return capNhatThanhNhanh(); }
+    if (k === 'an') { ghiLichSu(); hs.forEach(function (o) { o.an = true; }); nhom = []; dongThuocTinh(); daSua = true; canVe(); capNhatThanhNhanh(); return thongBao('Đã ẩn · mở lại trong bảng Thuộc tính (danh sách đối tượng)'); }
+    if (k === 'chep') return chepNhom(false);
+    if (k === 'cat') return chepNhom(true);
+    if (k === 'nhanBan') { if (chepNhom(false, true)) danChep(); return; }
+    if (k === 'xoa') { if (!nhom.length && chonId) nhom = [{ h: chonId }]; xoaNhom(); return capNhatThanhNhanh(); }
+    if (k === 'thuocTinh') { var cuoi = hs[hs.length - 1]; if (cuoi) moThuocTinh(cuoi.id); }
+  });
+  document.addEventListener('pointerdown', function (e) { if (tnMo && !e.target.closest('#tn-ds') && !e.target.closest('#thanh-nhanh')) dongDsTN(); });
+
+  // ---- Sao chép / cắt / dán / nhân bản hình (bảng nhớ riêng của GeoInk) ----
+  var boNhoChep = null, MA_CHEP = 'GeoInk: hình đã sao chép', lanDan = 0;
+  function chepNhom(cat, imLang) {
+    var t = trang(), can = {}, net = [];
+    function them(id) { if (can[id]) return; var o = timTheoId(id); if (!o || !t.hinh.some(function (x) { return x === o; })) return; can[id] = 1; H.cha(o).forEach(them); }   // kèm các điểm, hình nó dựa vào
+    nhom.forEach(function (x) { if (x.h) them(x.h); else if (x.n) net.push(x.n); });
+    if (!Object.keys(can).length && chonId) them(chonId);
+    var hinh = t.hinh.filter(function (o) { return can[o.id]; }), chon = nhom.filter(function (x) { return x.h; }).map(function (x) { return x.h; });
+    if (!hinh.length && !net.length) { thongBao('Chưa chọn hình nào để sao chép'); return false; }
+    boNhoChep = JSON.stringify({ hinh: hinh, net: net, chon: chon.length ? chon : hinh.map(function (o) { return o.id; }) }, boPhanPhu); lanDan = 0;
+    if (!imLang) { try { if (navigator.clipboard) navigator.clipboard.writeText(MA_CHEP).catch(function () { }); } catch (e) { } }
+    if (cat) { xoaNhom(); thongBao('Đã cắt ' + (hinh.length + net.length) + ' đối tượng · Ctrl+V để dán'); }
+    else if (!imLang) thongBao('Đã sao chép · Ctrl+V để dán');
+    return true;
+  }
+  function danChep() {
+    if (!boNhoChep) return false;
+    var d = JSON.parse(boNhoChep), doi = {}, L = (++lanDan) * 30 / V.s;
+    d.hinh.forEach(function (o) { doi[o.id] = idMoi(laDiemO(o) ? 'd' : 'h'); });
+    function re(v) { return typeof v === 'string' && doi[v] ? doi[v] : Array.isArray(v) ? v.map(re) : v; }
+    ghiLichSu(); var t = trang();
+    d.hinh.forEach(function (o) {
+      Object.keys(o).forEach(function (k) { if (k !== 'ten' && k !== 'loai') o[k] = re(o[k]); });
+      if (LOAI_CO_TOA_DO[o.loai] && typeof o.x === 'number') { o.x += L; o.y += L; }
+      t.hinh.push(o);
+    });
+    d.net.forEach(function (n) { n.pts.forEach(function (q) { q[0] += L; q[1] += L; }); t.net.push(n); });
+    giaTri = H.tinh(t.hinh); daSua = true;
+    if (cc !== 'chon') chonCongCu('chon');
+    nhom = d.chon.map(function (id) { return { h: doi[id] }; }).filter(function (x) { return x.h; }).concat(d.net.map(function (n) { return { n: n }; }));
+    capNhatChon(false); canVe(); thongBao('Đã dán ' + (d.chon.length + d.net.length) + ' đối tượng');
+    return true;
+  }
   function moMenuPhai(x, y) {
     dongMenuPhai();
     var hs = nhom.filter(function (q) { return q.h; }).map(function (q) { return timTheoId(q.h); }).filter(Boolean), conLai = nhom.length - hs.length;
@@ -3043,12 +3252,15 @@
     var el = e.target; if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable || el.tagName === 'MATH-FIELD')) return;
     var cd = e.clipboardData || window.clipboardData, tep = cd && Array.prototype.filter.call(cd.items || [], function (it) { return it.kind === 'file' && /^image\//.test(it.type); })[0];
     if (tep) { e.preventDefault(); var f = tep.getAsFile(), fr = new FileReader(); fr.onload = function () { chenAnh(fr.result, f.name || 'Ảnh dán'); }; fr.readAsDataURL(f); return; }
-    if (danChu(cd.getData('text/plain') || '')) e.preventDefault();
+    var chuDan = cd.getData('text/plain') || '';
+    if (boNhoChep && (!chuDan || chuDan === MA_CHEP)) { e.preventDefault(); danChep(); return; }
+    if (danChu(chuDan)) e.preventDefault();
   });
   // Trong app: Ctrl+V đọc thẳng clipboard của máy (ảnh chụp Win+Shift+S, ảnh sao chép từ web, mã TikZ)
   function danTuMay() {
     MT.docClipboard().then(function (kq) {
       if (kq.anh) return chenAnh(kq.anh, 'Ảnh dán');
+      if (boNhoChep && (!kq.chu || kq.chu === MA_CHEP)) return danChep();   // hình đã sao chép trong GeoInk
       if (!danChu(kq.chu || '')) thongBao('Clipboard chưa có ảnh để dán');
     });
   }
@@ -3069,6 +3281,9 @@
       else if (k === '-') { e.preventDefault(); thuPhong(0.8); }
       else if (k === '0') { e.preventDefault(); thuPhong(1 / V.s); }
       else if (k === 'a') { e.preventDefault(); chonTatCa(); }
+      else if (k === 'c' && nhom.length) { e.preventDefault(); chepNhom(false); }
+      else if (k === 'x' && nhom.length) { e.preventDefault(); chepNhom(true); }
+      else if (k === 'd' && nhom.length) { e.preventDefault(); if (chepNhom(false, true)) danChep(); }
       else if (k === 'v' && MT && MT.docClipboard) { e.preventDefault(); danTuMay(); }
       return;
     }
