@@ -62,6 +62,10 @@ Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu
 
 **Xoay hình 3D**: nút *Dựng hình chóp* / *Dựng hình lăng trụ* (nhóm hình không gian) — bấm lần lượt các đỉnh đáy, bấm lại đỉnh đầu để khép đáy, rồi bấm đỉnh trên → thành khối 3D. Kéo núm ↻ để xoay ngang / nghiêng. Thanh hiệu chỉnh dưới bảng (2 dòng): góc xoay, góc nghiêng, góc xiên, tự quay; *Tô* mặt bên và mặt đáy riêng, mỗi loại một màu, chỉnh độ đậm; *Ẩn* tên đỉnh, điểm đỉnh, nét đứt (cạnh khuất); đường cao / đường phụ; nút *Góc nhìn chuẩn* đưa về hình vẽ SGK, hình đã xoay vẫn giữ nguyên khi tắt thanh.
 
+**Hệ trục toạ độ Oxy** và **Điểm có toạ độ** (cùng nhóm với nút Đồ thị hàm số, bấm ▽): *Hệ trục toạ độ Oxy* chỉ hỏi giới hạn Ox, Oy (có xem trước) rồi vẽ hệ trục; *Điểm có toạ độ* nhập tên và toạ độ "x; y" (nhận số thập phân dấu phẩy, phân số 1/2), bấm *+ Thêm điểm* để thêm, chọn màu từng điểm; điểm vẽ lên hệ trục đang chọn (hoặc hệ trục mới nhất), ghi kiểu A(2; 3), có nét đứt gióng xuống hai trục (tắt được).
+
+**Bút chì** to hơn; khi viết bằng bút cảm ứng hoặc tay, cây bút chì vẫn hiện ở đầu nét (Windows tự giấu con trỏ lúc đầu bút chạm màn hình).
+
 **Thiết lập trang** (Menu → dưới mục Nền trang): chọn **Trang vô cực** (một mặt bảng rộng vô hạn, như trước) hoặc **Theo trang giấy A4** (các tờ A4 xếp dọc, tự thêm tờ khi viết xuống dưới). Tuỳ chọn: độ đậm dòng kẻ, khoảng cách dòng của giấy kẻ, ô tiêu đề (Bài / Ngày) ở trang đầu, tách rời các trang (có khoảng trống giữa hai tờ) hoặc nối liền, hiện đường ngắt trang và số trang. Lưu theo từng bảng; bảng mới dùng thiết lập lần cuối.
 
 **Thanh tuỳ chọn nổi**: bấm chọn hình (con trỏ) thì hiện ngay trên hình một thanh: Hiện/Ẩn tên, Hiện/Ẩn chấm điểm, Cỡ điểm, Kiểu nét, Độ dày, Màu, Tô/Bỏ tô (đa giác, hình quạt), Ghi/Ẩn độ dài (đoạn thẳng), Ẩn, Sao chép (Ctrl+C), Nhân bản (Ctrl+D), Cắt (Ctrl+X), Xoá, ⋯ Thuộc tính. Dán bằng Ctrl+V. Khi đang cầm công cụ dựng hình, thanh này ở trên cùng để chọn kiểu cho **hình sắp vẽ** (tên điểm, chấm, cỡ điểm, kiểu nét, độ dày, màu, tô hay không) — nhớ cho lần sau. Dòng gợi ý trên cùng tự ẩn sau 4 giây.

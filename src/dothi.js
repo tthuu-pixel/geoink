@@ -15,6 +15,12 @@ GI.doThi = (function () {
       t = t.replace(',', '.'); var m = /^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/.exec(t); return m ? +m[1] / +m[2] : parseFloat(t);
     }).filter(function (v) { return isFinite(v); });
   }
+  // "2; -1,5" / "(2 ; 3)" / "1/2;3" → [x, y]
+  function docXY(t) {
+    var m = String(t || '').replace(/[()\s]/g, '').replace(/[−–]/g, '-').split(';'); if (m.length !== 2) return null;
+    var v = m.map(function (u) { u = u.replace(',', '.'); var q = /^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/.exec(u); return q ? +q[1] / +q[2] : (u === '' ? NaN : +u); });
+    return isFinite(v[0]) && isFinite(v[1]) ? v : null;
+  }
   // số đẹp: phân số đơn giản (½, −1/3…) hoặc thập phân dùng dấu phẩy
   function so(v) {
     if (!isFinite(v)) return '—';
@@ -89,30 +95,35 @@ GI.doThi = (function () {
     });
     // điểm từ bảng giá trị + nét đứt gióng xuống hai trục (kiểu SGK)
     var daDat = [], vachX = {}, vachY = {};
-    if (o.giong !== false) {
-      var bx0 = buoc(x1 - x0), by0 = buoc(y1 - y0);
+    // điểm cần gióng: điểm trong bảng giá trị + điểm nhập theo toạ độ (o.diem)
+    var dsG = [], bx0 = buoc(x1 - x0), by0 = buoc(y1 - y0);
+    if (o.giong !== false) (o.bang || []).forEach(function (b) {
+      var d = o.ds[b.i] || o.ds[0]; if (!d) return; var f = ham(d); if (!f) return;
+      docX(b.xs).forEach(function (x) { dsG.push({ x: x, y: f(x, {}), mau: d.mau || MAU[(b.i || 0) % MAU.length], giong: true }); });
+    });
+    (o.diem || []).forEach(function (q) { var xy = docXY(q.td); if (xy) dsG.push({ x: xy[0], y: xy[1], mau: q.mau || '#DC2626', giong: o.diemGiong !== false, ten: q.ten, td: o.ghiTD !== false }); });
       function datSo(t, ds) {   // chọn chỗ ít đè nhất trong các chỗ thử
         var tot = null, it = 1e9;
         ds.forEach(function (d) { var h = oChu(t, d[0], d[1]), n = 0; chiem.forEach(function (k) { if (h.x0 < k.x1 && k.x0 < h.x1 && h.y0 < k.y1 && k.y0 < h.y1) n++; }); if (n < it) { it = n; tot = { d: d, h: h }; } });
         chiem.push(tot.h); veO(c, t, tot.d[0], tot.d[1], px);
       }
-      (o.bang || []).forEach(function (b) {
-        var d = o.ds[b.i] || o.ds[0]; if (!d) return; var f = ham(d); if (!f) return;
-        var mauD = d.mau || MAU[(b.i || 0) % MAU.length];
-        docX(b.xs).forEach(function (x) {
-          var y = f(x, {}); if (!isFinite(y) || x < o.xMin - 1e-9 || x > o.xMax + 1e-9 || y < o.yMin - 1e-9 || y > o.yMax + 1e-9) return;
-          c.save(); c.setLineDash([5 * px, 4 * px]); c.strokeStyle = mau; c.lineWidth = 1 * px; c.globalAlpha = 0.85; c.beginPath();
-          if (Math.abs(y) > 1e-9) { c.moveTo(X(x), Y(y)); c.lineTo(X(x), Y(0)); }
-          if (Math.abs(x) > 1e-9) { c.moveTo(X(x), Y(y)); c.lineTo(X(0), Y(y)); }
-          c.stroke(); c.restore();
-          // số chưa có vạch trên trục (như 1/2, 2,5…) thì ghi thêm
-          var kx = so(x), ky = so(y);
+    var nhanDiem = [];
+    dsG.forEach(function (q) {
+      var x = q.x, y = q.y;
+      if (!isFinite(y) || x < o.xMin - 1e-9 || x > o.xMax + 1e-9 || y < o.yMin - 1e-9 || y > o.yMax + 1e-9) return;
+      if (q.giong) {
+        c.save(); c.setLineDash([5 * px, 4 * px]); c.strokeStyle = mau; c.lineWidth = 1 * px; c.globalAlpha = 0.85; c.beginPath();
+        if (Math.abs(y) > 1e-9) { c.moveTo(X(x), Y(y)); c.lineTo(X(x), Y(0)); }
+        if (Math.abs(x) > 1e-9) { c.moveTo(X(x), Y(y)); c.lineTo(X(0), Y(y)); }
+        c.stroke(); c.restore();
+        // số chưa có vạch trên trục (như 1/2, 2,5…) thì ghi thêm
+        var kx = so(x), ky = so(y);
           if (Math.abs(x) > 1e-9 && Math.abs(x / bx0 - Math.round(x / bx0)) > 1e-9 && !vachX[kx]) { vachX[kx] = 1; c.save(); c.fillStyle = mau; c.strokeStyle = mau; c.lineWidth = 1.2 * px; c.beginPath(); c.moveTo(X(x), Y(0) - 3.5 * px); c.lineTo(X(x), Y(0) + 3.5 * px); c.stroke(); c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; var dx = (PS.test(kx) ? 22 : 15) * px; datSo(kx, [[X(x), Y(0) + dx], [X(x), Y(0) - dx]]); c.restore(); }
           if (Math.abs(y) > 1e-9 && Math.abs(y / by0 - Math.round(y / by0)) > 1e-9 && !vachY[ky]) { vachY[ky] = 1; c.save(); c.fillStyle = mau; c.strokeStyle = mau; c.lineWidth = 1.2 * px; c.beginPath(); c.moveTo(X(0) - 3.5 * px, Y(y)); c.lineTo(X(0) + 3.5 * px, Y(y)); c.stroke(); c.font = (15 * px) + 'px ' + FONT; c.textAlign = 'right'; c.textBaseline = 'middle'; c.save(); c.textAlign = 'center'; var dy = 7 * px + rongChu(c, ky) / 2; datSo(ky, [[X(0) - dy, Y(y)], [X(0) + dy, Y(y)]]); c.restore(); c.restore(); }
-          daDat.push({ x0: X(x) - 6 * px, x1: X(x) + 6 * px, y0: Y(y) - 6 * px, y1: Y(y) + 6 * px, diem: { x: X(x), y: Y(y), mau: mauD } });
-        });
-      });
-    }
+      }
+      daDat.push({ x0: X(x) - 6 * px, x1: X(x) + 6 * px, y0: Y(y) - 6 * px, y1: Y(y) + 6 * px, diem: { x: X(x), y: Y(y), mau: q.mau } });
+      if (q.ten || q.td) nhanDiem.push(q);
+    });
     // nhãn phương trình: chọn chỗ dọc theo đồ thị không đè lên trục và nhãn khác
     c.font = 'italic ' + (19 * px) + 'px ' + FONT; c.textBaseline = 'middle'; c.textAlign = 'left';
     var cao = 22 * px, le = { x0: X(o.xMin), x1: X(o.xMax), y0: Y(o.yMax), y1: Y(o.yMin) };
@@ -136,6 +147,23 @@ GI.doThi = (function () {
       daDat.push(tot);
       c.lineWidth = 4 * px; c.strokeStyle = '#fff'; c.strokeText(n.t, tot.x0, (tot.y0 + tot.y1) / 2);
       c.fillStyle = n.mau; c.fillText(n.t, tot.x0, (tot.y0 + tot.y1) / 2);
+    });
+    // nhãn điểm toạ độ: tên nghiêng + (x; y) đứng, đặt chỗ ít đè nhất quanh điểm
+    nhanDiem.forEach(function (q) {
+      var fT = 'italic ' + (19 * px) + 'px ' + FONT, fS = (18 * px) + 'px ' + FONT, td = q.td ? '(' + so(q.x) + '; ' + so(q.y) + ')' : '';
+      c.font = fT; var wT = q.ten ? c.measureText(q.ten).width : 0; c.font = fS; var wS = td ? c.measureText(td).width : 0, w = wT + wS, hh = 20 * px, P = { x: X(q.x), y: Y(q.y) };
+      var tot = null, it = 1e9;
+      [[8, -24], [8, 4], [-8 - w, -24], [-8 - w, 4]].forEach(function (d) {
+        var h = { x0: P.x + d[0] * (d[0] > 0 ? px : 1) , y0: P.y + d[1] * px }; if (d[0] < 0) h.x0 = P.x - 8 * px - w; h.x1 = h.x0 + w; h.y1 = h.y0 + hh;
+        var n = 0; chiem.concat(daDat).forEach(function (k) { if (k.diem && k.diem.x === P.x && k.diem.y === P.y) return; if (h.x0 < k.x1 && k.x0 < h.x1 && h.y0 < k.y1 && k.y0 < h.y1) n++; });
+        if (n < it) { it = n; tot = h; }
+      });
+      chiem.push(tot);
+      c.save(); c.textBaseline = 'middle'; c.textAlign = 'left'; c.lineJoin = 'round'; c.lineWidth = 4 * px; c.strokeStyle = '#fff'; c.fillStyle = q.mau;
+      var yM = (tot.y0 + tot.y1) / 2;
+      if (q.ten) { c.font = fT; c.strokeText(q.ten, tot.x0, yM); c.fillText(q.ten, tot.x0, yM); }
+      if (td) { c.font = fS; c.fillStyle = mau; c.strokeText(td, tot.x0 + wT, yM); c.fillText(td, tot.x0 + wT, yM); }
+      c.restore();
     });
     daDat.forEach(function (k) { if (!k.diem) return; c.beginPath(); c.arc(k.diem.x, k.diem.y, 3.6 * px, 0, 2 * Math.PI); c.fillStyle = k.diem.mau; c.fill(); c.lineWidth = 1 * px; c.strokeStyle = '#fff'; c.stroke(); });
     // bảng giá trị ngay dưới hình
@@ -183,5 +211,5 @@ GI.doThi = (function () {
     var x = so(-b / a).replace('−', '-');
     return /,/.test(x) ? '0; 1' : '0; ' + x;
   }
-  return { dang: dang, xMacDinh: xMacDinh, ve: ve, docX: docX, so: so, MAU: MAU, ham: ham };
+  return { docXY: docXY, dang: dang, xMacDinh: xMacDinh, ve: ve, docX: docX, so: so, MAU: MAU, ham: ham };
 })();

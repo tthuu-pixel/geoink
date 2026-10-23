@@ -149,7 +149,7 @@
     [['thanhTruot', 'Thanh trượt']],
     [['keo', 'Di chuyển hình vẽ (kéo trang)'], ['xoa', 'Xoá đối tượng']],
     [['chu', 'Chèn chữ']],
-    [['doThi', 'Đồ thị hàm số']],
+    [['doThi', 'Đồ thị hàm số'], ['heTruc', 'Hệ trục toạ độ Oxy'], ['diemTD', 'Điểm có toạ độ (x; y)']],
   ];
   // Các nhóm mẫu hình (đặt sau nút GeoLab): bấm là chèn hình có sẵn
   var BAT_DAU_MAU = NHOM_HINH.length;
@@ -243,6 +243,8 @@
   function chonCongCu(k) {
     if (k === 'moHinh') return moHopMoHinh();
     if (k === 'doThi') return moHopDoThi(null);
+    if (k === 'heTruc') return moHopDoThi(null, true);
+    if (k === 'diemTD') return moHopDiemTD();
     cc = k; choChon = []; xemTruoc = null; dungKhoi = { pts: [], dong: false };
     NHOM_HINH.forEach(function (n, i) { if (n.some(function (x) { return x[0] === k; })) nhomHien[i] = k; });
     $$('[data-cc]').forEach(function (b) { b.classList.toggle('bat', b.dataset.cc === cc); });
@@ -1358,7 +1360,9 @@
     var c0 = choNutPhai; choNutPhai = null; batViecNutBut(c0.viec, e, c0.p);
   }, true);
   cv.addEventListener('pointerup', function (e) { if (choNutPhai && e.pointerId === choNutPhai.id) choNutPhai = null; }, true);
+  var loaiConTroCuoi = 'mouse';
   cv.addEventListener('pointerdown', function (e) {
+    loaiConTroCuoi = e.pointerType;
     var nb = e.button, viec = viecNutBut(e);
     if (viec && viec !== 'menu') {
       if (nb === 2 && (viec === 'tay' || viec === 'chon' || viec === 'keo')) { try { cv.setPointerCapture(e.pointerId); } catch (er) { } choNutPhai = { id: e.pointerId, p: toaDo(e), viec: viec }; return; }   // chờ xem có rê không
@@ -1587,6 +1591,11 @@
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, cvN.width, cvN.height);
     nctx.setTransform(dpr * V.s, 0, 0, dpr * V.s, -V.x * V.s * dpr, -V.y * V.s * dpr);
     if (netDang) veNet(nctx, netDang);
+    // đang viết bằng bút cảm ứng / tay: tự vẽ cây bút chì ở đầu nét (con trỏ thật bị Windows giấu đi)
+    if (netDang && netDang.kieu === 'but' && !netDang.compa && loaiConTroCuoi !== 'mouse' && GI.ANH_BUT && GI.ANH_BUT.complete && netDang.pts.length) {
+      var dau = netDang.pts[netDang.pts.length - 1], Pm = raMH({ x: dau[0], y: dau[1] }), kb = GI.ANH_BUT_DIEM;
+      nctx.save(); nctx.setTransform(dpr, 0, 0, dpr, 0, 0); nctx.drawImage(GI.ANH_BUT, Pm.x - kb[0], Pm.y - kb[1], kb[2], kb[2]); nctx.restore();
+    }
     if (cc === 'tay' && (M || conTro)) { var P = M || conTro; nctx.beginPath(); nctx.arc(P.x, P.y, tayCo / 2 / V.s, 0, Math.PI * 2); nctx.fillStyle = 'rgba(148,163,184,.25)'; nctx.fill(); nctx.strokeStyle = '#64748B'; nctx.lineWidth = 1.5 / V.s; nctx.stroke(); }
     if (laser.length) {
       var now = performance.now(); nctx.lineCap = 'round'; nctx.lineJoin = 'round';
@@ -3189,14 +3198,16 @@
   }
   // ----- Đồ thị hàm số (kiểu hình vẽ LaTeX) -----
   var dtSua = null;
-  function moHopDoThi(o) {
+  function moHopDoThi(o, chiTruc) {
     dtSua = o; var h = $('#hop-do-thi'); $('#dt-loi').textContent = '';
-    $('#dt-tieu-de').textContent = o ? 'Sửa đồ thị hàm số' : 'Đồ thị hàm số'; $('#dt-ve').textContent = o ? 'Cập nhật' : 'Vẽ đồ thị';
-    var g = o || { xMin: -4, xMax: 4, yMin: -3, yMax: 5, ds: [{ bt: '2x + 1' }], bang: [{ i: 0, xs: '0; -1/2', tu: true }], luoi: false, ghiPT: true };
+    if (o && !(o.ds || []).length) chiTruc = true;   // hệ trục không có hàm: mở lại ở dạng hệ trục
+    h.classList.toggle('chi-truc', !!chiTruc);
+    $('#dt-tieu-de').textContent = chiTruc ? (o ? 'Sửa hệ trục toạ độ Oxy' : 'Hệ trục toạ độ Oxy') : o ? 'Sửa đồ thị hàm số' : 'Đồ thị hàm số'; $('#dt-ve').textContent = o ? 'Cập nhật' : chiTruc ? 'Vẽ hệ trục' : 'Vẽ đồ thị';
+    var g = o || (chiTruc ? { xMin: -5, xMax: 5, yMin: -5, yMax: 5, ds: [], bang: [], luoi: true, ghiPT: true } : { xMin: -4, xMax: 4, yMin: -3, yMax: 5, ds: [{ bt: '2x + 1' }], bang: [{ i: 0, xs: '0; -1/2', tu: true }], luoi: false, ghiPT: true });
     $('#dt-x0').value = GI.doThi.so(g.xMin).replace('−', '-'); $('#dt-x1').value = GI.doThi.so(g.xMax).replace('−', '-'); $('#dt-y0').value = GI.doThi.so(g.yMin).replace('−', '-'); $('#dt-y1').value = GI.doThi.so(g.yMax).replace('−', '-');
     $('#dt-luoi').checked = !!g.luoi; $('#dt-pt').checked = g.ghiPT !== false; $('#dt-giong').checked = g.giong !== false; $('#dt-hien-bang').checked = !!g.hienBang;
-    $('#dt-ds').innerHTML = ''; g.ds.forEach(function (d) { themDongDT(d); });
-    $('#dt-bang').innerHTML = ''; (g.bang || []).forEach(function (b) { themDongBang(b); });
+    $('#dt-ds').innerHTML = ''; if (!chiTruc) g.ds.forEach(function (d) { themDongDT(d); });
+    $('#dt-bang').innerHTML = ''; if (!chiTruc) (g.bang || []).forEach(function (b) { themDongBang(b); });
     h.classList.remove('an'); xemTruocDT(); setTimeout(function () { var i = $('#dt-ds input.dt-bt'); if (i) i.focus(); xemTruocDT(); }, 30);
   }
   function capNhatSoDT() {
@@ -3302,6 +3313,47 @@
     thongBao(dtSua ? 'Đã cập nhật đồ thị' : 'Đã vẽ đồ thị · bấm đúp vào đồ thị để sửa, kéo để di chuyển');
   }
   $('#dt-ve').onclick = veDoThiTuHop;
+  // ---- Điểm có toạ độ (x; y) trên hệ trục ----
+  var dtdDich = null;
+  function heTrucDich() {   // hệ trục đang chọn, không thì hệ trục mới nhất trên trang
+    var chon = nhom.map(function (x) { return x.h && timTheoId(x.h); }).filter(function (o) { return o && o.loai === 'doThi'; });
+    if (chon.length) return chon[chon.length - 1];
+    var ds = trang().hinh.filter(function (o) { return o.loai === 'doThi' && !o.an; }); return ds[ds.length - 1] || null;
+  }
+  function themDongDTD(q) {
+    var n = $$('#dtd-ds .dt-dong').length, r = document.createElement('div'); r.className = 'dt-dong';
+    q = q || { ten: String.fromCharCode(65 + (n % 26)), td: '' };
+    r.innerHTML = '<span>Tên</span><input class="dtd-ten" spellcheck="false" style="width:56px"><span class="dt-y">(<i>x</i>; <i>y</i>) =</span><input class="dt-bt dtd-td" spellcheck="false" placeholder="ví dụ: 2; 3"><label>Màu <input type="color" class="dt-mau"></label><button class="dt-xoa" title="Xoá điểm này">×</button>';
+    r.querySelector('.dtd-ten').value = q.ten || ''; r.querySelector('.dtd-td').value = q.td || ''; r.querySelector('.dt-mau').value = q.mau || '#DC2626';
+    r.querySelector('.dt-xoa').onclick = function () { r.remove(); };
+    r.querySelector('.dtd-td').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); veDiemTD(); } });
+    $('#dtd-ds').appendChild(r); return r;
+  }
+  function moHopDiemTD() {
+    var o = heTrucDich();
+    if (!o) { thongBao('Chưa có hệ trục: hãy tạo Hệ trục toạ độ Oxy trước'); return moHopDoThi(null, true); }
+    dtdDich = o; $('#dtd-loi').textContent = ''; $('#dtd-ds').innerHTML = '';
+    (o.diem || []).forEach(function (q) { themDongDTD(q); }); var r = themDongDTD(null);
+    $('#dtd-ghi').checked = o.ghiTD !== false; $('#dtd-giong').checked = o.diemGiong !== false;
+    $('#dtd-mo-ta').textContent = 'Nhập tên và toạ độ (x; y), ví dụ 2; 3 hoặc -1,5; 1/2. Hệ trục: Ox từ ' + GI.doThi.so(o.xMin) + ' đến ' + GI.doThi.so(o.xMax) + ', Oy từ ' + GI.doThi.so(o.yMin) + ' đến ' + GI.doThi.so(o.yMax) + '.';
+    $('#hop-diem-td').classList.remove('an'); setTimeout(function () { r.querySelector('.dtd-td').focus(); }, 30);
+  }
+  function veDiemTD() {
+    var o = dtdDich; if (!o) return; var ds = [], loi = '', ngoai = [];
+    $$('#dtd-ds .dt-dong').forEach(function (r, i) {
+      var td = r.querySelector('.dtd-td').value.trim(), ten = r.querySelector('.dtd-ten').value.trim(); if (!td) return;
+      var xy = GI.doThi.docXY(td); if (!xy) { loi = loi || 'Điểm ' + (ten || i + 1) + ': toạ độ phải có dạng x; y (ví dụ 2; -3)'; return; }
+      if (xy[0] < o.xMin || xy[0] > o.xMax || xy[1] < o.yMin || xy[1] > o.yMax) ngoai.push(ten || td);
+      ds.push({ ten: ten, td: td, mau: r.querySelector('.dt-mau').value });
+    });
+    if (loi) return ($('#dtd-loi').textContent = loi);
+    ghiLichSu(); o.diem = ds; o.ghiTD = $('#dtd-ghi').checked ? undefined : false; o.diemGiong = $('#dtd-giong').checked ? undefined : false;
+    daSua = true; $('#hop-diem-td').classList.add('an'); canVe();
+    thongBao(ngoai.length ? 'Điểm ' + ngoai.join(', ') + ' nằm ngoài giới hạn hệ trục nên không hiện · bấm đúp hệ trục để nới giới hạn' : 'Đã vẽ ' + ds.length + ' điểm');
+  }
+  $('#dtd-them').onclick = function () { themDongDTD(null).querySelector('.dtd-td').focus(); };
+  $('#dtd-ve').onclick = veDiemTD;
+
   var choXuatTex = false;
   function xuatTexChon(ids) {
     var ma = null; try { ma = GI.xuatTex.xuat(trang().hinh, ids, giaTri); } catch (e) { return thongBao('Không xuất được mã: ' + (e.message || e)); }

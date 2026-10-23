@@ -638,3 +638,7 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 .hop-tl .tl-truot span { color: #2563EB; font-weight: 600; }
 .hop-tl .tl-tich { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 4px; font-size: 14px; }
 .hop-tl .tl-tich.mo { opacity: .45; pointer-events: none; }
+
+#hop-do-thi.chi-truc #dt-nhom-ham, #hop-do-thi.chi-truc #dt-nhom-bang, #hop-do-thi.chi-truc .dt-tich:has(#dt-pt) { display: none; }
+#hop-diem-td .hop-noi-dung { width: min(620px, 94vw); }
+#hop-diem-td .dt-dong { margin: 8px 0; }
