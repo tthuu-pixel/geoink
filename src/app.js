@@ -149,7 +149,7 @@
     [['thanhTruot', 'Thanh trượt']],
     [['keo', 'Di chuyển hình vẽ (kéo trang)'], ['xoa', 'Xoá đối tượng']],
     [['chu', 'Chèn chữ']],
-    [['doThi', 'Đồ thị hàm số'], ['heTruc', 'Hệ trục toạ độ Oxy'], ['diemTD', 'Điểm có toạ độ (x; y)']],
+    [['doThi', 'Đồ thị hàm số'], ['heTruc', 'Hệ trục toạ độ Oxy'], ['diemTD', 'Điểm có toạ độ (x; y)'], ['bieuDo', 'Biểu đồ thống kê (cột, đoạn thẳng, hình quạt)']],
   ];
   // Các nhóm mẫu hình (đặt sau nút GeoLab): bấm là chèn hình có sẵn
   var BAT_DAU_MAU = NHOM_HINH.length;
@@ -245,6 +245,7 @@
     if (k === 'doThi') return moHopDoThi(null);
     if (k === 'heTruc') return moHopDoThi(null, true);
     if (k === 'diemTD') return moHopDiemTD();
+    if (k === 'bieuDo') return moHopBieuDo(null);
     cc = k; choChon = []; xemTruoc = null; dungKhoi = { pts: [], dong: false };
     NHOM_HINH.forEach(function (n, i) { if (n.some(function (x) { return x[0] === k; })) nhomHien[i] = k; });
     $$('[data-cc]').forEach(function (b) { b.classList.toggle('bat', b.dataset.cc === cc); });
@@ -848,6 +849,11 @@
     t.hinh.forEach(function (o) {
       var v = gt[o.id]; if (!v || !hien(o)) return;
       if (o.loai === 'doThi') { o._khung = GI.doThi.ve(c, o, px, kieuNen().toi ? '#E5E7EB' : '#111827', sang(o) && c === ctx); return; }
+      if (o.loai === 'bieuDo') {
+        o._khung = GI.bieuDo.ve(c, o);
+        if (sang(o) && c === ctx) { var kB = o._khung, kN = 7 * px; c.save(); c.setLineDash([6 * px, 4 * px]); c.strokeStyle = '#F97316'; c.lineWidth = 1.5 * px; c.strokeRect(kB.x0, kB.y0, kB.x1 - kB.x0, kB.y1 - kB.y0); c.setLineDash([]); c.fillStyle = '#fff'; c.strokeStyle = '#2457C5'; c.fillRect(kB.x1 - kN, kB.y1 - kN, 2 * kN, 2 * kN); c.strokeRect(kB.x1 - kN, kB.y1 - kN, 2 * kN, 2 * kN); c.restore(); }
+        return;
+      }
       if (o.loai === 'nhanTZ') {
         var gN = o.huong == null ? null : o.huong * Math.PI / 180, dN = gN == null ? 0 : Math.max(12, (o.kc || 0.25) * 40 * 1.5 * 1.15) * px, motChu = /^[A-Za-zα-ω]'*\d*$/.test(o.nd);
         c.save(); c.font = (motChu ? 'italic ' : '') + (21 * px) + 'px ' + FONT_TEN; c.textAlign = 'center'; c.textBaseline = 'middle';
@@ -1292,7 +1298,7 @@
     var ds = trang().hinh, px = 1 / V.s;
     for (var i = ds.length - 1; i >= 0; i--) {
       var o = ds[i]; if (o.an) continue;
-      if ((o.loai === 'chu' || o.loai === 'congThuc' || o.loai === 'doThi') && o._khung && M.x >= o._khung.x0 - 4 * px && M.x <= o._khung.x1 + 4 * px && M.y >= o._khung.y0 - 4 * px && M.y <= o._khung.y1 + 4 * px) return o;
+      if ((o.loai === 'chu' || o.loai === 'congThuc' || o.loai === 'doThi' || o.loai === 'bieuDo') && o._khung && M.x >= o._khung.x0 - 4 * px && M.x <= o._khung.x1 + 4 * px && M.y >= o._khung.y0 - 4 * px && M.y <= o._khung.y1 + 4 * px) return o;
       if (o.loai === 'thanhTruot' && M.x >= o.x - 10 * px && M.x <= o.x + o.dai * px + 10 * px && M.y >= o.y - 30 * px && M.y <= o.y + 14 * px) return o;
     }
     return null;
@@ -1598,6 +1604,7 @@
     }
     var o = timChuTruot(M);
     if (o && o.loai === 'doThi') return moHopDoThi(o);
+    if (o && o.loai === 'bieuDo') return moHopBieuDo(o);
     if (!o && cc === 'chon') { var h = timDiem(M) || timDoiTuong(M); if (h && coTen(h)) return doiTenHinh(h); }
     if (!o) return;
     if (o.loai === 'chu') moSoanChu(o, false); else if (o.loai === 'congThuc') moHopCongThuc(o);
@@ -1898,6 +1905,7 @@
     ['Ảnh', function (o) { return o.loai === 'anh'; }],
     ['Khung che đáp án', function (o) { return o.loai === 'che'; }],
     ['Đồ thị hàm số', function (o) { return o.loai === 'doThi'; }],
+    ['Biểu đồ thống kê', function (o) { return o.loai === 'bieuDo'; }],
   ];
   var BANG_MAU = ['#000000', '#374151', '#6B7280', '#9CA3AF', '#FFFFFF', '#7A1E1E', '#DC2626', '#F97316', '#F59E0B', '#EAB308', '#84CC16', '#16A34A',
     '#059669', '#0D9488', '#0891B2', '#0284C7', '#2563EB', '#1F3A8A', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#DB2777', '#92400E'];
@@ -1949,6 +1957,7 @@
       case 'congThuc': return 'Công thức: ' + (o.latex || '').slice(0, 40);
       case 'anh': return 'Ảnh ' + Math.round(o.w) + ' × ' + Math.round(o.h);
       case 'che': return 'Khung che đáp án' + (o.mo ? ' (đang mở)' : '');
+      case 'bieuDo': return (GI.bieuDo.TEN_KIEU[o.kieu] || 'Biểu đồ') + (o.tieuDe ? ': ' + o.tieuDe : '');
       case 'doThi': return 'Đồ thị: ' + (o.ds || []).map(function (d) { return 'y = ' + d.bt; }).join('; ');
       case 'bienHinh': {
         var tenBH = { dxTruc: 'Đối xứng qua ' + T(o.truc), dxTam: 'Đối xứng qua ' + T(o.tam), quay: 'Quay quanh ' + T(o.tam) + ' góc ' + soVN(o.goc, 1) + '°',
@@ -2047,7 +2056,7 @@
     var o = timTheoId(chonId); if (!o || !o.loai) { dongThuocTinh(); return; }
     veDanhSachTT();
     var gtO = giaTri[o.id] || {}, laDiem = gtO.k === 'diem', laDoan = gtO.k === 'thang' && gtO.loai === 'doan' && o.loai !== 'bienHinh';
-    var coNet = !laDiem && ['doDai', 'dienTich', 'chu', 'thanhTruot', 'gocVuong', 'goc', 'anh', 'che', 'doThi'].indexOf(o.loai) < 0, coTo = gtO.k === 'daGiac' || (gtO.k === 'cung' && gtO.quat) || o.loai === 'banNguyet';
+    var coNet = !laDiem && ['doDai', 'dienTich', 'chu', 'thanhTruot', 'gocVuong', 'goc', 'anh', 'che', 'doThi', 'bieuDo'].indexOf(o.loai) < 0, coTo = gtO.k === 'daGiac' || (gtO.k === 'cung' && gtO.quat) || o.loai === 'banNguyet';
     var TAB = [['coBan', 'Cơ bản'], ['mauSac', 'Màu sắc']]; if (coNet || laDiem) TAB.push(['kieu', 'Kiểu']);
     if (!TAB.some(function (x) { return x[0] === tabTT; })) tabTT = 'coBan';
     $('#tt-tab').innerHTML = TAB.map(function (x) { return '<button data-tab="' + x[0] + '"' + (x[0] === tabTT ? ' class="bat"' : '') + '>' + x[1] + '</button>'; }).join('');
@@ -2094,7 +2103,7 @@
         });
         noi.appendChild(hangTT);
       }
-      if (['doDai', 'goc', 'dienTich', 'gocVuong', 'chu', 'congThuc', 'anh', 'che', 'doThi'].indexOf(o.loai) < 0) noi.appendChild(oTich('Hiển thị tên', o.loai === 'hamSo' ? o.hienTen !== false : hienTenCua(o), function (v) { doi('hienTen', function (x) { x.hienTen = v; if (v && !x.ten && x.loai !== 'hamSo') x.ten = laDiemO(x) ? tenDiemMoi() : tenDuongMoi(); }); veThuocTinh(); }));
+      if (['doDai', 'goc', 'dienTich', 'gocVuong', 'chu', 'congThuc', 'anh', 'che', 'doThi', 'bieuDo'].indexOf(o.loai) < 0) noi.appendChild(oTich('Hiển thị tên', o.loai === 'hamSo' ? o.hienTen !== false : hienTenCua(o), function (v) { doi('hienTen', function (x) { x.hienTen = v; if (v && !x.ten && x.loai !== 'hamSo') x.ten = laDiemO(x) ? tenDiemMoi() : tenDuongMoi(); }); veThuocTinh(); }));
       if (o.loai === 'goc') {
         noi.appendChild(dong('Kí hiệu góc:', hopXo(KIEU_GOC.map(function (k) { return { gt: k[0], ten: k[1], html: svgGoc(k[0]) }; }), (o.cung || 1) + (o.gach ? 'g' : ''), function (v) {
           doi('kieuGoc', function (x) { if (x.loai !== 'goc') return; var n = +v.charAt(0); x.cung = n > 1 ? n : undefined; x.gach = v.indexOf('g') > 0 || undefined; }); })));
@@ -2554,7 +2563,7 @@
   function timTayNam(M) {
     var r = 9 / V.s, ds = trang().hinh;
     for (var ia = ds.length - 1; ia >= 0; ia--) {   // góc dưới phải của ảnh đang chọn: kéo để đổi cỡ (giữ tỉ lệ)
-      var a = ds[ia]; if ((a.loai !== 'anh' && a.loai !== 'che') || a.an || a.coDinh || !(trongNhom({ h: a.id }) || a.id === chonId)) continue;
+      var a = ds[ia]; if ((a.loai !== 'anh' && a.loai !== 'che' && a.loai !== 'bieuDo') || a.an || a.coDinh || !(trongNhom({ h: a.id }) || a.id === chonId)) continue;
       if (Math.abs(M.x - (a.x + a.w)) < r && Math.abs(M.y - (a.y + a.h)) < r) return { loai: 'coAnh', o: a, tl: a.loai === 'che' ? null : a.h / a.w };
     }
     for (var i = ds.length - 1; i >= 0; i--) {
@@ -2774,6 +2783,7 @@
   // Những điểm đặc trưng của hình (để biết hình có nằm trọn trong khung chọn không)
   function diemDaiDien(o, v) {
     if (o.loai === 'anh' || o.loai === 'che') return [{ x: o.x, y: o.y }, { x: o.x + o.w, y: o.y + o.h }];
+    if (o.loai === 'bieuDo') return [{ x: o.x, y: o.y }, { x: o.x + (o.w || 440), y: o.y + (o.h || 330) }];
     if (o.loai === 'doThi') return o._khung ? [{ x: o._khung.x0, y: o._khung.y0 }, { x: o._khung.x1, y: o._khung.y1 }] : [{ x: o.x, y: o.y }];
     if (o.loai === 'chu' || o.loai === 'congThuc' || o.loai === 'thanhTruot') return o._khung && o.loai !== 'thanhTruot' ? [{ x: o._khung.x0, y: o._khung.y0 }, { x: o._khung.x1, y: o._khung.y1 }] : [{ x: o.x, y: o.y }];
     if (v.k === 'diem') return [v];
@@ -2795,7 +2805,7 @@
   // Kéo cả nhóm: dời các điểm tự do (và chữ, thanh trượt, nét viết, mô hình) đã tạo ra các hình đang chọn
   // ---- Chèn khoảng trống: dời mọi thứ nằm dưới đường bấm (nét viết, hình, chữ…) xuống / lên ----
   //   Hình dựng được dời theo cả cụm liên kết, chỉ khi cả cụm nằm dưới đường (không kéo dãn hình cắt ngang đường).
-  var LOAI_CO_TOA_DO = { diem: 1, chu: 1, congThuc: 1, thanhTruot: 1, khoi: 1, anh: 1, che: 1, doThi: 1 };
+  var LOAI_CO_TOA_DO = { diem: 1, chu: 1, congThuc: 1, thanhTruot: 1, khoi: 1, anh: 1, che: 1, doThi: 1, bieuDo: 1 };
   function batDauChenKhoang(M) {
     var t = trang(), y0 = M.y, goc = {};
     function re(id) { while (goc[id] !== id) id = goc[id]; return id; }
@@ -2858,7 +2868,7 @@
     function leo(id) {
       if (daXet[id]) return; daXet[id] = 1; var o = timTheoId(id); if (!o) return;
       if (o.loai === 'diem') { if (!o.coDinh) diem[o.id] = o; return; }
-      if (o.loai === 'chu' || o.loai === 'congThuc' || o.loai === 'thanhTruot' || o.loai === 'khoi' || o.loai === 'anh' || o.loai === 'che' || o.loai === 'doThi') { if (!o.coDinh) chu.push(o); return; }
+      if (o.loai === 'chu' || o.loai === 'congThuc' || o.loai === 'thanhTruot' || o.loai === 'khoi' || o.loai === 'anh' || o.loai === 'che' || o.loai === 'doThi' || o.loai === 'bieuDo') { if (!o.coDinh) chu.push(o); return; }
       H.cha(o).forEach(leo);
     }
     nhom.forEach(function (x) { if (x.h) leo(x.h); else if (x.n) net.push(x.n); else if (x.m) mh.push(x.m); });
@@ -2888,7 +2898,7 @@
     if (o.loai === 'khoi') return GI.khoi.TEN[o.dang];
     return { 'Cung tròn, hình quạt': giaTri[o.id] && giaTri[o.id].quat ? 'Hình quạt' : 'Cung tròn', 'Đường conic': { elip: 'Elip', hypebol: 'Hypebol', parabol: 'Parabol' }[o.loai] || 'Đường conic', 'Số đo': { doDai: 'Độ dài', goc: 'Góc', dienTich: 'Diện tích', gocVuong: 'Kí hiệu góc vuông' }[o.loai] || 'Số đo' }[t] || t;
   }
-  function coTen(o) { return ['doDai', 'goc', 'dienTich', 'gocVuong', 'chu', 'congThuc', 'anh', 'che', 'doThi'].indexOf(o.loai) < 0; }
+  function coTen(o) { return ['doDai', 'goc', 'dienTich', 'gocVuong', 'chu', 'congThuc', 'anh', 'che', 'doThi', 'bieuDo'].indexOf(o.loai) < 0; }
   function dongMenuPhai() { var m = $('#menu-phai'); if (m) m.remove(); }
   /* =====================================================================
      THANH TUỲ CHỌN NỔI
@@ -2904,7 +2914,7 @@
   function luuMD() { try { localStorage.setItem('geoink_md_hinh', JSON.stringify(macDinh)); } catch (e) { } }
   var LA_SO_DO = { doDai: 1, goc: 1, dienTich: 1, gocVuong: 1 };
   function laToDuoc(o, v) { v = v || giaTri[o.id] || {}; return v.k === 'daGiac' || (v.k === 'cung' && v.quat) || o.loai === 'banNguyet'; }
-  function laNet(o, v) { v = v || giaTri[o.id] || {}; return v.k !== 'diem' && !LA_SO_DO[o.loai] && ['chu', 'congThuc', 'thanhTruot', 'anh', 'che', 'doThi', 'khoi'].indexOf(o.loai) < 0; }
+  function laNet(o, v) { v = v || giaTri[o.id] || {}; return v.k !== 'diem' && !LA_SO_DO[o.loai] && ['chu', 'congThuc', 'thanhTruot', 'anh', 'che', 'doThi', 'bieuDo', 'khoi'].indexOf(o.loai) < 0; }
   function apDungMacDinh(o) {   // hình vừa dựng bằng công cụ: theo kiểu mặc định đang chọn trên thanh
     var v = giaTri[o.id]; if (!v || LA_SO_DO[o.loai]) return;
     if (v.k === 'diem') {
@@ -3355,6 +3365,95 @@
     thongBao(dtSua ? 'Đã cập nhật đồ thị' : 'Đã vẽ đồ thị · bấm đúp vào đồ thị để sửa, kéo để di chuyển');
   }
   $('#dt-ve').onclick = veDoThiTuHop;
+  // ---- Biểu đồ thống kê: hộp nhập số liệu + xem trước ----
+  var bdSua = null, bdKieu = 'cot', bdNho = [];
+  function bdSoDay() { return bdKieu === 'cotKep' || bdKieu === 'duongKep' ? 2 : 1; }
+  function bdVeBang(dm, ds) {   // dựng lại bảng nhập theo kiểu biểu đồ
+    var n = bdSoDay(), b = $('#bd-bang'), h = '<tr><th>Danh mục</th>';
+    for (var j = 0; j < n; j++) h += '<th><span class="bd-day">' + (bdKieu === 'tron' ? 'Số liệu' : '<input type="color" class="bd-mau" data-j="' + j + '"><input class="bd-ten-day" data-j="' + j + '" placeholder="Dãy ' + (j + 1) + '">') + '</span></th>';
+    b.innerHTML = h + '<th></th></tr>';
+    for (j = 0; j < n; j++) { var mi = b.querySelector('.bd-mau[data-j="' + j + '"]'), ti = b.querySelector('.bd-ten-day[data-j="' + j + '"]'); if (mi) mi.value = (ds[j] && ds[j].mau) || GI.bieuDo.MAU[j]; if (ti) ti.value = (ds[j] && ds[j].ten) || ''; }
+    dm.forEach(function (t, i) { bdThemDong(t, ds.map(function (d) { return d.so[i]; })); });
+  }
+  function bdThemDong(t, sos) {
+    var n = bdSoDay(), r = document.createElement('tr'), h = '<td><input class="bd-dm" spellcheck="false"></td>';
+    for (var j = 0; j < n; j++) h += '<td><input class="bd-so" data-j="' + j + '" inputmode="decimal"></td>';
+    r.innerHTML = h + '<td><button class="dt-xoa" title="Xoá dòng">×</button></td>';
+    r.querySelector('.bd-dm').value = t == null ? '' : t;
+    r.querySelectorAll('.bd-so').forEach(function (ip) { var v = (sos || [])[+ip.dataset.j]; ip.value = v == null || v === '' ? '' : String(v).replace('.', ','); });
+    r.querySelector('.dt-xoa').onclick = function () { r.remove(); bdXem(); };
+    $('#bd-bang').appendChild(r); return r;
+  }
+  function bdSo(t) { t = String(t || '').trim().replace(/\s/g, '').replace(',', '.'); return t === '' ? NaN : +t; }
+  function docHopBD() {
+    var dm = [], n = bdSoDay(), ds = [], loi = '';
+    for (var j = 0; j < n; j++) { var ti = $('#bd-bang .bd-ten-day[data-j="' + j + '"]'), mi = $('#bd-bang .bd-mau[data-j="' + j + '"]'); ds.push({ ten: ti ? ti.value.trim() : '', mau: mi ? mi.value : GI.bieuDo.MAU[j], so: [] }); }
+    $$('#bd-bang tr').forEach(function (r, i) {
+      var dmI = r.querySelector('.bd-dm'); if (!dmI) return; var t = dmI.value.trim(), sos = Array.prototype.map.call(r.querySelectorAll('.bd-so'), function (ip) { return ip.value; });
+      if (!t && sos.every(function (v) { return !String(v).trim(); })) return;
+      sos.forEach(function (v, j) { var x = bdSo(v); if (String(v).trim() && !isFinite(x)) loi = loi || 'Dòng ' + i + ': "' + v + '" không phải số'; if (bdKieu === 'tron' && x < 0) loi = loi || 'Biểu đồ hình quạt không nhận số âm'; ds[j].so.push(isFinite(x) ? x : null); });
+      dm.push(t);
+    });
+    if (!dm.length && !loi) loi = 'Hãy nhập ít nhất một dòng số liệu';
+    var buoc = bdSo($('#bd-buoc').value);
+    return { loi: loi, o: { kieu: bdKieu, tieuDe: $('#bd-td').value.trim(), tenX: $('#bd-tx').value.trim(), tenY: $('#bd-ty').value.trim(), dm: dm, ds: ds,
+      ghiSo: $('#bd-ghiSo').checked ? undefined : false, luoi: $('#bd-luoi').checked ? undefined : false, chuThich: $('#bd-ct').checked ? undefined : false,
+      denTrang: $('#bd-dt').checked || undefined, buoc: buoc > 0 ? buoc : undefined, w: bdSua ? bdSua.w : undefined, h: bdSua ? bdSua.h : undefined } };
+  }
+  function bdXem() {
+    var cv = $('#bd-xem'), hop = cv.parentNode, W0 = hop.clientWidth, H0 = hop.clientHeight, tl2 = window.devicePixelRatio || 1; if (!W0) return;
+    cv.width = W0 * tl2; cv.height = H0 * tl2; cv.style.width = W0 + 'px'; cv.style.height = H0 + 'px';
+    var c = cv.getContext('2d'), kq = docHopBD(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#fff'; c.fillRect(0, 0, cv.width, cv.height);
+    $('#bd-loi').textContent = kq.loi && kq.o.dm.length ? kq.loi : ''; if (!kq.o.dm.length) return;
+    var o = Object.assign({ x: 0, y: 0 }, kq.o), w = o.w || 440, h = o.h || 330, k = Math.min((W0 - 12) / w, (H0 - 12) / h);
+    c.setTransform(tl2 * k, 0, 0, tl2 * k, tl2 * (W0 - w * k) / 2, tl2 * (H0 - h * k) / 2); GI.bieuDo.ve(c, o);
+  }
+  function bdChonKieu(k) {
+    var cu = docHopBD().o; bdKieu = k;
+    cu.ds.forEach(function (d, j) { bdNho[j] = d; });   // nhớ số liệu từng dãy để chuyển qua lại giữa các kiểu không mất
+    $$('#bd-kieu [data-k]').forEach(function (b) { b.classList.toggle('bat', b.dataset.k === k); });
+    $('#hop-bieu-do').classList.toggle('la-tron', k === 'tron');
+    if (bdSoDay() === 2 && cu.ds.length < 2) cu.ds.push(bdNho[1] && bdNho[1].so.length ? bdNho[1] : { ten: '', mau: GI.bieuDo.MAU[1], so: [] });
+    bdVeBang(cu.dm, cu.ds.slice(0, bdSoDay())); bdXem();
+  }
+  function moHopBieuDo(o) {
+    bdSua = o; $('#bd-loi').textContent = '';
+    var g = o || { kieu: 'cot', tieuDe: 'Số học sinh giỏi của khối 6', tenX: 'Lớp', tenY: 'Số học sinh', dm: ['6A', '6B', '6C', '6D'], ds: [{ ten: 'Nam', mau: GI.bieuDo.MAU[0], so: [18, 22, 15, 20] }, { ten: 'Nữ', mau: GI.bieuDo.MAU[1], so: [20, 17, 21, 19] }] };
+    $('#bd-tieu-de-hop').textContent = o ? 'Sửa biểu đồ thống kê' : 'Biểu đồ thống kê'; $('#bd-ve').textContent = o ? 'Cập nhật' : 'Vẽ biểu đồ';
+    $('#bd-td').value = g.tieuDe || ''; $('#bd-tx').value = g.tenX || ''; $('#bd-ty').value = g.tenY || ''; $('#bd-buoc').value = g.buoc ? String(g.buoc).replace('.', ',') : '';
+    $('#bd-ghiSo').checked = g.ghiSo !== false; $('#bd-luoi').checked = g.luoi !== false; $('#bd-ct').checked = g.chuThich !== false; $('#bd-dt').checked = !!g.denTrang; $('#bd-mau-to').checked = !g.denTrang;
+    bdKieu = g.kieu || 'cot'; bdNho = (g.ds || []).slice();
+    $$('#bd-kieu [data-k]').forEach(function (b) { b.classList.toggle('bat', b.dataset.k === bdKieu); }); $('#hop-bieu-do').classList.toggle('la-tron', bdKieu === 'tron');
+    bdVeBang(g.dm || [], (g.ds || []).slice(0, bdSoDay()));
+    $('#hop-bieu-do').classList.remove('an'); setTimeout(bdXem, 30);
+  }
+  function veBieuDoTuHop() {
+    var kq = docHopBD(); if (kq.loi) return ($('#bd-loi').textContent = kq.loi);
+    ghiLichSu(); var o = bdSua || { id: idMoi('h'), loai: 'bieuDo' };
+    Object.assign(o, kq.o); delete o._khung;
+    if (!bdSua) { var tam = veTG(W / 2, Hh / 2); o.w = 440; o.h = 330; o.x = tam.x - o.w / 2; o.y = tam.y - o.h / 2; trang().hinh.push(o); }
+    giaTri = H.tinh(trang().hinh); daSua = true;
+    $('#hop-bieu-do').classList.add('an'); chonCongCu('chon'); nhom = [{ h: o.id }]; capNhatChon(false); canVe();
+    thongBao(bdSua ? 'Đã cập nhật biểu đồ' : 'Đã vẽ biểu đồ · bấm đúp để sửa số liệu, kéo góc dưới phải để đổi cỡ');
+  }
+  $('#bd-kieu').addEventListener('click', function (e) { var b = e.target.closest('[data-k]'); if (b) bdChonKieu(b.dataset.k); });
+  $('#bd-them-dong').onclick = function () { bdThemDong('', []).querySelector('.bd-dm').focus(); };
+  $('#bd-ve').onclick = veBieuDoTuHop;
+  $('#hop-bieu-do').addEventListener('input', function () { clearTimeout(bdXem.t); bdXem.t = setTimeout(bdXem, 60); });
+  $('#hop-bieu-do').addEventListener('change', function () { clearTimeout(bdXem.t); bdXem.t = setTimeout(bdXem, 60); });
+  // dán bảng từ Excel (các cột cách nhau bằng Tab): Danh mục | Dãy 1 | Dãy 2
+  $('#bd-bang').addEventListener('paste', function (e) {
+    var t = (e.clipboardData || window.clipboardData).getData('text/plain') || ''; if (t.indexOf('\t') < 0 && t.indexOf('\n') < 0) return;
+    e.preventDefault();
+    var dong = t.replace(/\r/g, '').split('\n').filter(function (x) { return x.trim(); }).map(function (x) { return x.split('\t'); });
+    if (dong.length && dong[0].slice(1).some(function (v) { return v.trim() && !isFinite(bdSo(v)); })) {   // dòng đầu là tiêu đề cột → tên dãy
+      dong.shift().slice(1).forEach(function (ten, j) { var ti = $('#bd-bang .bd-ten-day[data-j="' + j + '"]'); if (ti) ti.value = ten.trim(); });
+    }
+    $$('#bd-bang tr').forEach(function (r) { if (r.querySelector('.bd-dm')) r.remove(); });
+    dong.forEach(function (d) { bdThemDong(d[0].trim(), d.slice(1).map(function (v) { return v.trim(); })); });
+    bdXem(); thongBao('Đã dán ' + dong.length + ' dòng số liệu');
+  });
+
   // ---- Điểm có toạ độ (x; y) trên hệ trục ----
   var dtdDich = null;
   function heTrucDich() {   // hệ trục đang chọn, không thì hệ trục mới nhất trên trang

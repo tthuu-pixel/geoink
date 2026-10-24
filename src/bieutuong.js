@@ -192,6 +192,7 @@ window.GI = window.GI || {};
   B32.doThi = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M4 28L26 6', X, 2.3) + P('M4 7.5Q10 34 17 7.5', R, 2.3);
   B32.heTruc = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M3 15h25M3 8h25M17 4v25M24 4v25M3 4v25', XAM, 0.8, null, '1.5 2') + T(5, 30, 'O', K, 7, 'nghieng');
   B32.diemTD = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M22 10v12M10 10h12', XAM, 1.3, null, '2 2') + D(22, 10, R, 3.2) + T(14, 7, 'A', R, 9, 'nghieng');
+  B32.bieuDo = P('M4 28h25M4 28V4', K, 1.6) + '<rect x="7" y="16" width="4.5" height="12" fill="#3B82F6" stroke="#1E3A8A" stroke-width="0.8"/><rect x="13.5" y="9" width="4.5" height="19" fill="#F97316" stroke="#7C2D12" stroke-width="0.8"/>' + C(24.5, 11, 5.5, K, 1.2, '#10B981') + P('M24.5 11V5.5M24.5 11l4.8 2.6', '#fff', 1.2) + P('M6 21l7-7 6 4 6-6', R, 1.6);
   // ----- Nhóm đường tròn -----
   function d3(x, y, m) { return D(x, y, m || X, 2.3); }
   B32.m_noiTiep = C(16, 16, 12, K, 1.8) + NL('M12.9 4.4L5.6 22 26.4 22z') + d3(12.9, 4.4) + d3(5.6, 22) + d3(26.4, 22) + d3(16, 16, '#3A3F47');

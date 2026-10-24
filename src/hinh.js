@@ -158,6 +158,7 @@ GI.hinh = (function () {
         }
         case 'anh': return { k: 'anh', x: o.x, y: o.y, w: o.w, h: o.h };
         case 'che': return { k: 'che', x: o.x, y: o.y, w: o.w, h: o.h };
+        case 'bieuDo': return { k: 'bieuDo', x: o.x, y: o.y, w: o.w || 440, h: o.h || 330 };
         case 'doThi': return { k: 'doThi', x: o.x, y: o.y };   // đồ thị hàm số (hệ trục + đồ thị + bảng giá trị)   // ảnh dán / cắt từ màn hình
         case 'diemTZ': case 'nhanTZ': {   // điểm / nhãn dựng từ mã TikZ (biểu thức theo toạ độ TikZ, gốc là điểm o.goc)
           var G = diem(o.goc); if (!G || !GI.tikz) return null; var Dk = DV * (o.kt || 1);
