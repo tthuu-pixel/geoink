@@ -1,0 +1,73 @@
+apply plugin: 'com.android.application'
+
+// Phiên bản lấy từ package.json của GeoInk (cùng số với bản Windows): 0.19.1 → mã 1901
+def goiGeoInk = new groovy.json.JsonSlurper().parse(file('../../../package.json'))
+def phienBan = goiGeoInk.version
+def soPB = phienBan.tokenize('.').collect { it as int }
+def maPhienBan = soPB[0] * 10000 + soPB[1] * 100 + soPB[2]
+// Khoá ký: đường dẫn và mật khẩu lấy từ biến môi trường (GitHub Actions đặt từ secrets)
+def tepKhoa = System.getenv('GEOINK_KEYSTORE')
+
+android {
+    namespace = "vn.geolab.geoink"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "vn.geolab.geoink"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode maPhienBan
+        versionName phienBan
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (tepKhoa) {
+                storeFile file(tepKhoa)
+                storePassword System.getenv('GEOINK_KEYSTORE_PASS')
+                keyAlias System.getenv('GEOINK_KEY_ALIAS') ?: 'geoink'
+                keyPassword System.getenv('GEOINK_KEY_PASS') ?: System.getenv('GEOINK_KEYSTORE_PASS')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (tepKhoa) signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

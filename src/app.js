@@ -1515,6 +1515,10 @@
      SỰ KIỆN CON TRỎ (bút, chuột, chạm)
      ===================================================================== */
   var conTroDS = {}, chum = null, dangKeo = null, netDang = null, daThayBut = false, daGhiTay = false;
+  // Chống chạm lòng bàn tay (máy tính bảng): bút đang chạm thì bỏ qua mọi ngón tay / lòng bàn tay
+  var loaiCT = {}, boQua = {}, butCham = {}, conTroChinh = null;
+  var lucBut = 0;   // lần cuối thấy bút (đang chạm hoặc lơ lửng trên màn hình)
+  function coButCham() { return Object.keys(butCham).length > 0 || performance.now() - lucBut < 350; }
   var diDuoi = null, laser = [];
   function toaDo(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
   function lucNhan(e) { return e.pointerType === 'pen' ? (e.pressure || 0.5) : 0.5; }
@@ -1551,6 +1555,8 @@
   cv.addEventListener('pointerup', function (e) { if (choNutPhai && e.pointerId === choNutPhai.id) choNutPhai = null; }, true);
   var loaiConTroCuoi = 'mouse';
   cv.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'touch' && daThayBut && coButCham()) { boQua[e.pointerId] = 1; return; }   // lòng bàn tay khi đang cầm bút
+    if (e.pointerType === 'pen') lucBut = performance.now();
     loaiConTroCuoi = e.pointerType;
     var nb = e.button, viec = viecNutBut(e);
     if (viec && viec !== 'menu') {
@@ -1563,12 +1569,19 @@
     dongMenuPhai();
     if (moChinh) { moChinh = null; veBangChinh(); return; }   // chạm ra ngoài chỉ để đóng bảng chỉnh bút
     if ($('#xo-nhom')) { dongXoNhom(); return; }
-    if (e.pointerType === 'pen') daThayBut = true;
+    if (e.pointerType === 'pen') {
+      daThayBut = true; butCham[e.pointerId] = 1;
+      // bút vừa chạm: bỏ các điểm chạm của tay (lòng bàn tay đặt xuống trước bút)
+      Object.keys(conTroDS).forEach(function (k) { if (loaiCT[k] === 'touch') { delete conTroDS[k]; boQua[k] = 1; } });
+      if (chum) chum = null;
+      if (dangKeo && dangKeo.loai === 'trang' && dangKeo.cham) dangKeo = null;
+    } else if (e.pointerType === 'touch' && daThayBut && coButCham()) { boQua[e.pointerId] = 1; return; }
     try { cv.setPointerCapture(e.pointerId); } catch (er) { }
-    var p = toaDo(e); conTroDS[e.pointerId] = p;
+    var p = toaDo(e); conTroDS[e.pointerId] = p; loaiCT[e.pointerId] = e.pointerType;
     var soCham = Object.keys(conTroDS).length;
     if (soCham === 2) { huyNetDang(); var ds = Object.keys(conTroDS).map(function (k) { return conTroDS[k]; }); chum = { d: Math.hypot(ds[0].x - ds[1].x, ds[0].y - ds[1].y), s: V.s, m: { x: (ds[0].x + ds[1].x) / 2, y: (ds[0].y + ds[1].y) / 2 }, V: { x: V.x, y: V.y } }; dangKeo = null; return; }
     if (soCham > 2) return;
+    conTroChinh = e.pointerId;
     var M = veTG(p.x, p.y);
     // Nút "Mở mô hình GeoLab" bấm được ở mọi công cụ (trừ bút, tẩy)
     var nutMH = cc !== 'but' && cc !== 'dq' && cc !== 'tay' && cc !== 'thang' && trongNutMoHinh(M);
@@ -1576,7 +1589,7 @@
     $('#menu').classList.add('an');
     if (dungCuDS.length && nb === 0 && batDauDungCu(e, M)) return;
     var keoTrang = nb === 1 || giuSpace || cc === 'keo' || (e.pointerType === 'touch' && daThayBut && (cc === 'but' || cc === 'dq' || cc === 'tay' || cc === 'thang'));
-    if (keoTrang) { dangKeo = { loai: 'trang', p: p, V: { x: V.x, y: V.y } }; cv.style.cursor = 'grabbing'; return; }
+    if (keoTrang) { dangKeo = { loai: 'trang', p: p, V: { x: V.x, y: V.y }, cham: e.pointerType === 'touch' }; cv.style.cursor = 'grabbing'; return; }
     if (cc === 'chenKhoang' && nb === 0) { batDauChenKhoang(M); return; }
     if (cc === 'che' && nb === 0) { dangKeo = { loai: 'veChe', a: M, b: M }; return; }
     if (nb === 2) return;
@@ -1635,8 +1648,11 @@
     bamDungHinh(M);
   });
   cv.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'pen') lucBut = performance.now();
+    if (boQua[e.pointerId]) return;
     var p = toaDo(e);
     if (conTroDS[e.pointerId]) conTroDS[e.pointerId] = p;
+    if (!chum && conTroChinh != null && e.pointerId !== conTroChinh && conTroDS[conTroChinh]) return;   // ngón khác chạm thêm: không vẽ / kéo theo
     if (chum) {
       var ds = Object.keys(conTroDS).map(function (k) { return conTroDS[k]; }); if (ds.length < 2) return;
       var d = Math.hypot(ds[0].x - ds[1].x, ds[0].y - ds[1].y), m = { x: (ds[0].x + ds[1].x) / 2, y: (ds[0].y + ds[1].y) / 2 };
@@ -1651,7 +1667,8 @@
       netDang.pts[1] = [Q.x, Q.y, 0.6]; veNhap(); return;
     }
     if (netDang) {
-      var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+      if (!evs.length) evs = [e];
       evs.forEach(function (ev) { var q = toaDo(ev), W2 = veTG(q.x, q.y), cuoi = netDang.pts[netDang.pts.length - 1]; if (netDang.mep) W2 = GI.dungCu.chieuMep(netDang.mep, W2); if (Math.hypot(W2.x - cuoi[0], W2.y - cuoi[1]) * V.s >= 1.2) netDang.pts.push([W2.x, W2.y, lucNhan(ev)]); });
       veNhap(); return;
     }
@@ -1713,7 +1730,13 @@
     if (cc === 'tay') veNhap(M);
   });
   function thaTay(e) {
+    if (e.pointerType === 'pen') lucBut = performance.now();
+    delete butCham[e.pointerId]; delete loaiCT[e.pointerId];
+    if (boQua[e.pointerId]) { delete boQua[e.pointerId]; return; }
+    var laChinh = conTroChinh == null || e.pointerId === conTroChinh;
     delete conTroDS[e.pointerId];
+    if (!Object.keys(conTroDS).length) conTroChinh = null;
+    if (!chum && !laChinh) return;
     if (ccTam != null) { var ccCu = ccTam; ccTam = null; setTimeout(function () { cc = ccCu; cv.style.cursor = conTroCC(); veNhap(); }, 0); }   // xong nét bằng nút bút: về công cụ cũ
     if (chum) { if (Object.keys(conTroDS).length < 2) chum = null; return; }
     if (netDang) {
@@ -1770,6 +1793,7 @@
   });
   cv.addEventListener('contextmenu', function (e) {   // chuột phải vào hình → menu nhanh
     e.preventDefault(); if (Date.now() - chanMenuLuc < 1500) return;   // nút bút đã dùng để tẩy / kéo…
+    if (netDang || chum || coButCham() || (loaiConTroCuoi === 'touch' && daThayBut && (cc === 'but' || cc === 'dq' || cc === 'tay'))) return;   // đang viết / lòng bàn tay chạm lâu: không mở menu
     var p = toaDo(e), M = veTG(p.x, p.y), muc = timMuc(M);
     if (!muc) { dongMenuPhai(); return; }
     if (!trongNhom(muc)) nhom = [muc];
@@ -1986,6 +2010,11 @@
     };
   }
   var LENH = {
+    guiBang: function () {   // máy tính bảng: gửi tệp .geoink qua Zalo, Drive, Gmail…
+      $('#menu').classList.add('an'); if (!MT || !MT.chiaSe) return;
+      var ten = (GI.thuVien.tenSo() || (tenTep ? tenTep.split(/[\\/]/).pop().replace(/\.geoink$/i, '') : 'Bang-GeoInk')) + '.geoink';
+      MT.chiaSe(noiDungLuu(), ten, true).then(function (kq) { if (kq && kq.loi) thongBao('Không gửi được: ' + kq.loi); });
+    },
     caiDatBut: moCaiDatBut, thietLapTrang: moThietLapTrang, moi: moi, mo: mo, thuVien: function () { GI.thuVien.mo(); }, nhapPdf: nhapPdf, congThuc: function () { moHopCongThuc(null); }, dungCu: function () { moMenuDungCu($('[data-lenh="dungCu"]')); }, mayTinh: function () { GI.mayTinh.batTat(); }, luu: function () { luu(false); }, luuThanh: function () { luu(true); }, xuatAnh: xuatAnh, hoanTac: hoanTac, lamLai: lamLai,
     xoaTrangNay: function () {
       if (tl.trang.length < 2) return LENH.xoaTrang();
@@ -3335,10 +3364,15 @@
   function dongTheCapNhat() { $('#the-cap-nhat').classList.add('an'); }
   function moiCapNhat() {
     if (!capNhat.ban) return;
-    theCapNhat('Có bản GeoInk ' + capNhat.ban + ' mới', 'Bản bạn đang dùng cũ hơn. Bấm <b>Cập nhật</b> để tải về và cài; GeoInk sẽ tự mở lại sau khi cài xong.',
+    theCapNhat('Có bản GeoInk ' + capNhat.ban + ' mới', MT && MT.nenTang === 'android' ? 'Bản bạn đang dùng cũ hơn. Bấm <b>Cập nhật</b> để tải tệp cài đặt mới.' : 'Bản bạn đang dùng cũ hơn. Bấm <b>Cập nhật</b> để tải về và cài; GeoInk sẽ tự mở lại sau khi cài xong.',
       [{ ten: 'Để sau', lam: dongTheCapNhat }, { ten: 'Cập nhật', chinh: true, lam: batDauTai }]);
   }
   function batDauTai() {
+    if (MT && MT.nenTang === 'android') {   // máy tính bảng: trình duyệt tải tệp APK, tải xong bấm vào tệp để cài
+      tuLuu(); MT.taiCapNhat();
+      theCapNhat('Đang tải GeoInk ' + capNhat.ban, 'Trình duyệt đang tải tệp <b>GeoInk-Android.apk</b>. Tải xong, bấm vào tệp (trong thông báo hoặc thư mục Tải xuống) rồi chọn <b>Cài đặt</b>. Bảng của bạn đã được lưu.', [{ ten: 'Đóng', lam: dongTheCapNhat }]);
+      return;
+    }
     if (capNhat.dangTai) return; capNhat.dangTai = true;
     theCapNhat('Đang tải GeoInk ' + capNhat.ban, 'Vẫn dùng bảng bình thường trong lúc tải.', [], 0);
     MT.taiCapNhat();
@@ -3410,7 +3444,8 @@
     function xong(ok) {
       theCat(url, ten, c.width, c.height, ok);
     }
-    if (MT && MT.chepAnh) MT.chepAnh(url).then(xong, function () { xong(false); });
+    if (MT && MT.nenTang === 'android') xong(false);
+    else if (MT && MT.chepAnh) MT.chepAnh(url).then(xong, function () { xong(false); });
     else if (navigator.clipboard && window.ClipboardItem) c.toBlob(function (bl) { navigator.clipboard.write([new ClipboardItem({ 'image/png': bl })]).then(function () { xong(true); }, function () { xong(false); }); }, 'image/png');
     else xong(false);
   }
@@ -3419,13 +3454,14 @@
     var cu = $('#the-cat'); if (cu) cu.remove();
     var el = document.createElement('div'); el.id = 'the-cat';
     el.innerHTML = '<img alt=""><div><b>' + (daChep ? 'Đã chép ảnh vào clipboard' : 'Đã cắt ảnh') + '</b><small>' + w + ' × ' + h + ' px' + (daChep ? ' · mở Word bấm Ctrl+V để dán' : ' · bấm Lưu để lưu ra tệp') + '</small>' +
-      '<span><button class="nut chu" data-tc="luu">Lưu ra tệp PNG</button><button class="nut chu" data-tc="dong">Đóng</button></span></div>';
+      '<span>' + (MT && MT.chiaSe ? '<button class="nut chu" data-tc="gui">Gửi (Zalo, Drive…)</button>' : '') + '<button class="nut chu" data-tc="luu">Lưu ra tệp PNG</button><button class="nut chu" data-tc="dong">Đóng</button></span></div>';
     el.querySelector('img').src = url; document.body.appendChild(el);
     el.querySelector('[data-tc="luu"]').onclick = function () {
       if (MT) MT.xuatAnh(url, ten).then(function (kq) { if (kq.ten) thongBao('Đã lưu ảnh'); else if (kq.loi) thongBao('Không lưu được: ' + kq.loi); });
       else { var a = document.createElement('a'); a.href = url; a.download = ten; a.click(); }
     };
     el.querySelector('[data-tc="dong"]').onclick = function () { el.remove(); };
+    if (el.querySelector('[data-tc="gui"]')) el.querySelector('[data-tc="gui"]').onclick = function () { MT.chiaSe(url, ten, false).then(function (kq) { if (kq && kq.loi) thongBao('Không gửi được: ' + kq.loi); }); };
     clearTimeout(theCat.t); theCat.t = setTimeout(function () { if (el.parentNode) el.remove(); }, 12000);
   }
   // ----- Đồ thị hàm số (kiểu hình vẽ LaTeX) -----
@@ -3835,11 +3871,13 @@
     moi: function (imLang) { moi(true); }, doiTen: capNhatTieuDe,
     nap: function (nd, so) { taiNguyen = {}; boNhoPdf = {}; boNhoNho = {}; hangDoiPdf = []; napTaiLieu(nd); tenTep = null; daSua = false; truoc = []; sauLS = []; vuaNoiDung(); sauKhiDoiTrang(); thongBao('Đã mở ' + (so ? so.ten : 'sổ')); },
   });
-  setInterval(function () {
-    if (!daSua || dangKeo || netDang || GI.thuVien.dangMo()) return;
+  function tuLuu() {
+    if (!daSua || GI.thuVien.dangMo()) return;
     if (GI.thuVien.soDangMo()) luuThuVien(false);
     else if (!tenTep && !bangTrong()) luuThuVien(true);
-  }, 3000);
+  }
+  setInterval(function () { if (!dangKeo && !netDang) tuLuu(); }, 3000);
+  window.addEventListener('geoink-tam-dung', tuLuu);   // máy tính bảng: app bị đưa xuống nền
   if (MT) {
     MT.tepKhoiDong().then(function (d) { if (d) napTep(d); });
     MT.khiMoTep(function (d) { if (hoiBoThayDoi()) napTep(d); });
@@ -3850,5 +3888,20 @@
   } else {
     window.addEventListener('beforeunload', function (e) { if (daSua) { e.preventDefault(); e.returnValue = ''; } });
   }
+  GI.hoi = hoi;
+  // Nút Quay lại (máy tính bảng): đóng thứ đang mở trên cùng; không còn gì để đóng thì trả về false
+  GI.quayLai = function () {
+    var dong = function (h) { var b = h.querySelector('[data-huy], [data-dong], .dong, .nut-dong'); if (b) b.click(); else h.classList.add('an'); return true; };
+    var h = document.querySelector('.tv-hop'); if (h) return dong(h);
+    var hs = $$('.hop').filter(function (x) { return !x.classList.contains('an'); }); if (hs.length) return dong(hs[hs.length - 1]);
+    if ($('#menu-phai')) { dongMenuPhai(); return true; }
+    if (!$('#menu').classList.contains('an')) { $('#menu').classList.add('an'); return true; }
+    if ($('#the-cat')) { $('#the-cat').remove(); return true; }
+    if (!$('#the-cap-nhat').classList.contains('an')) { dongTheCapNhat(); return true; }
+    if (GI.thuVien.dangMo()) { GI.thuVien.dong(); return true; }
+    if (cat) { huyCat(); return true; }
+    if (!$('#thuoc-tinh').classList.contains('an')) { dongThuocTinh(); return true; }
+    return false;
+  };
   window.GeoInk = { tl: function () { return tl; }, nhom: function () { return nhom.map(function (x) { return x.h || (x.n ? 'net' : 'mh'); }); }, V: function () { return V; }, chonCongCu: chonCongCu, chenMau: chenMau, lenh: LENH, giaTri: function () { return giaTri; }, dungCu: function () { return dungCuDS; } };   // để kiểm thử
 })();
