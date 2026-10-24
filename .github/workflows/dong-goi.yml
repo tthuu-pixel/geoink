@@ -72,6 +72,9 @@ jobs:
         run: npm ci
       - name: Chép giao diện GeoInk vào app Android
         working-directory: android-app
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: node chuan-bi-web.js && npx cap sync android
       - name: Khoá ký APK
         env:

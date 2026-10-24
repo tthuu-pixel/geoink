@@ -66,10 +66,58 @@
   var ggTk = null, KHOA_GG = 'geoink_google_drive';
   function ggDoc() { try { return JSON.parse(localStorage.getItem(KHOA_GG) || '{}') || {}; } catch (e) { return {}; } }
   function ggGhi(d) { try { if (d) localStorage.setItem(KHOA_GG, JSON.stringify(d)); else localStorage.removeItem(KHOA_GG); } catch (e) { } }
+  // Hai cách đăng nhập: (1) Google Play Services (hộp chọn tài khoản của Android);
+  // (2) máy không có Play Services chính hãng: mở trình duyệt, nhận mã qua 127.0.0.1 như bản Windows,
+  //     dùng mã ứng dụng Desktop trong google-config.json (GitHub Actions ghi vào khi đóng gói), giữ mã làm mới trên máy.
+  var GG_PHAM_VI = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email', ggCauHinh = null, ggRefreshMoi = null;
+  function layCauHinh() {
+    if (!ggCauHinh) ggCauHinh = fetch('google-config.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (c) { return c && c.clientId && c.clientSecret ? c : null; }, function () { return null; });
+    return ggCauHinh;
+  }
+  function qs(o) { return Object.keys(o).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(o[k]); }).join('&'); }
+  function b64url(u8) { var s = ''; for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function ngauNhien(n) { var a = new Uint8Array(n); crypto.getRandomValues(a); return b64url(a); }
+  function ggDoiMa(thamSo) {
+    return layCauHinh().then(function (ch) {
+      if (!ch) throw { code: 'LOI', message: 'Bản GeoInk này chưa có mã kết nối Google' };
+      return goi('CapacitorHttp', 'request', { url: 'https://oauth2.googleapis.com/token', method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        data: qs(Object.assign({ client_id: ch.clientId, client_secret: ch.clientSecret }, thamSo)), responseType: 'text' });
+    }).then(function (r) {
+      var d = r.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } }
+      if (r.status !== 200 || !d.access_token) throw { code: d && d.error === 'invalid_grant' ? 'CAN_DANG_NHAP' : 'LOI', message: (d && (d.error_description || d.error)) || ('Lỗi ' + r.status) };
+      ggTk = { token: d.access_token, het: Date.now() + ((d.expires_in || 3600) - 120) * 1000 };
+      return d;
+    });
+  }
+  function gmsToken(hoi) { return goi('GoogleDrive', 'layToken', { hoi: !!hoi }).then(function (k) { ggTk = { token: k.token, het: Date.now() + 45 * 60e3 }; return k.token; }); }
+  function dangNhapTrinhDuyet() {
+    var ver = ngauNhien(48), trangThai = ngauNhien(16);
+    return layCauHinh().then(function (ch) {
+      if (!ch) throw { code: 'LOI', message: 'Máy này không có Google Play Services và bản GeoInk này chưa có mã đăng nhập dự phòng' };
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(ver)).then(function (h) {
+        return goi('GoogleDrive', 'dangNhapTrinhDuyet', { url: 'https://accounts.google.com/o/oauth2/v2/auth?' + qs({ client_id: ch.clientId, response_type: 'code', scope: GG_PHAM_VI,
+          code_challenge: b64url(new Uint8Array(h)), code_challenge_method: 'S256', state: trangThai, access_type: 'offline', prompt: 'consent' }) });
+      });
+    }).then(function (k) {
+      if (!k.code) throw { code: k.error === 'access_denied' ? 'HUY' : 'LOI', message: k.error || 'Chưa đăng nhập Google' };
+      if (k.state !== trangThai) throw { code: 'LOI', message: 'Phản hồi đăng nhập không hợp lệ' };
+      return ggDoiMa({ code: k.code, code_verifier: ver, redirect_uri: k.redirect, grant_type: 'authorization_code' });
+    }).then(function (d) {
+      if (!d.refresh_token) throw { code: 'LOI', message: 'Google không trả mã làm mới, thử ngắt kết nối GeoInk trong tài khoản Google rồi kết nối lại' };
+      ggRefreshMoi = d.refresh_token; return d.access_token;
+    });
+  }
   function ggLayToken(hoi) {
     if (!hoi && ggTk && ggTk.het > Date.now()) return Promise.resolve(ggTk.token);
-    if (!hoi && !ggDoc().daKetNoi) return Promise.reject({ code: 'CAN_DANG_NHAP', message: 'Chưa kết nối Google Drive' });
-    return goi('GoogleDrive', 'layToken', { hoi: !!hoi }).then(function (k) { ggTk = { token: k.token, het: Date.now() + 45 * 60e3 }; return k.token; });
+    var d = ggDoc();
+    if (!hoi) {
+      if (!d.daKetNoi) return Promise.reject({ code: 'CAN_DANG_NHAP', message: 'Chưa kết nối Google Drive' });
+      if (d.refresh) return ggDoiMa({ refresh_token: d.refresh, grant_type: 'refresh_token' }).then(function () { return ggTk.token; }, function (e) { if (e && e.code === 'CAN_DANG_NHAP') ggGhi(null); throw e; });
+      return gmsToken(false);
+    }
+    ggRefreshMoi = null;
+    // máy có Play Services: hộp chọn tài khoản; không có (hoặc lỗi): đăng nhập bằng trình duyệt
+    return gmsToken(true).catch(function (e) { if (e && (e.code || e.errorCode) === 'HUY') throw e; return dangNhapTrinhDuyet(); });
   }
   var ngheDong = null;
   window.mayTinh = {
@@ -138,11 +186,11 @@
       return ggLayToken(true).then(function (tk) {
         return goi('CapacitorHttp', 'request', { url: 'https://www.googleapis.com/oauth2/v3/userinfo', method: 'GET', headers: { Authorization: 'Bearer ' + tk } })
           .then(function (r) { var d = r.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } } return (d && d.email) || ''; }, function () { return ''; });
-      }).then(function (email) { ggGhi({ daKetNoi: true, email: email }); return { ok: true, email: email }; },
+      }).then(function (email) { var d = { daKetNoi: true, email: email }; if (ggRefreshMoi) d.refresh = ggRefreshMoi; ggRefreshMoi = null; ggGhi(d); return { ok: true, email: email }; },
         function (e) { var ma = e && (e.code || e.errorCode); return ma === 'HUY' ? { huy: true } : { loi: loiChu(e) }; });
     },
     ggDangXuat: function () {
-      var tk = ggTk && ggTk.token; ggTk = null; ggGhi(null);
+      var tk = ggDoc().refresh || (ggTk && ggTk.token); ggTk = null; ggGhi(null);
       if (tk) goi('CapacitorHttp', 'request', { url: 'https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(tk), method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, data: '' }).catch(function () { });
       return Promise.resolve({ ok: true });
     },
