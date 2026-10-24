@@ -10,6 +10,21 @@ Bảng viết tay cho giáo viên Toán trên Windows: viết bằng bút như S
 
 Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“Mở mô hình GeoLab”** mới cần mạng để mở trang GeoLab.
 
+### Máy tính bảng Android
+
+1. Trên máy tính bảng, mở [**Releases**](https://github.com/tthuu-pixel/geoink/releases/latest) bằng Chrome, tải **`GeoInk-Android.apk`**.
+2. Bấm vào tệp vừa tải → **Cài đặt**. Lần đầu Android hỏi *“Cho phép cài ứng dụng từ nguồn này”*: bật cho Chrome (hoặc Trình quản lý tệp) rồi quay lại cài.
+3. Mở GeoInk, đăng nhập bằng tài khoản GeoLab như trên máy tính.
+
+Khác bản Windows:
+- Luôn toàn màn hình; vuốt từ mép màn hình để hiện thanh hệ thống.
+- **Hai ngón tay**: chụm để phóng to / thu nhỏ, kéo để dời bảng. **Chạm giữ** vào hình để mở menu (như chuột phải).
+- **Chống chạm lòng bàn tay**: khi đã viết bằng bút (S Pen, bút cảm ứng), bút đang chạm hoặc lơ lửng trên màn hình thì tay chạm vào bảng không vẽ; một ngón tay để kéo bảng.
+- Nút **Quay lại** của Android đóng hộp thoại / menu đang mở; ở màn hình chính thì hỏi trước khi thoát (sổ thư viện tự lưu).
+- **Lưu** ghi tệp `.geoink` vào thư mục *Tài liệu/GeoInk*; **Xuất ảnh** ghi vào *Ảnh/GeoInk*. Menu ☰ có thêm **Gửi bảng (Zalo, Drive, Gmail…)**; cắt hình có nút **Gửi**. (Không dán thẳng ảnh sang Word được như trên Windows.)
+- Thư viện sổ lưu trong bộ nhớ riêng của app (gỡ app là mất — hãy *Gửi bảng* ra Drive những sổ quan trọng). Tự lưu cả khi chuyển sang app khác.
+- Có bản mới: GeoInk báo, bấm **Cập nhật** để tải tệp APK mới rồi cài đè (không mất dữ liệu).
+
 ## Giao diện
 
 Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu tượng nét mảnh; công cụ đang dùng hiện trong ô đỏ sẫm):
@@ -146,4 +161,6 @@ npm start          # chạy thử
 
 Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab), `src/bieutuong.js` (biểu tượng màu, con trỏ bút chì), `src/thu-vien/` (pdf.js 3.11 – Apache 2.0; MathLive 0.111 – MIT; MathJax 3.2 – Apache 2.0; font Latin Modern Roman – GUST Font License).
 
-**Phát hành bản mới**: tăng `version` trong `package.json` (ví dụ `0.1.1`) rồi đẩy lên nhánh `main`. GitHub Actions đóng gói trên máy Windows, tạo bản phát hành `v0.1.1` và đăng tệp cài đặt lên Releases. Đẩy lên `main` mà không đổi `version` thì chỉ đóng gói thử.
+**Bản Android** (`android-app/`): bọc nguyên thư mục `src/` bằng [Capacitor](https://capacitorjs.com) 8. `src/android.js` thay cho `preload.js` (lưu tệp, thư viện sổ, đăng nhập, cập nhật, nút Quay lại) và chỉ chạy trong app Android. `android-app/chuan-bi-web.js` chép `src/` sang `android-app/www` (nới CSP cho Capacitor). Đóng gói thử trên máy: cần Android SDK + JDK 21, rồi `cd android-app && npm install && npm run chuan-bi && cd android && ./gradlew assembleRelease`. Khoá ký APK đặt trong secrets của repo: `ANDROID_KEYSTORE_B64` (tệp .jks mã hoá base64) và `ANDROID_KEYSTORE_PASS`; thiếu thì APK được ký bằng khoá tạm (cài bản sau phải gỡ bản trước).
+
+**Phát hành bản mới**: tăng `version` trong `package.json` (ví dụ `0.1.1`) rồi đẩy lên nhánh `main`. GitHub Actions đóng gói trên máy Windows, tạo bản phát hành `v0.1.1` và đăng tệp cài đặt lên Releases, sau đó đóng gói APK Android và gắn `GeoInk-Android.apk` vào cùng bản phát hành. Đẩy lên nhánh `may-tinh-bang` thì chỉ đóng gói APK thử, đăng vào bản thử `android-thu`. Đẩy lên `main` mà không đổi `version` thì chỉ đóng gói thử.

@@ -672,3 +672,8 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 .hop-nhieu .hn-thut { padding-left: 26px; }
 .hop-nhieu .mo { opacity: .4; pointer-events: none; }
 .hop-nhieu .tv-hop-chan .chinh { background: #7F1D1D; color: #fff; border-color: #7F1D1D; }
+
+/* ---- Máy tính bảng Android ---- */
+html:not(.android) .chi-android { display: none !important; }
+html.android .an-android, html.android kbd { display: none !important; }
+html.android, html.android body { -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }

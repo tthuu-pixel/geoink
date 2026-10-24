@@ -1,12 +1,15 @@
-# Đóng gói GeoInk cho Windows (file cài đặt trực tuyến) và phát hành lên GitHub Releases.
+# Đóng gói GeoInk cho Windows (file cài đặt trực tuyến) và Android (APK cho máy tính bảng),
+# phát hành lên GitHub Releases.
 # Mỗi lần đẩy lên nhánh main (hoặc chạy tay ở tab Actions): đóng gói trên máy Windows.
 # Nếu phiên bản trong package.json chưa có bản phát hành, electron-builder tạo bản phát hành
 # mới (tag v<phiên bản>) và đăng file cài đặt. Phiên bản đã phát hành thì chỉ đóng gói thử.
+# Sau đó đóng gói APK và gắn GeoInk-Android.apk vào cùng bản phát hành.
+# Đẩy lên nhánh may-tinh-bang: chỉ đóng gói APK thử, đăng vào bản thử "android-thu".
 name: Đóng gói GeoInk
 
 on:
   push:
-    branches: [main]
+    branches: [main, may-tinh-bang]
   workflow_dispatch:
 
 permissions:
@@ -18,6 +21,7 @@ concurrency:
 
 jobs:
   windows:
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,4 +38,63 @@ jobs:
         with:
           name: GeoInk-windows
           path: dist/nsis-web/*
+          if-no-files-found: error
+
+  android:
+    needs: windows
+    if: always() && (needs.windows.result == 'success' || (needs.windows.result == 'skipped' && github.ref == 'refs/heads/may-tinh-bang'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: android-app/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Cài Capacitor
+        working-directory: android-app
+        run: npm ci
+      - name: Chép giao diện GeoInk vào app Android
+        working-directory: android-app
+        run: node chuan-bi-web.js && npx cap sync android
+      - name: Khoá ký APK
+        env:
+          KHOA_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          MAT_KHAU: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+        run: |
+          if [ -n "$KHOA_B64" ] && [ -n "$MAT_KHAU" ]; then
+            echo "$KHOA_B64" | base64 -d > "$RUNNER_TEMP/geoink.jks"
+            echo "GEOINK_KEYSTORE_PASS=$MAT_KHAU" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Chưa có secrets ANDROID_KEYSTORE_B64 / ANDROID_KEYSTORE_PASS: APK được ký bằng khoá tạm, cài bản sau phải gỡ bản này trước."
+            keytool -genkeypair -keystore "$RUNNER_TEMP/geoink.jks" -alias geoink -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass khoatamthoi -keypass khoatamthoi -dname "CN=GeoInk thu, O=GeoInk, C=VN"
+            echo "GEOINK_KEYSTORE_PASS=khoatamthoi" >> "$GITHUB_ENV"
+          fi
+          echo "GEOINK_KEYSTORE=$RUNNER_TEMP/geoink.jks" >> "$GITHUB_ENV"
+      - name: Đóng gói APK
+        working-directory: android-app/android
+        run: chmod +x gradlew && ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Đăng APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          cp android-app/android/app/build/outputs/apk/release/app-release.apk GeoInk-Android.apk
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            gh release upload "v$VER" GeoInk-Android.apk --clobber
+          else
+            gh release view android-thu >/dev/null 2>&1 || gh release create android-thu --prerelease --target "$GITHUB_SHA" \
+              --title "GeoInk Android – bản thử" --notes "Bản thử cho máy tính bảng Android, đóng gói từ nhánh may-tinh-bang."
+            gh release upload android-thu GeoInk-Android.apk --clobber
+            gh release edit android-thu --notes "Bản thử GeoInk $VER cho máy tính bảng Android (nhánh may-tinh-bang, $(date -u +%Y-%m-%d\ %H:%M) UTC). Tải GeoInk-Android.apk bên dưới."
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeoInk-android
+          path: GeoInk-Android.apk
           if-no-files-found: error
