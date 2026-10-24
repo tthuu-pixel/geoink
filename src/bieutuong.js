@@ -40,6 +40,7 @@ window.GI = window.GI || {};
     chep: '<rect x="8" y="8" width="12" height="12" rx="2" fill="#fff" stroke="' + DEN + '" stroke-width="1.6"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" fill="none" stroke="' + DEN + '" stroke-width="1.6"/>',
     nhanBan: '<rect x="3.5" y="3.5" width="11" height="11" rx="2" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/><rect x="9.5" y="9.5" width="11" height="11" rx="2" fill="#fff" stroke="#2563EB" stroke-width="1.5"/><path d="M15 12.5v5M12.5 15h5" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round"/>',
     cat: '<circle cx="6.5" cy="17.5" r="2.8" fill="none" stroke="' + DEN + '" stroke-width="1.6"/><circle cx="17.5" cy="17.5" r="2.8" fill="none" stroke="' + DEN + '" stroke-width="1.6"/>' + p('M8.5 15.5L18 4M15.5 15.5L6 4', DEN, 1.6),
+        bdSua: p('M4 20h16M6 16V10M10 16V6M14 16v-4M18 16V8', '#2563EB', 2) + p('M15 4l4 4-7 7H8v-4z', DEN, 1.4),
         caiDatBut: p('M4 20l3.5-1 10-10-2.5-2.5-10 10z', '#2563EB', 1.8) + p('M15 6.5l2.5 2.5', '#2563EB', 1.8) + '<circle cx="18.5" cy="18.5" r="2.6" fill="none" stroke="#334155" stroke-width="1.5"/><path d="M18.5 14.6v1.3M18.5 21.1v1.3M14.6 18.5h1.3M21.1 18.5h1.3" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>',
     thuNho: tron(11, 11, 7, DEN, 2) + p('M8 11h6M21 21l-5-5', DEN, 2),
     phongTo: tron(11, 11, 7, DEN, 2) + p('M8 11h6M11 8v6M21 21l-5-5', DEN, 2),
@@ -193,6 +194,13 @@ window.GI = window.GI || {};
   B32.heTruc = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M3 15h25M3 8h25M17 4v25M24 4v25M3 4v25', XAM, 0.8, null, '1.5 2') + T(5, 30, 'O', K, 7, 'nghieng');
   B32.diemTD = P('M3 22h25M10 29V4', K, 1.7) + muiTen(29.5, 22, 0) + muiTen(10, 2.5, -90) + P('M22 10v12M10 10h12', XAM, 1.3, null, '2 2') + D(22, 10, R, 3.2) + T(14, 7, 'A', R, 9, 'nghieng');
   B32.bieuDo = P('M4 28h25M4 28V4', K, 1.6) + '<rect x="7" y="16" width="4.5" height="12" fill="#3B82F6" stroke="#1E3A8A" stroke-width="0.8"/><rect x="13.5" y="9" width="4.5" height="19" fill="#F97316" stroke="#7C2D12" stroke-width="0.8"/>' + C(24.5, 11, 5.5, K, 1.2, '#10B981') + P('M24.5 11V5.5M24.5 11l4.8 2.6', '#fff', 1.2) + P('M6 21l7-7 6 4 6-6', R, 1.6);
+  // biểu đồ thống kê
+  function truc2() { return P('M4 28h25M4 28V4', K, 1.6); }
+  B32.bd_cot = truc2() + '<rect x="7" y="17" width="5" height="11" fill="#3B82F6" stroke="#1E3A8A" stroke-width=".8"/><rect x="14.5" y="9" width="5" height="19" fill="#3B82F6" stroke="#1E3A8A" stroke-width=".8"/><rect x="22" y="13" width="5" height="15" fill="#3B82F6" stroke="#1E3A8A" stroke-width=".8"/>';
+  B32.bd_cotKep = truc2() + '<rect x="6" y="15" width="3.6" height="13" fill="#3B82F6"/><rect x="9.6" y="11" width="3.6" height="17" fill="#F97316"/><rect x="17" y="9" width="3.6" height="19" fill="#3B82F6"/><rect x="20.6" y="16" width="3.6" height="12" fill="#F97316"/>';
+  B32.bd_duong = truc2() + P('M7 22l6-8 6 4 8-11', R, 2) + D(7, 22, R, 2) + D(13, 14, R, 2) + D(19, 18, R, 2) + D(27, 7, R, 2);
+  B32.bd_duongKep = truc2() + P('M7 20l6-7 6 3 8-9', X, 2) + P('M7 25l6-4 6 1 8-6', '#F97316', 2);
+  B32.bd_tron = '<path d="M16 16V4a12 12 0 0 1 11.4 15.7z" fill="#3B82F6" stroke="#fff" stroke-width="1"/><path d="M16 16l11.4 3.7A12 12 0 0 1 8 25z" fill="#F97316" stroke="#fff" stroke-width="1"/><path d="M16 16L8 25A12 12 0 0 1 16 4z" fill="#10B981" stroke="#fff" stroke-width="1"/>' + C(16, 16, 12, K, 1.2);
   // ----- Nhóm đường tròn -----
   function d3(x, y, m) { return D(x, y, m || X, 2.3); }
   B32.m_noiTiep = C(16, 16, 12, K, 1.8) + NL('M12.9 4.4L5.6 22 26.4 22z') + d3(12.9, 4.4) + d3(5.6, 22) + d3(26.4, 22) + d3(16, 16, '#3A3F47');

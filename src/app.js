@@ -149,7 +149,8 @@
     [['thanhTruot', 'Thanh trượt']],
     [['keo', 'Di chuyển hình vẽ (kéo trang)'], ['xoa', 'Xoá đối tượng']],
     [['chu', 'Chèn chữ']],
-    [['doThi', 'Đồ thị hàm số'], ['heTruc', 'Hệ trục toạ độ Oxy'], ['diemTD', 'Điểm có toạ độ (x; y)'], ['bieuDo', 'Biểu đồ thống kê (cột, đoạn thẳng, hình quạt)']],
+    [['doThi', 'Đồ thị hàm số'], ['heTruc', 'Hệ trục toạ độ Oxy'], ['diemTD', 'Điểm có toạ độ (x; y)']],
+    [['bd_cot', 'Biểu đồ cột'], ['bd_cotKep', 'Biểu đồ cột kép'], ['bd_duong', 'Biểu đồ đoạn thẳng'], ['bd_duongKep', 'Biểu đồ đoạn thẳng kép'], ['bd_tron', 'Biểu đồ hình quạt tròn']],
   ];
   // Các nhóm mẫu hình (đặt sau nút GeoLab): bấm là chèn hình có sẵn
   var BAT_DAU_MAU = NHOM_HINH.length;
@@ -246,6 +247,7 @@
     if (k === 'heTruc') return moHopDoThi(null, true);
     if (k === 'diemTD') return moHopDiemTD();
     if (k === 'bieuDo') return moHopBieuDo(null);
+    if (/^bd_/.test(k)) return moHopBieuDo(null, k.slice(3));
     cc = k; choChon = []; xemTruoc = null; dungKhoi = { pts: [], dong: false };
     NHOM_HINH.forEach(function (n, i) { if (n.some(function (x) { return x[0] === k; })) nhomHien[i] = k; });
     $$('[data-cc]').forEach(function (b) { b.classList.toggle('bat', b.dataset.cc === cc); });
@@ -850,7 +852,7 @@
       var v = gt[o.id]; if (!v || !hien(o)) return;
       if (o.loai === 'doThi') { o._khung = GI.doThi.ve(c, o, px, kieuNen().toi ? '#E5E7EB' : '#111827', sang(o) && c === ctx); return; }
       if (o.loai === 'bieuDo') {
-        o._khung = GI.bieuDo.ve(c, o);
+        o._khung = GI.bieuDo.ve(c, o, c === ctx && trongNhom({ h: o.id }));
         if (sang(o) && c === ctx) { var kB = o._khung, kN = 7 * px; c.save(); c.setLineDash([6 * px, 4 * px]); c.strokeStyle = '#F97316'; c.lineWidth = 1.5 * px; c.strokeRect(kB.x0, kB.y0, kB.x1 - kB.x0, kB.y1 - kB.y0); c.setLineDash([]); c.fillStyle = '#fff'; c.strokeStyle = '#2457C5'; c.fillRect(kB.x1 - kN, kB.y1 - kN, 2 * kN, 2 * kN); c.strokeRect(kB.x1 - kN, kB.y1 - kN, 2 * kN, 2 * kN); c.restore(); }
         return;
       }
@@ -1456,6 +1458,12 @@
       var ten0 = !(e.ctrlKey || e.metaKey) && !timDiem(M) && timTen(M);
       if (ten0) { var o0 = ten0.o; dangKeo = { loai: 'ten', o: o0, bat: M, dx0: o0.nhan ? o0.nhan.dx : 0, dy0: o0.nhan ? o0.nhan.dy : 0, daGhi: false }; nhom = [{ h: o0.id }]; capNhatChon(false); return; }
       var muc = timMuc(M);
+      var oBD = !(e.ctrlKey || e.metaKey) && muc && muc.h && timTheoId(muc.h);
+      if (oBD && oBD.loai === 'bieuDo') {   // biểu đồ: bấm cột / điểm / phần quạt để chọn danh mục; đã chọn biểu đồ thì kéo đỉnh cột, điểm để đổi số liệu
+        var ph = timPhanBD(oBD, M);
+        if (ph) { oBD._chonCot = ph.i; if (ph.dinh && trongNhom(muc) && oBD.kieu !== 'tron') { dangKeo = { loai: 'cotBD', o: oBD, i: ph.i, j: ph.j, daGhi: false }; cv.style.cursor = 'ns-resize'; capNhatThanhNhanh(); canVe(); return; } }
+        else oBD._chonCot = null;
+      }
       if (e.ctrlKey || e.metaKey) {   // Ctrl: thêm / bớt đối tượng; Ctrl + kéo chỗ trống: khung chọn thêm
         if (muc) { if (trongNhom(muc)) nhom = nhom.filter(function (y) { return !cungMuc(muc, y); }); else nhom.push(muc); capNhatChon(false); return; }
         dangKeo = { loai: 'khung', a: M, b: M, them: true }; return;
@@ -1519,6 +1527,7 @@
       }
       if (dangKeo.loai === 'nhom') { keoNhom(M); return; }
       if (dangKeo.loai === 'veChe') { dangKeo.b = M; canVe(); return; }
+      if (dangKeo.loai === 'cotBD') { keoCotBD(dangKeo, M); return; }
       if (dangKeo.loai === 'chenKhoang') { dangKeo.cuoi = M.y; keoChenKhoang(M.y - dangKeo.y0); return; }
       if (dangKeo.loai === 'dichChu') { dangKeo.o.x = M.x - dangKeo.dx; dangKeo.o.y = M.y - dangKeo.dy; daSua = true; canVe(); return; }
       if (dangKeo.loai === 'moHinh') { dangKeo.m.x = M.x - dangKeo.dx; dangKeo.m.y = M.y - dangKeo.dy; canVe(); return; }
@@ -2942,6 +2951,15 @@
     if (hs.length || net.length) {
       cheDo = 'chon';
       var diem = hs.filter(laDiemO), duong = hs.filter(function (o) { return laNet(o); }), to = hs.filter(function (o) { return laToDuoc(o); }), coT = hs.filter(coTen);
+      if (hs.length === 1 && hs[0].loai === 'bieuDo') {
+        var bd = hs[0], coChon = bd._chonCot != null && bd.dm[bd._chonCot] != null;
+        h += nutTN('bdSua', '<i data-bt="bdSua"></i>Sửa số liệu', false, 'Mở bảng số liệu (hoặc bấm đúp vào biểu đồ)') +
+          nutTN('bdThem', '<b class="tn-a" style="font-style:normal">+</b>' + (bd.kieu === 'tron' ? 'Thêm phần' : 'Thêm cột'), false, 'Thêm danh mục mới') +
+          nutTN('bdXoa', '<b class="tn-a" style="font-style:normal;color:#DC2626">−</b>Xoá ' + (coChon ? '“' + bd.dm[bd._chonCot] + '”' : (bd.kieu === 'tron' ? 'phần' : 'cột')), coChon, 'Bấm vào một cột / điểm / phần quạt để chọn, rồi bấm Xoá') +
+          nutTN('bdSo', (bd.ghiSo === false ? 'Hiện số liệu' : 'Ẩn số liệu'), bd.ghiSo === false, 'Ẩn số liệu để học sinh tự điền') +
+          nutTN('bdDT', bd.denTrang ? 'Tô màu' : 'Đen trắng', !!bd.denTrang, 'Đổi kiểu tô: màu / đen trắng (sọc, chấm)') +
+          nutTN('bdKieu', 'Kiểu ▾', false, 'Đổi kiểu biểu đồ') + '<i class="tn-ke"></i>';
+      }
       if (coT.length) { var hienT = coT.every(function (o) { return o.loai === 'hamSo' ? o.hienTen !== false : hienTenCua(o); }); h += nutTN('ten', '<b class="tn-a">A</b>' + (hienT ? 'Ẩn tên' : 'Hiện tên'), hienT, 'Hiện / ẩn tên'); }
       if (diem.length) {
         var anC = diem.every(function (o) { return o.chamAn; });
@@ -2949,7 +2967,7 @@
         h += nutTN('coDiem', svgCham(diem[0].rong ? Math.min(7, diem[0].rong) : 5) + 'Cỡ điểm ▾');
       }
       if (duong.length) { h += nutTN('kieuNet', svgNetNho(duong[0].kieuNet || 'lien') + 'Kiểu nét ▾'); h += nutTN('rong', svgDay(Math.min(5, duong[0].rong || 2.6)) + 'Độ dày ▾'); }
-      if (hs.length) h += nutTN('mau', '<i class="tn-mau" style="background:' + (hs[0].mau || mauMacDinh(hs[0])) + '"></i>Màu ▾');
+      if (hs.some(function (o) { return o.loai !== 'bieuDo'; })) h += nutTN('mau', '<i class="tn-mau" style="background:' + (hs[0].mau || mauMacDinh(hs[0])) + '"></i>Màu ▾');
       if (to.length) { var coTo = to.some(function (o) { return o.doMo !== 0; }); h += nutTN('to', '<i class="tn-to' + (coTo ? ' bat' : '') + '"></i>' + (coTo ? 'Bỏ tô' : 'Tô màu'), coTo, 'Tô / không tô phần trong'); }
       if (hs.length === 1 && giaTri[hs[0].id].k === 'thang' && giaTri[hs[0].id].loai === 'doan' && hs[0].a && hs[0].b) {
         var vD = giaTri[hs[0].id], dai = Math.hypot(vD.q.x - vD.p.x, vD.q.y - vD.p.y) / DV, coDo = timDoDai(hs[0]);
@@ -3018,6 +3036,18 @@
       if (m === 'tenDiem' || m === 'cham' || m === 'to') { macDinh[m] = !macDinh[m]; luuMD(); return capNhatThanhNhanh(); }
       var dsM = m === 'coDiem' ? dsCo(macDinh.coDiem) : m === 'kieuNet' ? dsNet(macDinh.kieuNet) : m === 'rong' ? dsDay(macDinh.rong || 2.6) : dsMau(macDinh.mau, true);
       return moDsTN(b, k, dsM, function (gt) { macDinh[m] = gt; luuMD(); });
+    }
+    if (k.indexOf('bd') === 0 && hs[0] && hs[0].loai === 'bieuDo') {
+      var bd = hs[0];
+      if (k === 'bdSua') return moHopBieuDo(bd);
+      if (k === 'bdThem') return bdThemCot(bd);
+      if (k === 'bdXoa') return bdXoaCot(bd);
+      if (k === 'bdSo') { ghiLichSu(); bd.ghiSo = bd.ghiSo === false ? undefined : false; daSua = true; canVe(); return capNhatThanhNhanh(); }
+      if (k === 'bdDT') { ghiLichSu(); bd.denTrang = bd.denTrang ? undefined : true; daSua = true; canVe(); return capNhatThanhNhanh(); }
+      if (k === 'bdKieu') return moDsTN(b, k, Object.keys(GI.bieuDo.TEN_KIEU).map(function (t) { return { gt: t, html: '<span>' + GI.bieuDo.TEN_KIEU[t] + '</span>', bat: bd.kieu === t }; }), function (gt) {
+        ghiLichSu(); bd.kieu = gt; if (GI.bieuDo.laKep(gt) && bd.ds.length < 2) bd.ds.push({ ten: 'Dãy 2', mau: GI.bieuDo.MAU[1], so: bd.dm.map(function () { return 0; }) });
+        daSua = true; canVe();
+      });
     }
     if (k === 'ten') { var coT = hs.filter(coTen), bat = !coT.every(hienTenCua); return suaChon(function (o) { if (!coTen(o)) return; o.hienTen = bat; if (bat && !o.ten && o.loai !== 'hamSo' && o.loai !== 'khoi') o.ten = laDiemO(o) ? tenDiemMoi() : tenDuongMoi(); }); }
     if (k === 'cham') { var anHet = hs.filter(laDiemO).every(function (o) { return o.chamAn; }); return suaChon(function (o) { if (laDiemO(o)) o.chamAn = anHet ? undefined : true; }); }
@@ -3365,6 +3395,44 @@
     thongBao(dtSua ? 'Đã cập nhật đồ thị' : 'Đã vẽ đồ thị · bấm đúp vào đồ thị để sửa, kéo để di chuyển');
   }
   $('#dt-ve').onclick = veDoThiTuHop;
+  // ---- Biểu đồ trên bảng: tìm cột / điểm / phần quạt dưới con trỏ, kéo đỉnh để đổi số liệu ----
+  function timPhanBD(o, M) {
+    var hh = o._hh; if (!hh) return null; var r = 9 / V.s;
+    for (var i = hh.diem.length - 1; i >= 0; i--) { var d = hh.diem[i]; if (Math.hypot(M.x - d.x, M.y - d.y) < r + 3 / V.s) return { i: d.i, j: d.j, dinh: true }; }
+    for (var k = hh.cot.length - 1; k >= 0; k--) {
+      var q = hh.cot[k]; if (M.x < q.x - 2 / V.s || M.x > q.x + q.w + 2 / V.s) continue;
+      if (Math.abs(M.y - q.y) < r) return { i: q.i, j: q.j, dinh: true };
+      if (M.y > q.y && M.y < q.y + q.h) return { i: q.i, j: q.j };
+    }
+    if (hh.quat) {
+      var Q = hh.quat, dx = M.x - Q.cx, dy = M.y - Q.cy; if (Math.hypot(dx, dy) > Q.r) return null;
+      var g = Math.atan2(dy, dx); while (g < -Math.PI / 2) g += 2 * Math.PI;
+      for (var n = 0; n < Q.phan.length; n++) if (g >= Q.phan[n].a && g < Q.phan[n].b) return { i: Q.phan[n].i };
+    }
+    return null;
+  }
+  function keoCotBD(k, M) {
+    var o = k.o, hh = o._hh; if (!hh || !o.ds[k.j]) return;
+    var buoc = hh.buoc || 1, nho = buoc >= 2 ? 1 : buoc / 5, v = Math.max(0, (hh.y0 - M.y) / hh.h * hh.max);
+    v = Math.round(v / nho) * nho; v = Math.round(v * 1000) / 1000;
+    if (o.ds[k.j].so[k.i] === v) return;
+    if (!k.daGhi) { ghiLichSu(); k.daGhi = true; }
+    o.ds[k.j].so[k.i] = v; daSua = true; canVe(); thongBao((o.dm[k.i] || '') + ': ' + String(v).replace('.', ','));
+  }
+  function bdThemCot(o) {
+    var goiY = 'Mục ' + (o.dm.length + 1), m = /^(.*?)([A-Z])$/.exec(o.dm[o.dm.length - 1] || '');
+    if (m && m[2] !== 'Z') goiY = m[1] + String.fromCharCode(m[2].charCodeAt(0) + 1);
+    hoi({ tieuDe: o.kieu === 'tron' ? 'Thêm phần vào hình quạt' : 'Thêm cột (danh mục)', nhan: 'Tên', macDinh: goiY, van: true }).then(function (ten) {
+      if (ten == null) return; ghiLichSu(); o.dm.push(String(ten).trim() || goiY);
+      o.ds.forEach(function (d) { d.so.push(o.kieu === 'tron' ? 1 : 0); });
+      o._chonCot = o.dm.length - 1; daSua = true; canVe(); capNhatThanhNhanh();
+      thongBao(o.kieu === 'tron' ? 'Đã thêm · bấm Sửa số liệu để nhập số' : 'Đã thêm cột · kéo đỉnh cột (hoặc điểm) lên để đặt số liệu');
+    });
+  }
+  function bdXoaCot(o) {
+    var i = o._chonCot != null ? o._chonCot : o.dm.length - 1; if (i < 0 || o.dm.length <= 1) return thongBao('Biểu đồ cần ít nhất một danh mục');
+    ghiLichSu(); var ten = o.dm[i]; o.dm.splice(i, 1); o.ds.forEach(function (d) { d.so.splice(i, 1); }); o._chonCot = null; daSua = true; canVe(); capNhatThanhNhanh(); thongBao('Đã xoá ' + ten);
+  }
   // ---- Biểu đồ thống kê: hộp nhập số liệu + xem trước ----
   var bdSua = null, bdKieu = 'cot', bdNho = [];
   function bdSoDay() { return bdKieu === 'cotKep' || bdKieu === 'duongKep' ? 2 : 1; }
@@ -3416,9 +3484,16 @@
     if (bdSoDay() === 2 && cu.ds.length < 2) cu.ds.push(bdNho[1] && bdNho[1].so.length ? bdNho[1] : { ten: '', mau: GI.bieuDo.MAU[1], so: [] });
     bdVeBang(cu.dm, cu.ds.slice(0, bdSoDay())); bdXem();
   }
-  function moHopBieuDo(o) {
+  var MAU_BD = {
+    cot: { tieuDe: 'Số học sinh giỏi của khối 6', tenX: 'Lớp', tenY: 'Số học sinh', dm: ['6A', '6B', '6C', '6D'], ds: [{ ten: 'Số học sinh', so: [32, 28, 35, 30] }] },
+    cotKep: { tieuDe: 'Số học sinh nam và nữ của khối 6', tenX: 'Lớp', tenY: 'Số học sinh', dm: ['6A', '6B', '6C', '6D'], ds: [{ ten: 'Nam', so: [18, 22, 15, 20] }, { ten: 'Nữ', so: [20, 17, 21, 19] }] },
+    duong: { tieuDe: 'Nhiệt độ trong một ngày', tenX: 'Giờ', tenY: 'Nhiệt độ (°C)', dm: ['7 h', '9 h', '11 h', '13 h', '15 h', '17 h'], ds: [{ ten: 'Nhiệt độ', mau: '#DC2626', so: [24, 27, 31, 33, 32, 28] }] },
+    duongKep: { tieuDe: 'Doanh thu hai cửa hàng (triệu đồng)', tenX: 'Tháng', tenY: 'Doanh thu', dm: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'], ds: [{ ten: 'Cửa hàng A', so: [12, 15, 14, 18, 21, 24] }, { ten: 'Cửa hàng B', so: [8, 10, 13, 12, 16, 17] }] },
+    tron: { tieuDe: 'Môn thể thao yêu thích của lớp 7A', dm: ['Bóng đá', 'Cầu lông', 'Bơi', 'Cờ vua'], ds: [{ ten: 'Số bạn', so: [12, 8, 6, 4] }] },
+  };
+  function moHopBieuDo(o, kieuDau) {
     bdSua = o; $('#bd-loi').textContent = '';
-    var g = o || { kieu: 'cot', tieuDe: 'Số học sinh giỏi của khối 6', tenX: 'Lớp', tenY: 'Số học sinh', dm: ['6A', '6B', '6C', '6D'], ds: [{ ten: 'Nam', mau: GI.bieuDo.MAU[0], so: [18, 22, 15, 20] }, { ten: 'Nữ', mau: GI.bieuDo.MAU[1], so: [20, 17, 21, 19] }] };
+    var k0 = kieuDau || 'cot', g = o || Object.assign({ kieu: k0 }, JSON.parse(JSON.stringify(MAU_BD[k0] || MAU_BD.cot)));
     $('#bd-tieu-de-hop').textContent = o ? 'Sửa biểu đồ thống kê' : 'Biểu đồ thống kê'; $('#bd-ve').textContent = o ? 'Cập nhật' : 'Vẽ biểu đồ';
     $('#bd-td').value = g.tieuDe || ''; $('#bd-tx').value = g.tenX || ''; $('#bd-ty').value = g.tenY || ''; $('#bd-buoc').value = g.buoc ? String(g.buoc).replace('.', ',') : '';
     $('#bd-ghiSo').checked = g.ghiSo !== false; $('#bd-luoi').checked = g.luoi !== false; $('#bd-ct').checked = g.chuThich !== false; $('#bd-dt').checked = !!g.denTrang; $('#bd-mau-to').checked = !g.denTrang;

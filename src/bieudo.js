@@ -52,13 +52,15 @@ GI.bieuDo = (function () {
   }
   function veMauDuong(c, o, i, x, y, dai) { var k = kieuDuong(o, i); c.save(); c.strokeStyle = k.mau; c.fillStyle = k.mau; c.lineWidth = 2.2; c.setLineDash(k.dash); c.beginPath(); c.moveTo(x, y); c.lineTo(x + dai, y); c.stroke(); dauDiem(c, k.dau, x + dai / 2, y, 3.6); c.restore(); }
 
-  function ve(c, o) {
+  // tren: đang vẽ lên màn hình (vẽ ô chọn danh mục). Ghi lại vị trí từng cột / điểm / phần quạt vào o._hh để bấm, kéo trên bảng.
+  function ve(c, o, tren) {
     var W = o.w || 440, Hh = o.h || 330, X0 = o.x, Y0 = o.y, ds = (o.ds || []).filter(function (d) { return d && d.so; }), dm = o.dm || [];
     c.save(); c.translate(X0, Y0); c.lineCap = 'butt'; c.lineJoin = 'round'; c.textBaseline = 'alphabetic';
     c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, W, Hh);
     if (o.tieuDe) chu(c, o.tieuDe, W / 2, 24, 17, 'center', false, true);
     var coCT = o.chuThich !== false && (laKep(o.kieu) || o.kieu === 'tron') && ds.length;
-    if (o.kieu === 'tron') { veTron(c, o, ds[0], dm, W, Hh); c.restore(); return { x0: X0, y0: Y0, x1: X0 + W, y1: Y0 + Hh }; }
+    var hh = o._hh = { X0: X0, Y0: Y0, cot: [], diem: [] };
+    if (o.kieu === 'tron') { veTron(c, o, ds[0], dm, W, Hh, tren); c.restore(); return { x0: X0, y0: Y0, x1: X0 + W, y1: Y0 + Hh }; }
     // ---- trục ----
     var soDay = laKep(o.kieu) ? Math.min(2, ds.length) : Math.min(1, ds.length), dsVe = ds.slice(0, soDay);
     var lon = 0; dsVe.forEach(function (d) { dm.forEach(function (_, i) { var v = giaTriO(d, i); if (v != null) lon = Math.max(lon, v); }); });
@@ -66,6 +68,7 @@ GI.bieuDo = (function () {
     if (lon >= max - buoc * 0.05) max += buoc;   // chừa chỗ ghi số trên đỉnh
     var x0 = 64, y0 = Hh - (coCT ? 62 : 40), w = W - x0 - 54, h = y0 - (o.tieuDe ? 82 : 52);
     var Yv = function (v) { return y0 - v / max * h; };
+    hh.y0 = Y0 + y0; hh.h = h; hh.max = max; hh.buoc = buoc;
     c.font = '14px ' + FONT;
     for (var v = 0; v <= max + 1e-9; v += buoc) {
       var yy = Yv(v);
@@ -87,6 +90,7 @@ GI.bieuDo = (function () {
         var cx = x0 + nhom * (i + 0.5);
         dsVe.forEach(function (d, j) {
           var val = giaTriO(d, i); if (val == null) return; var hc = Math.max(0, val) / max * h, xc = cx - rong * soDay / 2 + j * rong;
+          hh.cot.push({ i: i, j: j, x: X0 + xc, y: Y0 + y0 - hc, w: rong, h: hc });
           c.fillStyle = toMau(c, o, j); c.fillRect(xc, y0 - hc, rong, hc); c.strokeStyle = '#111'; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(xc, y0 - hc, rong, hc);
           if (o.ghiSo !== false) chu(c, so(val), xc + rong / 2, y0 - hc - 6, 13, 'center');
         });
@@ -97,7 +101,7 @@ GI.bieuDo = (function () {
         dm.forEach(function (_, i) { var val = giaTriO(d, i); if (val != null) P.push({ x: x0 + nhom * (i + 0.5), y: Yv(val), v: val, i: i }); });
         c.save(); c.strokeStyle = '#94A3B8'; c.lineWidth = 1; c.setLineDash([3, 3]); P.forEach(function (q) { c.beginPath(); c.moveTo(q.x, q.y); c.lineTo(q.x, y0); c.stroke(); }); c.restore();
         c.save(); c.strokeStyle = k.mau; c.fillStyle = k.mau; c.lineWidth = 2.4; c.setLineDash(k.dash); c.beginPath(); P.forEach(function (q, i) { i ? c.lineTo(q.x, q.y) : c.moveTo(q.x, q.y); }); c.stroke();
-        P.forEach(function (q) { c.strokeStyle = k.mau; dauDiem(c, k.dau, q.x, q.y, 4); });
+        P.forEach(function (q) { c.strokeStyle = k.mau; dauDiem(c, k.dau, q.x, q.y, 4); hh.diem.push({ i: q.i, j: j, x: X0 + q.x, y: Y0 + q.y }); });
         if (o.ghiSo !== false) P.forEach(function (q) {   // dãy thứ hai ghi số phía dưới cho khỏi đè
           var duoi = j === 1 && +dsVe[0].so[q.i] >= q.v;
           c.save(); c.lineWidth = 3; c.strokeStyle = '#fff'; c.font = '13px ' + FONT; c.textAlign = 'center'; var ty = duoi ? q.y + 19 : q.y - 9; c.strokeText(so(q.v), q.x, ty); c.fillStyle = o.denTrang ? '#111827' : k.mau; c.fillText(so(q.v), q.x, ty); c.restore();
@@ -106,16 +110,21 @@ GI.bieuDo = (function () {
       });
     }
     chu(c, '0', x0 - 8, y0 + 5, 14, 'right');
+    if (tren && o._chonCot != null) {   // danh mục đang chọn: khung cam quanh cột / điểm
+      c.save(); c.strokeStyle = '#F97316'; c.lineWidth = 2.5; c.setLineDash([5, 3]);
+      var cxC = x0 + nhom * (o._chonCot + 0.5); c.strokeRect(cxC - nhom * 0.45, y0 - h - 6, nhom * 0.9, h + 32); c.restore();
+    }
     if (coCT) chuThich(c, o, x0 + w / 2, Hh - 14, dsVe, o.kieu === 'duongKep');
     c.restore();
     return { x0: X0, y0: Y0, x1: X0 + W, y1: Y0 + Hh };
   }
-  function veTron(c, o, d, dm, W, Hh) {
+  function veTron(c, o, d, dm, W, Hh, tren) {
     if (!d) return;
     var gt = dm.map(function (_, i) { var v = giaTriO(d, i); return v > 0 ? v : 0; }), tong = gt.reduce(function (a, b) { return a + b; }, 0); if (!tong) return;
     var top = o.tieuDe ? 44 : 14, r = Math.min((Hh - top - 16) / 2, W * 0.27), cx = 22 + r, cy = top + (Hh - top) / 2, a = -Math.PI / 2;
+    o._hh.quat = { cx: o.x + cx, cy: o.y + cy, r: r, phan: [] };
     gt.forEach(function (v, i) {
-      if (!v) return; var g = v / tong * 2 * Math.PI, b = a + g;
+      if (!v) return; var g = v / tong * 2 * Math.PI, b = a + g; o._hh.quat.phan.push({ i: i, a: a, b: b });
       c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, r, a, b); c.closePath(); c.fillStyle = toMau(c, o, i); c.fill();
       c.lineWidth = o.denTrang ? 1.2 : 2; c.strokeStyle = o.denTrang ? '#111' : '#fff'; c.stroke();
       var m = (a + b) / 2, pt = Math.round(v / tong * 1000) / 10, nhan = String(pt).replace('.', ',') + '%', tx = cx + r * 0.62 * Math.cos(m), ty = cy + r * 0.62 * Math.sin(m) + 5;
@@ -126,6 +135,7 @@ GI.bieuDo = (function () {
       c.fillText(nhan, tx, ty); a = b;
     });
     c.beginPath(); c.arc(cx, cy, r, 0, 2 * Math.PI); c.lineWidth = 1.2; c.strokeStyle = '#111'; c.stroke();
+    if (tren && o._chonCot != null) { var ph = o._hh.quat.phan.filter(function (q) { return q.i === o._chonCot; })[0]; if (ph) { c.save(); c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, r + 4, ph.a, ph.b); c.closePath(); c.strokeStyle = '#F97316'; c.lineWidth = 3; c.setLineDash([5, 3]); c.stroke(); c.restore(); } }
     if (o.chuThich !== false) {   // chú thích bên phải
       var xL = cx + r + 34, n = dm.length, y = cy - (n * 28) / 2 + 14;
       dm.forEach(function (t, i) { c.fillStyle = toMau(c, o, i); c.fillRect(xL, y - 11, 18, 14); c.strokeStyle = '#111'; c.lineWidth = 0.8; c.strokeRect(xL, y - 11, 18, 14); chu(c, String(t), xL + 26, y + 1, 14, 'left'); y += 28; });
