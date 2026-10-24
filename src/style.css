@@ -693,3 +693,37 @@ html.android, html.android body { -webkit-touch-callout: none; -webkit-tap-highl
 .tv-gg-luc, .tv-gg-loi { margin: 2px 14px 8px; font-size: 12.5px; color: #64748B; }
 .tv-gg-loi { color: #B45309; max-width: 260px; }
 .hop-dong-bo { max-width: 520px; }
+
+/* ---- Màn chào hoạt hình (bản Android) ----
+   Chỉ dùng transform / opacity cho phần di chuyển (chạy trên GPU, không giật khi app đang khởi động). */
+#man-chao { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: radial-gradient(circle at 18% 22%, rgba(255, 236, 160, .75) 0%, rgba(255, 236, 160, 0) 42%),
+              radial-gradient(circle at 85% 80%, rgba(255, 226, 140, .55) 0%, rgba(255, 226, 140, 0) 40%),
+              linear-gradient(135deg, #DCEBFF 0%, #EEF5FF 50%, #FFF6DA 100%);
+  transition: opacity .45s ease; }
+#man-chao.xong { opacity: 0; pointer-events: none; }
+#man-chao .mc-hang { display: flex; align-items: center; --dx: 0px; }
+#man-chao .mc-truot { flex: none; position: relative; z-index: 2; transform: translate3d(var(--dx), 0, 0); will-change: transform;
+  animation: mcVeGiua 1s 2.3s cubic-bezier(.65, 0, .35, 1) forwards; }
+#man-chao .mc-logo { position: relative; width: min(36vmin, 320px); height: min(36vmin, 320px); will-change: transform, opacity;
+  animation: mcHien .9s cubic-bezier(.34, 1.56, .64, 1) both; }
+#man-chao .mc-logo::before { content: ""; position: absolute; inset: 4%; border-radius: 22%; box-shadow: 0 18px 36px rgba(30, 64, 175, .32); }
+#man-chao .mc-logo svg { position: relative; display: block; width: 100%; height: 100%; }
+#man-chao .mc-tg, #man-chao .mc-song { stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; }
+#man-chao .mc-tg { animation: mcVe .9s .6s ease-out forwards; }
+#man-chao .mc-song { animation: mcVe .85s 1.4s ease-in-out forwards; }
+#man-chao .mc-dinh circle { transform-box: fill-box; transform-origin: center; transform: scale(0); animation: mcCham .4s cubic-bezier(.34, 1.56, .64, 1) forwards; }
+#man-chao .mc-dinh circle:nth-child(1) { animation-delay: .7s; }
+#man-chao .mc-dinh circle:nth-child(2) { animation-delay: 1s; }
+#man-chao .mc-dinh circle:nth-child(3) { animation-delay: 1.3s; }
+#man-chao .mc-chu { flex: none; position: relative; z-index: 1; white-space: nowrap; opacity: 0; transform: translate3d(calc(var(--dx) * -.35), 0, 0); will-change: transform, opacity;
+  animation: mcChuVao 1s 2.4s cubic-bezier(.22, 1, .36, 1) forwards; }
+#man-chao .mc-ten { display: block; padding-left: 4.5vmin; font: 800 min(16vmin, 140px)/1.05 "Segoe UI", Roboto, Arial, sans-serif; letter-spacing: -.02em; color: #1E3A8A; }
+#man-chao .mc-ten b { color: #E0A100; font-weight: 800; }
+#man-chao .mc-phu { display: block; padding: 1.6vmin 0 0 5vmin; font: 600 min(3.2vmin, 28px)/1.3 "Segoe UI", Roboto, Arial, sans-serif; color: #475569; opacity: 0; animation: mcHienChu .6s 3.1s ease-out forwards; }
+@keyframes mcHien { from { opacity: 0; transform: scale(.3) rotate(-14deg); } to { opacity: 1; transform: none; } }
+@keyframes mcVe { from { stroke-dashoffset: 100; opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes mcCham { to { transform: scale(1); } }
+@keyframes mcVeGiua { to { transform: translate3d(0, 0, 0); } }
+@keyframes mcChuVao { 0%, 30% { opacity: 0; } 100% { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes mcHienChu { to { opacity: 1; } }
