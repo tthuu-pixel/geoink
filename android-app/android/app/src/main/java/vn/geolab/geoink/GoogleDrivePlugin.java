@@ -30,8 +30,7 @@ import java.util.List;
 public class GoogleDrivePlugin extends Plugin {
     private static final List<Scope> PHAM_VI = Arrays.asList(
         new Scope("https://www.googleapis.com/auth/drive.file"),
-        new Scope("https://www.googleapis.com/auth/userinfo.email"),
-        new Scope("openid")
+        new Scope("https://www.googleapis.com/auth/userinfo.email")
     );
     private ActivityResultLauncher<IntentSenderRequest> hopDangNhap;
     private PluginCall dangCho;

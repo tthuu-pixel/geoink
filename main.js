@@ -142,7 +142,7 @@ ipcMain.handle('tai-khoan', async (e, { hd, duLieu }) => {
 // Chỉ xin quyền drive.file: app chỉ thấy các tệp do chính GeoInk tạo trên Drive.
 // Mã ứng dụng (client id / secret) nằm ở google-config.json, do GitHub Actions tạo từ secrets khi đóng gói.
 const http = require('http'), crypto = require('crypto');
-const GG_PHAM_VI = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email openid';
+const GG_PHAM_VI = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email';
 function ggCauHinh() { try { const c = JSON.parse(fs.readFileSync(path.join(__dirname, 'google-config.json'), 'utf8')); return c.clientId && c.clientSecret ? c : null; } catch (e) { return null; } }
 function ggTep() { return path.join(app.getPath('userData'), 'google-drive.dat'); }
 function ggDoc() {
