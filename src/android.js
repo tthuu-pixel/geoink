@@ -62,6 +62,15 @@
       }, function (e) { if (tay) guiCapNhat('loi', { loi: loiChu(e) }); });
   }
 
+  // mã truy cập Google Drive: lấy từ Google Identity (plugin GoogleDrive), giữ khoảng 45 phút
+  var ggTk = null, KHOA_GG = 'geoink_google_drive';
+  function ggDoc() { try { return JSON.parse(localStorage.getItem(KHOA_GG) || '{}') || {}; } catch (e) { return {}; } }
+  function ggGhi(d) { try { if (d) localStorage.setItem(KHOA_GG, JSON.stringify(d)); else localStorage.removeItem(KHOA_GG); } catch (e) { } }
+  function ggLayToken(hoi) {
+    if (!hoi && ggTk && ggTk.het > Date.now()) return Promise.resolve(ggTk.token);
+    if (!hoi && !ggDoc().daKetNoi) return Promise.reject({ code: 'CAN_DANG_NHAP', message: 'Chưa kết nối Google Drive' });
+    return goi('GoogleDrive', 'layToken', { hoi: !!hoi }).then(function (k) { ggTk = { token: k.token, het: Date.now() + 45 * 60e3 }; return k.token; });
+  }
   var ngheDong = null;
   window.mayTinh = {
     nenTang: 'android',
@@ -122,6 +131,38 @@
           var d = r.data; if (d && typeof d === 'object') return d;
           try { return JSON.parse(d); } catch (e) { return { ok: false, mang: true, loi: 'Máy chủ trả lời không hợp lệ. Thử lại sau.' }; }
         }, function () { return { ok: false, mang: true, loi: 'Không kết nối được máy chủ GeoLab. Kiểm tra mạng rồi thử lại.' }; });
+    },
+    // ---- Google Drive (đồng bộ thư viện sổ) ----
+    ggTrangThai: function () { var d = ggDoc(); return Promise.resolve({ cauHinh: true, daKetNoi: !!d.daKetNoi, email: d.email || '' }); },
+    ggDangNhap: function () {
+      return ggLayToken(true).then(function (tk) {
+        return goi('CapacitorHttp', 'request', { url: 'https://www.googleapis.com/oauth2/v3/userinfo', method: 'GET', headers: { Authorization: 'Bearer ' + tk } })
+          .then(function (r) { var d = r.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } } return (d && d.email) || ''; }, function () { return ''; });
+      }).then(function (email) { ggGhi({ daKetNoi: true, email: email }); return { ok: true, email: email }; },
+        function (e) { var ma = e && (e.code || e.errorCode); return ma === 'HUY' ? { huy: true } : { loi: loiChu(e) }; });
+    },
+    ggDangXuat: function () {
+      var tk = ggTk && ggTk.token; ggTk = null; ggGhi(null);
+      if (tk) goi('CapacitorHttp', 'request', { url: 'https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(tk), method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, data: '' }).catch(function () { });
+      return Promise.resolve({ ok: true });
+    },
+    ggGoi: function (yc) {
+      var url = String((yc && yc.url) || '');
+      if (!/^https:\/\/www\.googleapis\.com\//.test(url)) return Promise.resolve({ status: 0, text: 'Địa chỉ không hợp lệ' });
+      var lan = function (thu) {
+        return ggLayToken(false).then(function (tk) {
+          var tc = { url: url, method: yc.method || 'GET', headers: Object.assign({}, yc.headers || {}, { Authorization: 'Bearer ' + tk }), responseType: 'text' };
+          if (tc.method === 'PATCH') { tc.method = 'POST'; tc.headers['X-HTTP-Method-Override'] = 'PATCH'; }   // HttpURLConnection của Android không có PATCH
+          if (yc.body != null) tc.data = yc.body;
+          return goi('CapacitorHttp', 'request', tc).then(function (r) {
+            if (r.status === 401 && thu === 0) { ggTk = null; return lan(1); }
+            var h = r.headers || {}, loc = '';
+            Object.keys(h).forEach(function (k) { if (k.toLowerCase() === 'location') loc = h[k]; });
+            return { status: r.status, text: typeof r.data === 'string' ? r.data : JSON.stringify(r.data), location: loc };
+          });
+        }, function (e) { var ma = e && (e.code || e.errorCode); return { status: 401, text: loiChu(e), canDangNhap: ma === 'CAN_DANG_NHAP' }; });
+      };
+      return lan(0).catch(function (e) { return { status: 0, text: loiChu(e) }; });
     },
     khiCapNhat: function (f) { ngheCapNhat.push(f); },
     kiemTraCapNhat: function () { kiemTraCapNhat(true); return Promise.resolve(true); },

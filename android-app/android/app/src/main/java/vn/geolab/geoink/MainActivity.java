@@ -13,6 +13,7 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(GoogleDrivePlugin.class);   // đăng nhập Google để đồng bộ Drive
         super.onCreate(savedInstanceState);
         // Giữ màn hình sáng khi đang giảng bài
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- màu nền màn chào (khớp với màn chào hoạt hình trong app) -->
+    <color name="nen_chao">#DCEBFF</color>
+</resources>
