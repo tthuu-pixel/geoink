@@ -58,8 +58,8 @@ GI.bieuDo = (function () {
     var W = o.w || 440, Hh = o.h || 330, X0 = o.x, Y0 = o.y, ds = (o.ds || []).filter(function (d) { return d && d.so; }), dm = o.dm || [];
     c.save(); c.translate(X0, Y0); c.lineCap = 'butt'; c.lineJoin = 'round'; c.textBaseline = 'alphabetic';
     c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, W, Hh);
-    if (o.tieuDe) {   // tiêu đề cỡ 22, tự nhỏ lại nếu dài hơn khung
-      c.font = 'bold 22px ' + FONT; var coTD = Math.max(14, Math.min(22, Math.floor(22 * (W - 24) / Math.max(1, c.measureText(o.tieuDe).width))));
+    if (o.tieuDe) {   // tiêu đề cỡ 20, tự nhỏ lại nếu dài hơn khung
+      c.font = 'bold 20px ' + FONT; var coTD = Math.max(14, Math.min(20, Math.floor(20 * (W - 24) / Math.max(1, c.measureText(o.tieuDe).width))));
       chu(c, o.tieuDe, W / 2, 30, coTD, 'center', false, true);
     }
     var coCT = o.chuThich !== false && (laKep(o.kieu) || o.kieu === 'tron') && ds.length;
