@@ -201,6 +201,7 @@ window.GI = window.GI || {};
   B32.bd_duong = truc2() + P('M7 22l6-8 6 4 8-11', R, 2) + D(7, 22, R, 2) + D(13, 14, R, 2) + D(19, 18, R, 2) + D(27, 7, R, 2);
   B32.bd_duongKep = truc2() + P('M7 20l6-7 6 3 8-9', X, 2) + P('M7 25l6-4 6 1 8-6', '#F97316', 2);
   B32.bd_tron = '<path d="M16 16V4a12 12 0 0 1 11.4 15.7z" fill="#3B82F6" stroke="#fff" stroke-width="1"/><path d="M16 16l11.4 3.7A12 12 0 0 1 8 25z" fill="#F97316" stroke="#fff" stroke-width="1"/><path d="M16 16L8 25A12 12 0 0 1 16 4z" fill="#10B981" stroke="#fff" stroke-width="1"/>' + C(16, 16, 12, K, 1.2);
+  B32.hinhChieu = NL('M3 25L29 25') + P('M12 5V25', XAM, 1.6, null, '2.5 2') + P('M12 21h4v4', K, 1.3) + d2(12, 5) + d2(12, 25) + T(14.5, 12, 'H', R, 8, 'nghieng');
   // ----- Nhóm đường tròn -----
   function d3(x, y, m) { return D(x, y, m || X, 2.3); }
   B32.m_noiTiep = C(16, 16, 12, K, 1.8) + NL('M12.9 4.4L5.6 22 26.4 22z') + d3(12.9, 4.4) + d3(5.6, 22) + d3(26.4, 22) + d3(16, 16, '#3A3F47');

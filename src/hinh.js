@@ -17,7 +17,7 @@
 window.GI = window.GI || {};
 GI.hinh = (function () {
   var DV = 40;   // 1 cm = 40 đơn vị thế giới
-  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1, trongTam: 1, trucTam: 1, chanCao: 1, diemTZ: 1 };
+  var LA_DIEM = { diem: 1, diemTren: 1, trungDiem: 1, giao: 1, tam: 1, diemCach: 1, dinhDG: 1, dauDoan: 1, trongTam: 1, trucTam: 1, chanCao: 1, diemTZ: 1, chanPhanGiac: 1, hinhChieu: 1 };
   var LA_THANG = { doan: 1, duong: 1, tia: 1, vuongGoc: 1, songSong: 1, trungTruc: 1, phanGiac: 1, tiepTuyenChung: 1 };
   var LA_TRON = { tron: 1, tronBanKinh: 1, compa: 1, tron3: 1 };
   var LA_CUNG = { banNguyet: 1, cungTam: 1, cung3: 1, quatTam: 1, quat3: 1 };
@@ -174,6 +174,14 @@ GI.hinh = (function () {
         case 'chanCao': {   // chân đường cao kẻ từ a xuống đường thẳng bc
           var Af = diem(o.a), Bf = diem(o.b), Cf = diem(o.c); if (!Af || !Bf || !Cf) return null; var ux = Cf.x - Bf.x, uy = Cf.y - Bf.y, L2 = ux * ux + uy * uy; if (L2 < 1e-12) return null;
           var tf = ((Af.x - Bf.x) * ux + (Af.y - Bf.y) * uy) / L2; return { k: 'diem', x: Bf.x + ux * tf, y: Bf.y + uy * tf, t: tf };
+        }
+        case 'chanPhanGiac': {   // chân đường phân giác góc aob trên đường thẳng ab: chia ab theo tỉ số oa : ob
+          var Aq = diem(o.a), Oq = diem(o.o), Bq = diem(o.b); if (!Aq || !Oq || !Bq) return null; var la = kc(Oq, Aq), lb = kc(Oq, Bq); if (la + lb < 1e-9) return null;
+          return { k: 'diem', x: (lb * Aq.x + la * Bq.x) / (la + lb), y: (lb * Aq.y + la * Bq.y) / (la + lb) };
+        }
+        case 'hinhChieu': {   // hình chiếu vuông góc của điểm a lên đường thẳng d
+          var Ar = diem(o.a), Dr = lay(o.d); if (!Ar || !Dr || Dr.k !== 'thang') return null; var vx = Dr.q.x - Dr.p.x, vy = Dr.q.y - Dr.p.y, L2r = vx * vx + vy * vy; if (L2r < 1e-12) return null;
+          var tr = ((Ar.x - Dr.p.x) * vx + (Ar.y - Dr.p.y) * vy) / L2r; return { k: 'diem', x: Dr.p.x + vx * tr, y: Dr.p.y + vy * tr, t: tr };
         }
         case 'tam': { var Tt = lay(o.d); return Tt && (Tt.k === 'tron' || Tt.k === 'cung') ? { k: 'diem', x: Tt.c.x, y: Tt.c.y } : null; }
         case 'diemCach': { var Ac = diem(o.a); return Ac ? { k: 'diem', x: Ac.x + o.l * DV * Math.cos(o.t || 0), y: Ac.y + o.l * DV * Math.sin(o.t || 0) } : null; }

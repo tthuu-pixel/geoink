@@ -663,3 +663,12 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 .bd-buoc { width: 70px; border: 1px solid #CBD5E1; border-radius: 6px; padding: 4px 6px; }
 #hop-bieu-do.la-tron .bd-truc { display: none !important; }
 #hop-bieu-do .dt-bt, #hop-bieu-do .bd-bang input { font-family: Arial, 'Segoe UI', sans-serif; }
+
+.hop-nhieu { width: min(480px, 92vw); }
+.hop-nhieu .hn-dong { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 9px 0; font-size: 14.5px; }
+.hop-nhieu .hn-chu { width: 90px; height: 32px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 10px; font: italic 17px "LM Roman", "Times New Roman", serif; }
+.hop-nhieu .hn-chon { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.hop-nhieu .hn-tich { display: flex; align-items: center; gap: 7px; margin: 9px 0; font-size: 14.5px; }
+.hop-nhieu .hn-thut { padding-left: 26px; }
+.hop-nhieu .mo { opacity: .4; pointer-events: none; }
+.hop-nhieu .tv-hop-chan .chinh { background: #7F1D1D; color: #fff; border-color: #7F1D1D; }
