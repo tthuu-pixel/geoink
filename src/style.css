@@ -645,3 +645,30 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 
 #ds-trang-pdf .them-to { width: 100%; margin: 6px 0 10px; height: 34px; border: 1.5px dashed #CBD5E1; border-radius: 8px; background: #fff; color: #334155; font: 600 13px Arial, sans-serif; cursor: pointer; }
 #ds-trang-pdf .them-to:hover { border-color: #2563EB; color: #2563EB; }
+
+/* ----- Hộp biểu đồ thống kê ----- */
+#hop-bieu-do .hop-noi-dung { width: min(1180px, 96vw); max-width: none; max-height: 92vh; overflow: auto; }
+.bd-kieu { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 6px; }
+.bd-kieu button { padding: 7px 11px; border: 1.5px solid #E2E8F0; border-radius: 10px; background: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; color: #334155; }
+.bd-kieu button.bat { border-color: #2563EB; background: #EFF6FF; color: #1D4ED8; }
+.bd-bang { border-collapse: collapse; font-size: 13.5px; }
+.bd-bang th, .bd-bang td { border: 1px solid #CBD5E1; padding: 3px; background: #fff; }
+.bd-bang th { background: #F1F5F9; padding: 5px 8px; font-weight: 600; }
+.bd-bang input { border: none; outline: none; width: 90px; padding: 4px 6px; font-size: 13.5px; background: transparent; }
+.bd-bang input:focus { background: #EFF6FF; }
+.bd-bang .bd-dm { width: 120px; }
+.bd-day { display: inline-flex; align-items: center; gap: 4px; }
+.bd-bang .bd-mau { width: 26px; height: 22px; padding: 0; border: 1px solid #CBD5E1; border-radius: 4px; cursor: pointer; }
+.bd-bang .bd-ten-day { width: 80px; font-weight: 600; }
+.bd-buoc { width: 70px; border: 1px solid #CBD5E1; border-radius: 6px; padding: 4px 6px; }
+#hop-bieu-do.la-tron .bd-truc { display: none !important; }
+#hop-bieu-do .dt-bt, #hop-bieu-do .bd-bang input { font-family: Arial, 'Segoe UI', sans-serif; }
+
+.hop-nhieu { width: min(480px, 92vw); }
+.hop-nhieu .hn-dong { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 9px 0; font-size: 14.5px; }
+.hop-nhieu .hn-chu { width: 90px; height: 32px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 10px; font: italic 17px "LM Roman", "Times New Roman", serif; }
+.hop-nhieu .hn-chon { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.hop-nhieu .hn-tich { display: flex; align-items: center; gap: 7px; margin: 9px 0; font-size: 14.5px; }
+.hop-nhieu .hn-thut { padding-left: 26px; }
+.hop-nhieu .mo { opacity: .4; pointer-events: none; }
+.hop-nhieu .tv-hop-chan .chinh { background: #7F1D1D; color: #fff; border-color: #7F1D1D; }

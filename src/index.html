@@ -171,6 +171,25 @@
   </div>
 </div>
 
+<div id="hop-bieu-do" class="hop an" role="dialog" aria-label="Biểu đồ thống kê">
+  <div class="hop-noi-dung rong">
+    <h2 id="bd-tieu-de-hop">Biểu đồ thống kê</h2>
+    <div class="dt-khung"><div class="dt-trai">
+      <div class="bd-kieu" id="bd-kieu"><button data-k="cot">▮ Cột</button><button data-k="cotKep">▮▮ Cột kép</button><button data-k="duong">╱ Đoạn thẳng</button><button data-k="duongKep">╱╲ Đoạn thẳng kép</button><button data-k="tron">◔ Hình quạt tròn</button></div>
+      <div class="dt-nhom"><div class="dt-nhan">Tiêu đề và trục</div>
+        <div class="dt-dong">Tiêu đề <input id="bd-td" class="dt-bt" spellcheck="false"></div>
+        <div class="dt-dong bd-truc">Trục ngang <input id="bd-tx" class="dt-bt" spellcheck="false"> Trục đứng <input id="bd-ty" class="dt-bt" spellcheck="false"></div></div>
+      <div class="dt-nhom"><div class="dt-nhan">Bảng số liệu <small>(dán thẳng các cột từ Excel vào bảng được)</small></div><table id="bd-bang" class="bd-bang"></table><button class="nut chu dt-them" id="bd-them-dong">+ Thêm dòng</button></div>
+      <div class="dt-nhom"><div class="dt-nhan">Trình bày</div>
+        <div class="dt-hang"><label class="dt-tich bd-truc"><input type="checkbox" id="bd-ghiSo" checked> Ghi số liệu</label><label class="dt-tich bd-truc"><input type="checkbox" id="bd-luoi" checked> Lưới ngang</label><label class="dt-tich"><input type="checkbox" id="bd-ct" checked> Chú thích</label></div>
+        <div class="dt-hang dt-hang-duoi"><span>Kiểu tô:</span><label class="dt-tich"><input type="radio" name="bd-to" id="bd-mau-to" checked> Màu</label><label class="dt-tich"><input type="radio" name="bd-to" id="bd-dt"> Đen trắng (sọc, chấm — để in đề)</label>
+          <span class="bd-truc">Vạch chia trục đứng <input id="bd-buoc" class="bd-buoc" placeholder="tự chọn"></span></div></div>
+      <div class="loi" id="bd-loi"></div>
+    </div><div class="dt-phai"><div class="dt-nhan">Xem trước</div><div class="dt-xem-hop"><canvas id="bd-xem"></canvas></div></div></div>
+    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="bd-ve">Vẽ biểu đồ</button></div>
+  </div>
+</div>
+
 <div id="hop-xuat-tex" class="hop an" role="dialog" aria-label="Mã TikZ của hình">
   <div class="hop-noi-dung rong">
     <h2>Mã TikZ của hình</h2>
@@ -275,6 +294,7 @@
 <script src="xuattex.js"></script>
 <script src="hinh.js"></script>
 <script src="dothi.js"></script>
+<script src="bieudo.js"></script>
 <script src="taikhoan.js"></script>
 <script src="thuvien.js"></script>
 <script src="app.js"></script>
