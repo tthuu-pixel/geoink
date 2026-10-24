@@ -17,6 +17,11 @@ contextBridge.exposeInMainWorld('mayTinh', {
   docClipboard: () => ipcRenderer.invoke('doc-clipboard'),
   // thư viện sổ trên máy
   thuVien: (hd, duong, noiDung) => ipcRenderer.invoke('thu-vien', { hd, duong, noiDung }),
+  // đồng bộ thư viện qua Google Drive
+  ggDangNhap: () => ipcRenderer.invoke('gg-dang-nhap'),
+  ggTrangThai: () => ipcRenderer.invoke('gg-trang-thai'),
+  ggDangXuat: () => ipcRenderer.invoke('gg-dang-xuat'),
+  ggGoi: (yc) => ipcRenderer.invoke('gg-goi', yc),
   // tài khoản GeoLab
   taiKhoan: (hd, duLieu) => ipcRenderer.invoke('tai-khoan', { hd, duLieu }),
   // tự cập nhật

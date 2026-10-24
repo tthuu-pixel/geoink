@@ -2010,6 +2010,11 @@
     };
   }
   var LENH = {
+    dongBoDrive: function () {   // mở thư viện; chưa kết nối thì hỏi kết nối Google Drive
+      if (!GI.dongBo || !MT || !MT.ggGoi) return thongBao('Đồng bộ Google Drive chỉ có trong app GeoInk đã cài');
+      GI.thuVien.mo(); var t = GI.dongBo.trangThai();
+      if (!t.ketNoi) setTimeout(GI.dongBo.ketNoi, 250); else GI.dongBo.dongBo();
+    },
     guiBang: function () {   // máy tính bảng: gửi tệp .geoink qua Zalo, Drive, Gmail…
       $('#menu').classList.add('an'); if (!MT || !MT.chiaSe) return;
       var ten = (GI.thuVien.tenSo() || (tenTep ? tenTep.split(/[\\/]/).pop().replace(/\.geoink$/i, '') : 'Bang-GeoInk')) + '.geoink';
@@ -3882,8 +3887,9 @@
     MT.tepKhoiDong().then(function (d) { if (d) napTep(d); });
     MT.khiMoTep(function (d) { if (hoiBoThayDoi()) napTep(d); });
     MT.khiHoiDong(function () {
-      if (((GI.thuVien && GI.thuVien.soDangMo()) || (!tenTep && !bangTrong())) && daSua) { luuThuVien(true).then(function () { MT.dongThat(); }); return; }   // sổ thư viện: tự lưu rồi thoát
-      if (!daSua || (GI.thuVien && GI.thuVien.soDangMo()) || window.confirm('Bảng có thay đổi chưa lưu. Thoát mà không lưu?')) MT.dongThat();
+      var thoat = function () { (GI.dongBo ? GI.dongBo.truocKhiThoat() : Promise.resolve()).then(function () { MT.dongThat(); }, function () { MT.dongThat(); }); };   // đẩy nốt lên Google Drive
+      if (((GI.thuVien && GI.thuVien.soDangMo()) || (!tenTep && !bangTrong())) && daSua) { luuThuVien(true).then(thoat); return; }   // sổ thư viện: tự lưu rồi thoát
+      if (!daSua || (GI.thuVien && GI.thuVien.soDangMo()) || window.confirm('Bảng có thay đổi chưa lưu. Thoát mà không lưu?')) thoat();
     });
   } else {
     window.addEventListener('beforeunload', function (e) { if (daSua) { e.preventDefault(); e.returnValue = ''; } });

@@ -7,7 +7,8 @@ GI.thuVien = (function () {
   var MT = window.mayTinh || null;
   var PHUT_PHIEN_BAN = 10, SO_PHIEN_BAN = 30, NGAY_THUNG_RAC = 30;
   var app = null;            // các hàm của app.js: layNoiDung, anhBia, nap, thongBao, hoiBoThayDoi
-  var chiMuc = null;         // { project: [{id, ten, tao, xoa}], so: [{id, ten, project, tao, sua, xoa}] }
+  var chiMuc = null;         // { project: [{id, ten, tao, xoa, ct}], so: [{id, ten, project, tao, sua, xoa, ct}], xoaHan: [{id, luc}] }
+                             //   ct: lúc đổi tên / chuyển project / xoá / khôi phục (để đồng bộ Drive lấy bên đổi sau); xoaHan: sổ, project đã xoá hẳn
   var loc = 'tatCa';         // 'tatCa' | 'khong' | 'rac' | id project
   var anhBo = {};            // ảnh bìa đã đọc
 
@@ -28,15 +29,19 @@ GI.thuVien = (function () {
     return kho('doc', 'chi-muc.json').then(function (kq) {
       try { chiMuc = JSON.parse(kq.noiDung || 'null'); } catch (e) { chiMuc = null; }
       if (!chiMuc || !Array.isArray(chiMuc.so)) chiMuc = { project: [], so: [] };
-      chiMuc.project = chiMuc.project || [];
+      chiMuc.project = chiMuc.project || []; chiMuc.xoaHan = chiMuc.xoaHan || [];
       // dọn thùng rác quá hạn
       var han = Date.now() - NGAY_THUNG_RAC * 864e5, bo = chiMuc.so.filter(function (s) { return s.xoa && s.xoa < han; });
-      if (bo.length) { bo.forEach(function (s) { xoaTep(s.id); }); chiMuc.so = chiMuc.so.filter(function (s) { return bo.indexOf(s) < 0; }); }
-      chiMuc.project = chiMuc.project.filter(function (p) { return !(p.xoa && p.xoa < han); });
+      if (bo.length) { bo.forEach(function (s) { xoaHan(s.id); }); chiMuc.so = chiMuc.so.filter(function (s) { return bo.indexOf(s) < 0; }); }
+      chiMuc.project = chiMuc.project.filter(function (p) { if (p.xoa && p.xoa < han) { ghiXoaHan(p.id); return false; } return true; });
       return chiMuc;
     });
   }
-  function ghiChiMuc() { return kho('ghi', 'chi-muc.json', JSON.stringify(chiMuc)); }
+  function ghiChiMucIm() { return kho('ghi', 'chi-muc.json', JSON.stringify(chiMuc)); }
+  function ghiChiMuc() { if (GI.dongBo) GI.dongBo.henDongBo(); return ghiChiMucIm(); }
+  function danhDau(x) { x.ct = Date.now(); return x; }   // tên / project / thùng rác vừa đổi
+  function ghiXoaHan(id) { chiMuc.xoaHan = (chiMuc.xoaHan || []).filter(function (x) { return x.id !== id; }); chiMuc.xoaHan.push({ id: id, luc: Date.now() }); }
+  function xoaHan(id) { xoaTep(id); ghiXoaHan(id); }   // xoá hẳn sổ: báo cho máy khác (qua Drive) xoá theo
   function xoaTep(id) { kho('xoa', 'so/' + id + '.geoink'); kho('xoa', 'anh/' + id + '.txt'); kho('xoa', 'lich-su/' + id); delete anhBo[id]; }
   function idMoi(t) { return t + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function timSo(id) { return chiMuc && chiMuc.so.filter(function (s) { return s.id === id; })[0]; }
@@ -61,7 +66,7 @@ GI.thuVien = (function () {
       var s = soLuc && timSo(soLuc);
       if (!s) {
         if (!taoNeuChua) return false;
-        s = { id: idMoi('s'), ten: tenTuDong(), project: (loc !== 'tatCa' && loc !== 'khong' && loc !== 'rac' && timProject(loc)) ? loc : null, tao: Date.now(), sua: 0 };
+        s = { id: idMoi('s'), ten: tenTuDong(), project: (loc !== 'tatCa' && loc !== 'khong' && loc !== 'rac' && timProject(loc)) ? loc : null, tao: Date.now(), sua: 0 }; s.ct = s.tao;
         chiMuc.so.push(s); if (soMo === soLuc) soMo = s.id;
       }
       var luc = Date.now(), cu = s.banCuoi || 0;
@@ -127,14 +132,15 @@ GI.thuVien = (function () {
         '<div class="tv-dong"><div><b title="' + thoat(s.ten) + '">' + thoat(s.ten) + '</b><small>' + (rac ? 'Xoá lúc ' + gioVN(s.xoa) : ngayVN(s.sua || s.tao)) + '</small></div><button class="tv-ba" data-menu="' + s.id + '" title="Tuỳ chọn">⋯</button></div></div>';
     }).join('');
     var prjRac = rac ? chiMuc.project.filter(function (p) { return p.xoa; }) : [];
-    el.innerHTML = '<div class="tv-dau"><button class="tv-ve" data-hd="ve">‹ Về sổ</button><h1>Thư viện</h1><span class="gian"></span>' +
-      '<button class="tv-nut" data-hd="thuMuc" title="Mở thư mục chứa thư viện trên máy">Mở thư mục</button></div>' +
+    el.innerHTML = '<div class="tv-dau"><button class="tv-ve" data-hd="ve">‹ Về sổ</button><h1>Thư viện</h1><span class="gian"></span><span id="tv-dong-bo"></span>' +
+      '<button class="tv-nut an-android" data-hd="thuMuc" title="Mở thư mục chứa thư viện trên máy">Mở thư mục</button></div>' +
       '<div class="tv-than"><nav class="tv-trai">' + trai + '</nav><section class="tv-phai">' +
       '<h2>' + thoat(tieuDe) + ' <small>' + ds.length + ' sổ</small>' + (!rac && loc !== 'tatCa' && loc !== 'khong' ? '<button class="tv-ba lon" data-menu-prj="' + loc + '" title="Tuỳ chọn project">⋯</button>' : '') + '</h2>' +
       (prjRac.length ? '<div class="tv-prj-rac">' + prjRac.map(function (p) { return '<div><span>' + IC.prj + thoat(p.ten) + ' <small>(project · xoá lúc ' + gioVN(p.xoa) + ')</small></span><button data-hd="khoiPhucPrj" data-id="' + p.id + '">Khôi phục</button><button class="do" data-hd="xoaHanPrj" data-id="' + p.id + '">Xoá hẳn</button></div>'; }).join('') + '</div>' : '') +
       '<div class="tv-luoi">' + (rac ? '' : '<button class="tv-so-moi" data-hd="soMoi"><span>' + IC.them + '</span>Sổ mới</button>') + the + '</div>' +
       (rac ? '<p class="tv-chu-y">Sổ và project trong Thùng rác tự xoá hẳn sau ' + NGAY_THUNG_RAC + ' ngày.</p>' : (!ds.length && loc !== 'tatCa' ? '' : '<p class="tv-chu-y">Trên máy tính, sổ và project bị xoá nằm trong Thùng rác, lấy lại được.</p>')) +
       '</section></div>';
+    if (GI.dongBo) GI.dongBo.veNut(el.querySelector('#tv-dong-bo'));
     // nạp ảnh bìa còn thiếu
     ds.forEach(function (s) {
       if (anhBo[s.id] !== undefined) return; anhBo[s.id] = null;
@@ -161,13 +167,13 @@ GI.thuVien = (function () {
     if (hd === 've') return dong();
     if (hd === 'thuMuc') { if (MT) kho('moThuMuc', 'chi-muc.json'); else app.thongBao('Chạy thử trên trình duyệt: thư viện lưu trong trình duyệt'); return; }
     if (hd === 'soMoi') return taoSoMoi();
-    if (hd === 'themPrj') { var ten = hoiTen('Tên project mới', ''); if (!ten) return; var p = { id: idMoi('p'), ten: ten, tao: Date.now() }; chiMuc.project.push(p); loc = p.id; ghiChiMuc(); return ve(); }
-    if (hd === 'khoiPhucPrj') { var p2 = timProject(t.dataset.id), x = p2.xoa; delete p2.xoa; chiMuc.so.forEach(function (s) { if (s.project === p2.id && s.xoa === x) delete s.xoa; }); ghiChiMuc(); loc = p2.id; return ve(); }
+    if (hd === 'themPrj') { var ten = hoiTen('Tên project mới', ''); if (!ten) return; var p = danhDau({ id: idMoi('p'), ten: ten, tao: Date.now() }); chiMuc.project.push(p); loc = p.id; ghiChiMuc(); return ve(); }
+    if (hd === 'khoiPhucPrj') { var p2 = timProject(t.dataset.id), x = p2.xoa; delete p2.xoa; danhDau(p2); chiMuc.so.forEach(function (s) { if (s.project === p2.id && s.xoa === x) { delete s.xoa; danhDau(s); } }); ghiChiMuc(); loc = p2.id; return ve(); }
     if (hd === 'xoaHanPrj') {
       var p3 = timProject(t.dataset.id); if (!xacNhan('Xoá hẳn project "' + p3.ten + '" và các sổ của nó trong Thùng rác? Không lấy lại được.')) return;
-      chiMuc.so.filter(function (s) { return s.project === p3.id && s.xoa; }).forEach(function (s) { xoaTep(s.id); });
-      chiMuc.so = chiMuc.so.filter(function (s) { return !(s.project === p3.id && s.xoa); }); chiMuc.project = chiMuc.project.filter(function (p) { return p !== p3; });
-      chiMuc.so.forEach(function (s) { if (s.project === p3.id) s.project = null; });
+      chiMuc.so.filter(function (s) { return s.project === p3.id && s.xoa; }).forEach(function (s) { xoaHan(s.id); });
+      chiMuc.so = chiMuc.so.filter(function (s) { return !(s.project === p3.id && s.xoa); }); chiMuc.project = chiMuc.project.filter(function (p) { return p !== p3; }); ghiXoaHan(p3.id);
+      chiMuc.so.forEach(function (s) { if (s.project === p3.id) { s.project = null; danhDau(s); } });
       ghiChiMuc(); return ve();
     }
     if (t.dataset.so && loc !== 'rac') {
@@ -188,24 +194,24 @@ GI.thuVien = (function () {
   function menuSo(id, nut) {
     var s = timSo(id);
     if (s.xoa) return moMenu(nut, [
-      { ten: 'Khôi phục', lam: function () { delete s.xoa; if (s.project && timProject(s.project) && timProject(s.project).xoa) s.project = null; ghiChiMuc(); ve(); } },
-      { ten: 'Xoá hẳn', do: true, lam: function () { if (!xacNhan('Xoá hẳn "' + s.ten + '"? Không lấy lại được.')) return; xoaTep(s.id); chiMuc.so = chiMuc.so.filter(function (x) { return x !== s; }); ghiChiMuc(); ve(); } }]);
-    var chuyen = prjSong().filter(function (p) { return p.id !== s.project; }).map(function (p) { return { ten: '→ ' + p.ten, lam: function () { s.project = p.id; ghiChiMuc(); ve(); app.thongBao('Đã chuyển vào ' + p.ten); } }; });
-    if (s.project) chuyen.push({ ten: '→ Không thuộc project', lam: function () { s.project = null; ghiChiMuc(); ve(); } });
+      { ten: 'Khôi phục', lam: function () { delete s.xoa; danhDau(s); if (s.project && timProject(s.project) && timProject(s.project).xoa) s.project = null; ghiChiMuc(); ve(); } },
+      { ten: 'Xoá hẳn', do: true, lam: function () { if (!xacNhan('Xoá hẳn "' + s.ten + '"? Không lấy lại được.')) return; xoaHan(s.id); chiMuc.so = chiMuc.so.filter(function (x) { return x !== s; }); ghiChiMuc(); ve(); } }]);
+    var chuyen = prjSong().filter(function (p) { return p.id !== s.project; }).map(function (p) { return { ten: '→ ' + p.ten, lam: function () { s.project = p.id; danhDau(s); ghiChiMuc(); ve(); app.thongBao('Đã chuyển vào ' + p.ten); } }; });
+    if (s.project) chuyen.push({ ten: '→ Không thuộc project', lam: function () { s.project = null; danhDau(s); ghiChiMuc(); ve(); } });
     moMenu(nut, [
       { ten: 'Mở', lam: function () { var el = $('#thu-vien [data-so="' + id + '"]'); bam({ target: el }); } },
-      { ten: 'Đổi tên', lam: function () { var ten = hoiTen('Tên sổ', s.ten); if (!ten) return; s.ten = ten; ghiChiMuc(); ve(); if (id === soMo) app.doiTen(); } },
-      { ten: 'Nhân bản', lam: function () { kho('doc', 'so/' + id + '.geoink').then(function (kq) { var m = { id: idMoi('s'), ten: s.ten + ' (bản sao)', project: s.project, tao: Date.now(), sua: Date.now() }; chiMuc.so.push(m); return Promise.all([kho('ghi', 'so/' + m.id + '.geoink', kq.noiDung), anhBo[id] ? kho('ghi', 'anh/' + m.id + '.txt', anhBo[id]) : 0, ghiChiMuc()]).then(function () { anhBo[m.id] = anhBo[id]; ve(); }); }); } },
+      { ten: 'Đổi tên', lam: function () { var ten = hoiTen('Tên sổ', s.ten); if (!ten) return; s.ten = ten; danhDau(s); ghiChiMuc(); ve(); if (id === soMo) app.doiTen(); } },
+      { ten: 'Nhân bản', lam: function () { kho('doc', 'so/' + id + '.geoink').then(function (kq) { var m = { id: idMoi('s'), ten: s.ten + ' (bản sao)', project: s.project, tao: Date.now(), sua: Date.now() }; m.ct = m.tao; chiMuc.so.push(m); return Promise.all([kho('ghi', 'so/' + m.id + '.geoink', kq.noiDung), anhBo[id] ? kho('ghi', 'anh/' + m.id + '.txt', anhBo[id]) : 0, ghiChiMuc()]).then(function () { anhBo[m.id] = anhBo[id]; ve(); }); }); } },
       { ten: 'Lịch sử phiên bản…', lam: function () { lichSu(s); } },
       '-'].concat(chuyen.length ? [{ ten: 'Chuyển đến project:', tat: true, lam: function () {} }].concat(chuyen, ['-']) : []).concat([
-      { ten: 'Xoá (vào Thùng rác)', do: true, lam: function () { s.xoa = Date.now(); if (id === soMo) { app.moi(true); soMo = null; } ghiChiMuc(); ve(); app.thongBao('Đã chuyển "' + s.ten + '" vào Thùng rác'); } }]));
+      { ten: 'Xoá (vào Thùng rác)', do: true, lam: function () { s.xoa = Date.now(); danhDau(s); if (id === soMo) { app.moi(true); soMo = null; } ghiChiMuc(); ve(); app.thongBao('Đã chuyển "' + s.ten + '" vào Thùng rác'); } }]));
   }
   function menuPrj(id, nut) {
     var p = timProject(id);
     moMenu(nut, [
-      { ten: 'Đổi tên project', lam: function () { var ten = hoiTen('Tên project', p.ten); if (!ten) return; p.ten = ten; ghiChiMuc(); ve(); } },
+      { ten: 'Đổi tên project', lam: function () { var ten = hoiTen('Tên project', p.ten); if (!ten) return; p.ten = ten; danhDau(p); ghiChiMuc(); ve(); } },
       { ten: 'Xoá project (vào Thùng rác)', do: true, lam: function () {
-        var luc = Date.now(); p.xoa = luc; chiMuc.so.forEach(function (s) { if (s.project === p.id && !s.xoa) { s.xoa = luc; if (s.id === soMo) { app.moi(true); soMo = null; } } });
+        var luc = Date.now(); p.xoa = luc; p.ct = luc; chiMuc.so.forEach(function (s) { if (s.project === p.id && !s.xoa) { s.xoa = luc; s.ct = luc; if (s.id === soMo) { app.moi(true); soMo = null; } } });
         loc = 'tatCa'; ghiChiMuc(); ve(); app.thongBao('Đã chuyển project "' + p.ten + '" vào Thùng rác'); } }]);
   }
   function lichSu(s) {
@@ -235,6 +241,17 @@ GI.thuVien = (function () {
     $('#thu-vien').addEventListener('click', bam);
     document.addEventListener('pointerdown', function (e) { if (menuEl && !e.target.closest('.tv-menu')) dongMenu(); });
     napChiMuc().catch(function () { });
+    if (GI.dongBo) GI.dongBo.khoiTao(noiBo);
   }
+  // phần trong cho đồng bộ Google Drive (dongbo.js)
+  var noiBo = {
+    kho: kho, napChiMuc: napChiMuc, ghiChiMuc: ghiChiMucIm, timSo: timSo, xoaTep: xoaTep, idMoi: idMoi,
+    xoaAnh: function (id) { delete anhBo[id]; },
+    soDangMo: function () { return soMo; },
+    dongSoMo: function () { app.moi(true); soMo = null; },
+    luuNeuCan: function () { return soMo && app.daSua() ? luuSo(false) : Promise.resolve(); },
+    ve: function () { if (dangMo()) ve(); },
+    get app() { return app; },
+  };
   return { khoiTao: khoiTao, mo: moTV, dong: dong, dangMo: dangMo, luuSo: luuSo, soDangMo: soDangMo, datSoMo: datSoMo, tenSo: function () { var s = soMo && timSo(soMo); return s ? s.ten : null; } };
 })();

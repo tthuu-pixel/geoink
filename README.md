@@ -10,6 +10,15 @@ Bảng viết tay cho giáo viên Toán trên Windows: viết bằng bút như S
 
 Sau khi cài, GeoInk chạy **không cần mạng**. Chỉ khi bấm nút **“Mở mô hình GeoLab”** mới cần mạng để mở trang GeoLab.
 
+### Đồng bộ thư viện sổ với Google Drive
+
+Mở **Thư viện** → bấm **Đồng bộ Google Drive** (hoặc menu ☰ → *Đồng bộ thư viện với Google Drive…*) → đăng nhập Gmail. Làm như vậy trên cả máy tính và máy tính bảng, **cùng một tài khoản Google**.
+- Thư viện sổ được lưu thêm vào thư mục **GeoInk – Thư viện sổ** trên Drive của chính bạn. GeoInk chỉ được xem / sửa các tệp do nó tạo.
+- Tự đồng bộ: khoảng 15 giây sau khi sửa, khi mở thư viện, 5 phút một lần, khi chuyển app (máy tính bảng) và trước khi thoát. Không có mạng vẫn dùng bình thường, có mạng lại thì tự đẩy lên.
+- Sổ đang mở được sửa ở máy khác: tự mở lại bản mới. Một sổ bị sửa ở **cả hai** máy giữa hai lần đồng bộ: giữ cả hai, bản kia thành sổ *“… (bản từ máy khác)”*.
+- Đổi tên, chuyển project, xoá vào Thùng rác, xoá hẳn: máy kia làm theo.
+- Nút trên đầu thư viện cho biết lần đồng bộ cuối; bấm vào để *Đồng bộ ngay* hoặc *Ngắt kết nối*.
+
 ### Máy tính bảng Android
 
 1. Trên máy tính bảng, mở [**Releases**](https://github.com/tthuu-pixel/geoink/releases/latest) bằng Chrome, tải **`GeoInk-Android.apk`**.
@@ -162,5 +171,7 @@ npm start          # chạy thử
 Mã nguồn: `main.js` (cửa sổ, lưu/mở tệp), `preload.js`, `src/app.js` (giao diện, bút, công cụ), `src/hinh.js` (bộ dựng hình), `src/bieuthuc.js` (đọc biểu thức hàm số), `src/mohinh.js` (danh mục mô hình GeoLab), `src/bieutuong.js` (biểu tượng màu, con trỏ bút chì), `src/thu-vien/` (pdf.js 3.11 – Apache 2.0; MathLive 0.111 – MIT; MathJax 3.2 – Apache 2.0; font Latin Modern Roman – GUST Font License).
 
 **Bản Android** (`android-app/`): bọc nguyên thư mục `src/` bằng [Capacitor](https://capacitorjs.com) 8. `src/android.js` thay cho `preload.js` (lưu tệp, thư viện sổ, đăng nhập, cập nhật, nút Quay lại) và chỉ chạy trong app Android. `android-app/chuan-bi-web.js` chép `src/` sang `android-app/www` (nới CSP cho Capacitor). Đóng gói thử trên máy: cần Android SDK + JDK 21, rồi `cd android-app && npm install && npm run chuan-bi && cd android && ./gradlew assembleRelease`. Khoá ký APK đặt trong secrets của repo: `ANDROID_KEYSTORE_B64` (tệp .jks mã hoá base64) và `ANDROID_KEYSTORE_PASS`; thiếu thì APK được ký bằng khoá tạm (cài bản sau phải gỡ bản trước).
+
+**Đồng bộ Google Drive** (`src/dongbo.js`): Drive API v3, quyền `drive.file`. Bản Windows đăng nhập kiểu ứng dụng trên máy (trình duyệt + 127.0.0.1, PKCE) trong `main.js`, mã làm mới lưu mã hoá (safeStorage); mã ứng dụng lấy từ secrets `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (GitHub Actions ghi ra `google-config.json` khi đóng gói). Bản Android dùng Google Identity Services (`GoogleDrivePlugin.java`), Google nhận app qua tên gói `vn.geolab.geoink` + SHA-1 khoá ký.
 
 **Phát hành bản mới**: tăng `version` trong `package.json` (ví dụ `0.1.1`) rồi đẩy lên nhánh `main`. GitHub Actions đóng gói trên máy Windows, tạo bản phát hành `v0.1.1` và đăng tệp cài đặt lên Releases, sau đó đóng gói APK Android và gắn `GeoInk-Android.apk` vào cùng bản phát hành. Đẩy lên nhánh `may-tinh-bang` thì chỉ đóng gói APK thử, đăng vào bản thử `android-thu`. Đẩy lên `main` mà không đổi `version` thì chỉ đóng gói thử.

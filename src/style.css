@@ -677,3 +677,19 @@ body.co-thanh-khoi #thong-bao { bottom: 132px; }
 html:not(.android) .chi-android { display: none !important; }
 html.android .an-android, html.android kbd { display: none !important; }
 html.android, html.android body { -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+
+/* ---- Đồng bộ Google Drive (đầu thư viện) ---- */
+#tv-dong-bo:empty { display: none; }
+.tv-gg { display: inline-flex; align-items: center; gap: 6px; }
+.tv-gg svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tv-gg.bat { color: #1E40AF; }
+.tv-gg.loi { color: #B45309; }
+.tv-gg svg.xoay { animation: ggXoay 1s linear infinite; }
+@keyframes ggXoay { to { transform: rotate(360deg); } }
+.tv-menu-gg { min-width: 250px; }
+.tv-gg-tk { display: flex; align-items: center; gap: 10px; padding: 10px 14px 6px; }
+.tv-gg-tk svg { width: 26px; height: 26px; fill: none; stroke: #1E40AF; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tv-gg-tk b { display: block; font-size: 14px; } .tv-gg-tk small { color: #64748B; font-size: 12.5px; }
+.tv-gg-luc, .tv-gg-loi { margin: 2px 14px 8px; font-size: 12.5px; color: #64748B; }
+.tv-gg-loi { color: #B45309; max-width: 260px; }
+.hop-dong-bo { max-width: 520px; }

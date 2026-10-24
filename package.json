@@ -28,6 +28,7 @@
       "main.js",
       "preload.js",
       "src/**/*",
+      "google-config.json",
       "package.json"
     ],
     "fileAssociations": [

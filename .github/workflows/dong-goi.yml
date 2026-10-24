@@ -30,6 +30,18 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Mã kết nối Google Drive (đồng bộ thư viện)
+        shell: bash
+        env:
+          GG_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GG_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: |
+          if [ -n "$GG_ID" ] && [ -n "$GG_SECRET" ]; then
+            node -e "require('fs').writeFileSync('google-config.json', JSON.stringify({ clientId: process.env.GG_ID, clientSecret: process.env.GG_SECRET }))"
+            echo "Đã có mã Google: đồng bộ Drive bật"
+          else
+            echo "::warning::Chưa có secrets GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: bản Windows này chưa đồng bộ Google Drive được."
+          fi
       - name: Đóng gói và phát hành
         run: npx electron-builder --win --publish always
         env:
