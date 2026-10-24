@@ -1606,7 +1606,11 @@
       var oBD = !(e.ctrlKey || e.metaKey) && muc && muc.h && timTheoId(muc.h);
       if (oBD && oBD.loai === 'bieuDo') {   // biểu đồ: bấm cột / điểm / phần quạt để chọn danh mục; đã chọn biểu đồ thì kéo đỉnh cột, điểm để đổi số liệu
         var ph = timPhanBD(oBD, M);
-        if (ph) { oBD._chonCot = ph.i; if (ph.dinh && trongNhom(muc) && oBD.kieu !== 'tron') { dangKeo = { loai: 'cotBD', o: oBD, i: ph.i, j: ph.j, daGhi: false }; cv.style.cursor = 'ns-resize'; capNhatThanhNhanh(); canVe(); return; } }
+        if (ph) {
+          oBD._chonCot = ph.i;
+          if (ph.dinh && trongNhom(muc) && oBD.kieu !== 'tron') { dangKeo = { loai: 'cotBD', o: oBD, i: ph.i, j: ph.j, daGhi: false }; cv.style.cursor = 'ns-resize'; capNhatThanhNhanh(); canVe(); return; }
+          if (!ph.dinh && trongNhom(muc)) { dangKeo = { loai: 'doiCotBD', o: oBD, i: ph.i, daGhi: false }; cv.style.cursor = 'grabbing'; capNhatThanhNhanh(); canVe(); return; }
+        }
         else oBD._chonCot = null;
       }
       if (e.ctrlKey || e.metaKey) {   // Ctrl: thêm / bớt đối tượng; Ctrl + kéo chỗ trống: khung chọn thêm
@@ -1673,6 +1677,7 @@
       if (dangKeo.loai === 'nhom') { keoNhom(M); return; }
       if (dangKeo.loai === 'veChe') { dangKeo.b = M; canVe(); return; }
       if (dangKeo.loai === 'cotBD') { keoCotBD(dangKeo, M); return; }
+      if (dangKeo.loai === 'doiCotBD') { doiCotBD(dangKeo, M); return; }
       if (dangKeo.loai === 'chenKhoang') { dangKeo.cuoi = M.y; keoChenKhoang(M.y - dangKeo.y0); return; }
       if (dangKeo.loai === 'dichChu') { dangKeo.o.x = M.x - dangKeo.dx; dangKeo.o.y = M.y - dangKeo.dy; daSua = true; canVe(); return; }
       if (dangKeo.loai === 'moHinh') { dangKeo.m.x = M.x - dangKeo.dx; dangKeo.m.y = M.y - dangKeo.dy; canVe(); return; }
@@ -3549,6 +3554,7 @@
       if (Math.abs(M.y - q.y) < r) return { i: q.i, j: q.j, dinh: true };
       if (M.y > q.y && M.y < q.y + q.h) return { i: q.i, j: q.j };
     }
+    if (hh.nhom && M.y > hh.yNhan + 2 / V.s && M.y < hh.yNhan + 30 && M.x > hh.x0 && M.x < hh.x0 + hh.nhom * hh.n) return { i: Math.floor((M.x - hh.x0) / hh.nhom), nhan: true };
     if (hh.quat) {
       var Q = hh.quat, dx = M.x - Q.cx, dy = M.y - Q.cy; if (Math.hypot(dx, dy) > Q.r) return null;
       var g = Math.atan2(dy, dx); while (g < -Math.PI / 2) g += 2 * Math.PI;
@@ -3563,6 +3569,27 @@
     if (o.ds[k.j].so[k.i] === v) return;
     if (!k.daGhi) { ghiLichSu(); k.daGhi = true; }
     o.ds[k.j].so[k.i] = v; daSua = true; canVe(); thongBao((o.dm[k.i] || '') + ': ' + String(v).replace('.', ','));
+  }
+  // Kéo cột (hoặc tên danh mục, phần quạt) sang ngang để đổi thứ tự danh mục
+  function doiChoBD(o, tu, den) {
+    if (tu === den || den < 0 || den >= o.dm.length) return;
+    o.dm.splice(den, 0, o.dm.splice(tu, 1)[0]);
+    o.ds.forEach(function (d) { while (d.so.length < o.dm.length) d.so.push(null); d.so.splice(den, 0, d.so.splice(tu, 1)[0]); });
+  }
+  function doiCotBD(k, M) {
+    var o = k.o, hh = o._hh, den; if (!hh) return;
+    if (hh.quat) {   // hình quạt: đổi chỗ với phần đang trỏ tới
+      var Q = hh.quat, g = Math.atan2(M.y - Q.cy, M.x - Q.cx); while (g < -Math.PI / 2) g += 2 * Math.PI;
+      if (Math.hypot(M.x - Q.cx, M.y - Q.cy) > Q.r * 1.3) return;
+      var ph = Q.phan.filter(function (q) { return g >= q.a && g < q.b; })[0]; if (!ph || ph.i === k.i || ph.i === k.vua) return;
+      den = ph.i;
+    } else {
+      if (!hh.nhom) return;
+      den = Math.max(0, Math.min(o.dm.length - 1, Math.floor((M.x - hh.x0) / hh.nhom)));
+      if (den === k.i) return;
+    }
+    if (!k.daGhi) { ghiLichSu(); k.daGhi = true; }
+    doiChoBD(o, k.i, den); k.vua = k.i; k.i = den; o._chonCot = den; daSua = true; canVe(); capNhatThanhNhanh();
   }
   function bdThemCot(o) {
     var goiY = 'Mục ' + (o.dm.length + 1), m = /^(.*?)([A-Z])$/.exec(o.dm[o.dm.length - 1] || '');
