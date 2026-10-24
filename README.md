@@ -29,6 +29,7 @@ Khác bản Windows:
 - Luôn toàn màn hình; vuốt từ mép màn hình để hiện thanh hệ thống.
 - **Hai ngón tay**: chụm để phóng to / thu nhỏ, kéo để dời bảng. **Chạm giữ** vào hình để mở menu (như chuột phải).
 - **Chống chạm lòng bàn tay**: khi đã viết bằng bút (S Pen, bút cảm ứng), bút đang chạm hoặc lơ lửng trên màn hình thì tay chạm vào bảng không vẽ; một ngón tay để kéo bảng.
+- Chạm vào hình, nét viết, mô hình… (công cụ con trỏ) là hiện nút **Xoá** đỏ ngay cạnh (thay cho phím Delete). Chạm vào nhóm công cụ có ▽ là xổ danh sách ngay dưới nút.
 - Nút **Quay lại** của Android đóng hộp thoại / menu đang mở; ở màn hình chính thì hỏi trước khi thoát (sổ thư viện tự lưu).
 - **Lưu** ghi tệp `.geoink` vào thư mục *Tài liệu/GeoInk*; **Xuất ảnh** ghi vào *Ảnh/GeoInk*. Menu ☰ có thêm **Gửi bảng (Zalo, Drive, Gmail…)**; cắt hình có nút **Gửi**. (Không dán thẳng ảnh sang Word được như trên Windows.)
 - Thư viện sổ lưu trong bộ nhớ riêng của app (gỡ app là mất — hãy *Gửi bảng* ra Drive những sổ quan trọng). Tự lưu cả khi chuyển sang app khác.
