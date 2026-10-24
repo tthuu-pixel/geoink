@@ -141,4 +141,11 @@
   nghe('App', 'pause', function () { window.dispatchEvent(new Event('geoink-tam-dung')); });
   setTimeout(function () { kiemTraCapNhat(false); }, 5000);
   document.documentElement.classList.add('android');
+  // Màn chào hoạt hình: chạy xong (khoảng 3,6 giây) thì mờ dần; chạm vào để bỏ qua
+  var manChao = document.getElementById('man-chao');
+  if (manChao) {
+    var tatChao = function () { if (!manChao) return; var m = manChao; manChao = null; m.classList.add('xong'); setTimeout(function () { m.remove(); }, 550); };
+    var henChao = setTimeout(tatChao, 3600);
+    manChao.addEventListener('pointerdown', function () { clearTimeout(henChao); tatChao(); });
+  }
 })();
