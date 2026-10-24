@@ -22,5 +22,10 @@ const MAN_CHAO = `<div id="man-chao" aria-hidden="true"><div class="mc-hang"><di
 </svg></div></div><div class="mc-chu"><span class="mc-ten">Geo<b>Ink</b></span><span class="mc-phu">Bảng viết tay &amp; dựng hình cho giáo viên Toán</span></div></div></div>`;
 html = html.replace(/<body([^>]*)>/, (m) => m + '\n' + MAN_CHAO + '\n<script src="man-chao.js"></script>');
 fs.writeFileSync(f, html);
+// Mã ứng dụng Google (Desktop) cho đăng nhập bằng trình duyệt trên máy không có Google Play Services
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  fs.writeFileSync(path.join(dich, 'google-config.json'), JSON.stringify({ clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET }));
+  console.log('Đã ghi google-config.json');
+}
 const goi = require('./package.json');
 console.log('Đã chép giao diện GeoInk ' + goi.version + ' vào www/');
