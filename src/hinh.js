@@ -160,6 +160,10 @@ GI.hinh = (function () {
         case 'che': return { k: 'che', x: o.x, y: o.y, w: o.w, h: o.h };
         case 'bieuDo': return { k: 'bieuDo', x: o.x, y: o.y, w: o.w || 440, h: o.h || 330 };
         case 'doThi': return { k: 'doThi', x: o.x, y: o.y };   // đồ thị hàm số (hệ trục + đồ thị + bảng giá trị)   // ảnh dán / cắt từ màn hình
+        case 'duongTZ': {   // đường cong \draw plot của mã TikZ: dãy điểm (toạ độ TikZ) theo gốc o.goc → đường gấp khúc mịn
+          var Gd = diem(o.goc); if (!Gd) return null; var Dd = DV * (o.kt || 1);
+          return { k: 'gapKhuc', ds: o.pts.map(function (q) { return { x: Gd.x + q[0] * Dd, y: Gd.y - q[1] * Dd }; }) };
+        }
         case 'diemTZ': case 'nhanTZ': {   // điểm / nhãn dựng từ mã TikZ (biểu thức theo toạ độ TikZ, gốc là điểm o.goc)
           var G = diem(o.goc); if (!G || !GI.tikz) return null; var Dk = DV * (o.kt || 1);
           var Pz = GI.tikz.tinh(o.bt, function (id) { var Q = diem(id); return Q ? { x: (Q.x - G.x) / Dk, y: -(Q.y - G.y) / Dk } : null; });
