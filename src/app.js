@@ -71,7 +71,7 @@
     xuong: '<path d="M7.5 10l4.5 4.5 4.5-4.5"/>',
     toanManHinh: '<path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/>',
   };
-  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1, nhapTex: 1, xuatTex: 1, catHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
+  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1, nhapDe: 1, nhapTex: 1, xuatTex: 1, catHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
   function bieuTuong(k, hang2) {
     if (!hang2 && BT_MAU[k] && GI.bieuTuong) return GI.bieuTuong(k);
     if (!hang2 && BT_NET[k]) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + BT_NET[k] + '</svg>';
@@ -2128,6 +2128,7 @@
     truc: function () { ghiLichSu(); trang().truc = !trang().truc; if (trang().truc) { V.x = -W / 2 / V.s; V.y = -Hh / 2 / V.s; } capNhatNutBat(); canVe(); },
     soDo: function () { hienSo = !hienSo; capNhatNutBat(); canVe(); },
     nhapTex: function () { LENH.nhapTikz(); },
+    nhapDe: function () { if (LA_BANG) return; suaDeBai = null; LENH.nhapTikz('de'); },
     catHinh: function () { batDauCat(); },
     kiemTraCapNhat: function () { $('#menu').classList.add('an'); if (!MT || !MT.kiemTraCapNhat) return thongBao('Chỉ kiểm tra cập nhật được trong app đã cài'); capNhat.tay = true; thongBao('Đang kiểm tra bản mới…'); MT.kiemTraCapNhat(); },
     xuatTex: function () {
@@ -2137,7 +2138,7 @@
       choXuatTex = true; chonCongCu('chon');
       var el = $('#goi-y'); el.innerHTML = '<b>Xuất mã TeX:</b> kéo khung quanh hình cần xuất (Esc để huỷ)'; el.classList.remove('an');
     },
-    nhapTikz: function () { $('#menu').classList.add('an'); $('#tikz-loi').innerHTML = ''; $('#hop-tikz').classList.remove('an'); setTimeout(function () { $('#tikz-ma').focus(); }, 30); },
+    nhapTikz: function (cheDo) { $('#menu').classList.add('an'); if (cheDo !== 'de') suaDeBai = null; datCheDoNhap(cheDo === 'de' ? 'de' : 'tikz'); $('#tikz-loi').innerHTML = ''; $('#hop-tikz').classList.remove('an'); setTimeout(function () { $('#tikz-ma').focus(); }, 30); },
     toanManHinh: function () { if (MT) MT.toanManHinh(); else if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); },
     thuNho: function () { thuPhong(1 / 1.25); }, phongTo: function () { thuPhong(1.25); }, tiLeMacDinh: function () { thuPhong(1 / V.s); }, chenKhoang: function () { chonCongCu('chenKhoang'); }, che: function () { chonCongCu('che'); },
     vuaKhung: function () { thuPhong(1 / V.s); },
@@ -3478,10 +3479,21 @@
     return kq;
   }
   // ----- Đề bài từ mã LaTeX (\begin{ex}…, \begin{bt}…): chữ + công thức + phương án, hình TikZ bên phải, lời giải bị che -----
-  var suaDeBai = null;
+  var suaDeBai = null, NHAP_TIKZ = null;
+  // hộp nhập dùng chung: chế độ 'tikz' (dựng hình) hoặc 'de' (đề LaTeX ex / bt)
+  function datCheDoNhap(k) {
+    var td = $('#tikz-tieu-de'), gc = $('#tikz-ghi-chu'), ma = $('#tikz-ma');
+    if (!NHAP_TIKZ) NHAP_TIKZ = { td: td.innerHTML, gc: gc.innerHTML, ph: ma.placeholder, nut: $('#tikz-dung').textContent };
+    $('#tikz-dung').textContent = k === 'de' ? (suaDeBai ? 'Cập nhật đề' : 'Đưa lên bảng') : NHAP_TIKZ.nut;
+    if (k === 'de') {
+      td.textContent = suaDeBai ? 'Sửa đề (mã LaTeX)' : 'Nhập đề từ mã LaTeX';
+      gc.innerHTML = 'Dán một hay nhiều câu <code>\\begin{ex}…\\end{ex}</code>, <code>\\begin{bt}…\\end{bt}</code>. Câu có <code>\\choice</code>, <code>\\choiceTF</code>, <code>\\shortans</code> thành <b>Câu</b> trắc nghiệm, còn lại thành <b>Bài</b> tự luận; mỗi câu / bài một khung, <code>\\loigiai</code> nằm trong khung (bấm đúp để xem). Đọc được bảng <code>tabular</code>, <code>multicols</code>, <code>\\immini</code> và hình TikZ. Mẹo: dán thẳng lên bảng bằng Ctrl+V cũng được.';
+      ma.placeholder = '\\begin{ex}\nCho phương trình $x^2-2x+m=0$. Giá trị của $m$ để phương trình có nghiệm kép là\n\\choice{$m=0$}{\\True $m=1$}{$m=2$}{$m=-1$}\n\\loigiai{$\\Delta\'=1-m=0\\Leftrightarrow m=1$.}\n\\end{ex}';
+    } else { td.innerHTML = NHAP_TIKZ.td; gc.innerHTML = NHAP_TIKZ.gc; ma.placeholder = NHAP_TIKZ.ph; }
+  }
   function moSuaDeBai(o) {
     if (LA_BANG) return thongBao('Sửa mã LaTeX đề bài chỉ có trên bản máy tính');
-    suaDeBai = o; LENH.nhapTikz(); $('#tikz-ma').value = o.ma || ''; $('#tikz-loi').innerHTML = '';
+    suaDeBai = o; LENH.nhapTikz('de'); $('#tikz-ma').value = o.ma || ''; $('#tikz-loi').innerHTML = '';
   }
   function nhapDeBai(ma, cu) {
     var ds; try { ds = GI.deBai.phanTich(ma); } catch (e) { return { loi: 'Không đọc được mã: ' + escHtml(e.message || String(e)) }; }
