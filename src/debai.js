@@ -322,10 +322,10 @@ GI.deBai = (function () {
     hang.chua = chua;
     return hang;
   }
-  // ===== Khung đề (thẻ): trắc nghiệm = "Câu" tông tím, tự luận = "Bài" tông xanh; lời giải nằm trong khung =====
+  // ===== Khung đề (thẻ): trắc nghiệm = "Câu" tông đỏ nâu, tự luận = "Bài" tông xanh GeoInk; lời giải nằm trong khung =====
   var TONG = {
-    tn: { vien: '#7C3AED', nenDau: '#EDE9FE', chuDau: '#4C1D95', nhan: '#7C3AED', nenHang: '#F3F2F8', the: '#DDD6FE' },
-    tl: { vien: '#0E7490', nenDau: '#CFFAFE', chuDau: '#134E4A', nhan: '#0E7490', nenHang: '#EEF6F8', the: '#A5F3FC' },
+    tn: { vien: '#A3341F', nenDau: '#FBEAE4', chuDau: '#6B1D10', nhan: '#A3341F', nenHang: '#F8F2F0', the: '#F0C4B8' },   // trắc nghiệm: đỏ nâu
+    tl: { vien: '#2451C7', nenDau: '#E3EBFF', chuDau: '#1A3A8F', nhan: '#2451C7', nenHang: '#F1F4FB', the: '#BFD0F7' },   // tự luận: xanh của GeoInk
   };
   var MAU_CHU = '#1F2937', MAU_LG = '#15803D', MAU_DUNG = '#16A34A', MAU_SAI = '#DC2626';
   function tongCua(o) { return TONG[o.dang === 'tn' ? 'tn' : 'tl']; }
