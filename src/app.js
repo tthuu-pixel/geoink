@@ -2139,6 +2139,7 @@
     soDo: function () { hienSo = !hienSo; capNhatNutBat(); canVe(); },
     nhapTex: function () { LENH.nhapTikz(); },
     nhapDe: function () { if (LA_BANG) return; suaDeBai = null; LENH.nhapTikz('de'); },
+    nhapTepTex: function () { if (LA_BANG) return; $('#menu').classList.add('an'); chonTepTex(); },
     catHinh: function () { batDauCat(); },
     kiemTraCapNhat: function () { $('#menu').classList.add('an'); if (!MT || !MT.kiemTraCapNhat) return thongBao('Chỉ kiểm tra cập nhật được trong app đã cài'); capNhat.tay = true; thongBao('Đang kiểm tra bản mới…'); MT.kiemTraCapNhat(); },
     xuatTex: function () {
@@ -3522,6 +3523,20 @@
       ma.placeholder = '\\begin{ex}\nCho phương trình $x^2-2x+m=0$. Giá trị của $m$ để phương trình có nghiệm kép là\n\\choice{$m=0$}{\\True $m=1$}{$m=2$}{$m=-1$}\n\\loigiai{$\\Delta\'=1-m=0\\Leftrightarrow m=1$.}\n\\end{ex}';
     } else { td.innerHTML = NHAP_TIKZ.td; gc.innerHTML = NHAP_TIKZ.gc; ma.placeholder = NHAP_TIKZ.ph; }
   }
+  // Nhập tệp .tex: chọn tệp là đưa lên bảng (đề ex / bt / vd → khung đề; chỉ có tikzpicture → dựng hình)
+  function chonTepTex() {
+    var inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.tex,.txt,text/plain,application/x-tex';
+    inp.onchange = function () {
+      var f = inp.files[0]; if (!f) return;
+      f.text().then(function (ma) {
+        var ten = f.name;
+        if (GI.deBai.coMa(ma)) { suaDeBai = null; var kq = nhapDeBai(ma); if (kq.loi) return thongBao(ten + ': ' + kq.loi.replace(/<[^>]+>/g, '')); $('#hop-tikz').classList.add('an'); return; }
+        if (/\\begin\{tikzpicture\}|\\draw\b/.test(ma)) { var kt = nhapTikz(ma); if (kt.loi) return thongBao(ten + ': ' + kt.loi.replace(/<[^>]+>/g, '')); $('#hop-tikz').classList.add('an'); return; }
+        thongBao(ten + ': không tìm thấy \\begin{ex}, \\begin{bt} hay tikzpicture trong tệp');
+      }, function () { thongBao('Không đọc được tệp ' + f.name); });
+    };
+    inp.click();
+  }
   function moSuaDeBai(o) {
     if (LA_BANG) return thongBao('Sửa mã LaTeX đề bài chỉ có trên bản máy tính');
     suaDeBai = o; LENH.nhapTikz('de'); $('#tikz-ma').value = o.ma || ''; $('#tikz-loi').innerHTML = '';
@@ -4075,6 +4090,7 @@
     else { ta.select(); document.execCommand('copy'); xong(); }
   };
   function escHtml(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  $('#tikz-tep').onclick = chonTepTex;
   $('#tikz-dung').onclick = function () {
     var maDB = $('#tikz-ma').value;
     if (!LA_BANG && GI.deBai.coMa(maDB)) {   // đề bài LaTeX (ex, bt, vd): chỉ bản máy tính

@@ -8,6 +8,15 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Màn chào hoạt hình lúc mở app: logo tự vẽ ở giữa, trượt sang trái, chữ GeoInk hiện bên phải (src/man-chao.js) -->
+<div id="man-chao" aria-hidden="true"><div class="mc-hang"><div class="mc-truot"><div class="mc-logo">
+<svg viewBox="0 0 100 100"><defs><linearGradient id="mc-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2452C4"/><stop offset="1" stop-color="#1A3A9C"/></linearGradient></defs>
+<rect x="4" y="4" width="92" height="92" rx="20" fill="url(#mc-g)"/>
+<path class="mc-tg" d="M54.7 24.4 L24.4 74.2 L77.1 74.2 Z" fill="none" stroke="#fff" stroke-width="4.2" stroke-linejoin="round" pathLength="100"/>
+<g class="mc-dinh" fill="#fff"><circle cx="54.7" cy="24.4" r="3.9"/><circle cx="24.4" cy="74.2" r="3.9"/><circle cx="77.1" cy="74.2" r="3.9"/></g>
+<path class="mc-song" d="M29.3 62.3 C35 54 39 49.5 42 49.3 C47 49 52 57 58 66 C62 72 65 75.5 68 75.3 C72 75 76 69 79.8 63.3" fill="none" stroke="#FACC15" stroke-width="4.6" stroke-linecap="round" pathLength="100"/>
+</svg></div></div><div class="mc-chu"><span class="mc-ten">Geo<b>Ink</b></span><span class="mc-phu">Bảng viết tay &amp; dựng hình cho giáo viên Toán</span></div></div></div>
+<script src="man-chao.js"></script>
 <!-- Hàng trên: tệp, hoàn tác, trang -->
 <header id="hang-dau" class="hang">
   <button class="nut" id="nut-menu" title="Menu"><i data-bt="menu"></i></button>
@@ -89,6 +98,7 @@
   <button data-lenh="xuatAnh"><i data-bt="anh"></i>Xuất trang ra ảnh PNG</button>
   <button data-lenh="guiBang" class="chi-android"><i data-bt="luu"></i>Gửi bảng (Zalo, Drive, Gmail…)</button>
   <button data-lenh="nhapDe" class="an-android"><i data-bt="nhapDe"></i>Nhập đề từ mã LaTeX (ex, bt)…</button>
+  <button data-lenh="nhapTepTex" class="an-android"><i data-bt="nhapDe"></i>Nhập tệp .tex…</button>
   <button data-lenh="nhapTikz"><i data-bt="tikz"></i>Nhập hình từ mã TikZ…</button>
   <hr>
   <div class="tieu-de-menu">Nền trang</div>
@@ -143,7 +153,7 @@
 \foreach \d/\g in {A/100, B/-135, C/-30, H/-90} \path[draw, fill=white] (\d) circle(1pt) + (\g:9pt) node {$\d$};
 \end{tikzpicture}"></textarea>
     <div class="loi" id="tikz-loi"></div>
-    <div class="hanh-dong"><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="tikz-dung">Dựng hình</button></div>
+    <div class="hanh-dong"><button class="nut chu an-android" id="tikz-tep" title="Chọn tệp .tex trên máy: có \begin{ex} / \begin{bt} thì đưa đề lên bảng, có tikzpicture thì dựng hình" style="margin-right:auto">📂 Mở tệp .tex…</button><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="tikz-dung">Dựng hình</button></div>
   </div>
 </div>
 

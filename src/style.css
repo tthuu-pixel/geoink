@@ -696,7 +696,7 @@ html.android, html.android body { -webkit-touch-callout: none; -webkit-tap-highl
 .tv-gg-loi { color: #B45309; max-width: 260px; }
 .hop-dong-bo { max-width: 520px; }
 
-/* ---- Màn chào hoạt hình (bản Android) ----
+/* ---- Màn chào hoạt hình lúc mở app (máy tính và Android) ----
    Chỉ dùng transform / opacity cho phần di chuyển (chạy trên GPU, không giật khi app đang khởi động). */
 #man-chao { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; overflow: hidden;
   background: radial-gradient(circle at 18% 22%, rgba(255, 236, 160, .75) 0%, rgba(255, 236, 160, 0) 42%),

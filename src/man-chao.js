@@ -1,4 +1,4 @@
-// Màn chào hoạt hình của bản Android (khung #man-chao do android-app/chuan-bi-web.js chèn vào).
+// Màn chào hoạt hình lúc mở app (khung #man-chao trong index.html, dùng cho cả máy tính và Android).
 // Lúc đầu logo nằm giữa màn hình: dời logo sang phải nửa bề rộng phần chữ, rồi CSS trượt về chỗ.
 (function () {
   var m = document.getElementById('man-chao'); if (!m) return;
