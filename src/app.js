@@ -4193,8 +4193,9 @@
     MT.khiMoTep(function (d) { if (hoiBoThayDoi()) napTep(d); });
     MT.khiHoiDong(function () {
       var thoat = function () { (GI.dongBo ? GI.dongBo.truocKhiThoat() : Promise.resolve()).then(function () { MT.dongThat(); }, function () { MT.dongThat(); }); };   // đẩy nốt lên Google Drive
-      if (((GI.thuVien && GI.thuVien.soDangMo()) || (!tenTep && !bangTrong())) && daSua) { luuThuVien(true).then(thoat); return; }   // sổ thư viện: tự lưu rồi thoát
-      if (!daSua || (GI.thuVien && GI.thuVien.soDangMo()) || window.confirm('Bảng có thay đổi chưa lưu. Thoát mà không lưu?')) thoat();
+      var an = function () { if (MT.anCuaSo) MT.anCuaSo(); };   // ẩn cửa sổ ngay, việc lưu / đồng bộ làm tiếp phía sau
+      if (((GI.thuVien && GI.thuVien.soDangMo()) || (!tenTep && !bangTrong())) && daSua) { an(); luuThuVien(true).then(thoat, thoat); return; }   // sổ thư viện: tự lưu rồi thoát
+      if (!daSua || (GI.thuVien && GI.thuVien.soDangMo()) || window.confirm('Bảng có thay đổi chưa lưu. Thoát mà không lưu?')) { an(); thoat(); }
     });
   } else {
     window.addEventListener('beforeunload', function (e) { if (daSua) { e.preventDefault(); e.returnValue = ''; } });

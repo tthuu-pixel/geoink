@@ -12,7 +12,7 @@ function taoCuaSo() {
     height: 900,
     minWidth: 900,
     minHeight: 600,
-    backgroundColor: '#DCEBFF',   // trùng màu nền màn chào, không bị chớp trắng lúc mở
+    backgroundColor: '#F6F8FC',
     title: 'GeoInk',
     icon: path.join(__dirname, 'src', 'icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, spellcheck: false },
@@ -31,7 +31,15 @@ function taoCuaSo() {
     cuaSo.webContents.send('hoi-dong');
   });
   ipcMain.removeAllListeners('dong-that');
-  ipcMain.on('dong-that', () => { choDong = true; cuaSo.close(); });
+  ipcMain.on('dong-that', () => { choDong = true; if (!cuaSo.isDestroyed()) cuaSo.close(); });
+  // Bấm X: ẩn cửa sổ ngay cho người dùng thấy app đã tắt; lưu sổ + đồng bộ Drive chạy nốt phía sau rồi mới thoát hẳn
+  ipcMain.removeAllListeners('an-cua-so');
+  ipcMain.on('an-cua-so', () => {
+    if (!cuaSo || cuaSo.isDestroyed()) return;
+    cuaSo.webContents.setBackgroundThrottling(false);   // ẩn rồi vẫn chạy đủ nhanh để lưu xong
+    cuaSo.hide();
+    setTimeout(() => { if (cuaSo && !cuaSo.isDestroyed()) { choDong = true; cuaSo.close(); } }, 15000);   // chốt an toàn
+  });
   ipcMain.removeAllListeners('cap-nhat-cai');
   ipcMain.on('cap-nhat-cai', () => { choDong = true; setImmediate(() => autoUpdater.quitAndInstall(true, true)); });
   cuaSo.webContents.once('did-finish-load', () => setTimeout(() => kiemTraCapNhat(false), 4000));
