@@ -236,6 +236,8 @@ i { font-style: normal; }
 .nhap-dong { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
 .nhap-dong input, .nhap-dong textarea { height: 46px; padding: 0 14px; font: 600 20px var(--phong); border: 2px solid var(--vien); border-radius: 12px; user-select: text; }
 .nhap-dong textarea { height: auto; padding: 10px 14px; font-size: 18px; resize: vertical; }
+.nhap-dong select { height: 42px; padding: 0 10px; font: 600 16px var(--phong); border: 2px solid var(--vien); border-radius: 12px; background: #fff; }
+#nhap-co-dong { margin-top: 12px; }
 .nhap-dong input:focus, .nhap-dong textarea:focus { outline: none; border-color: var(--nhan); }
 textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 1.4; }
 .tt-so { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin: 0 0 10px; }
