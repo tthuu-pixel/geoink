@@ -737,3 +737,15 @@ html.android, html.android body { -webkit-touch-callout: none; -webkit-tap-highl
 html.android #xo-nhom button { padding: 6px 14px 6px 8px; font-size: 15px; }
 html.android #xo-nhom button i { width: 40px; height: 40px; }
 html.android #xo-nhom button i svg { width: 34px; height: 34px; }
+
+/* Bảng xổ dài hơn màn hình: cuộn dọc + thanh trượt tự vẽ ở mép phải (kéo được, cả trên máy tính bảng) */
+#xo-nhom, #menu-dc, #menu-phai { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; touch-action: pan-y; }
+.co-cuon { scrollbar-width: none; padding-right: 18px !important; }
+.co-cuon::-webkit-scrollbar { display: none; }
+.tc-ranh { position: absolute; right: 3px; width: 12px; background: #EEF2F7; border-radius: 6px; z-index: 3; cursor: pointer; touch-action: none; }
+.tc-ranh b { position: absolute; left: 1px; right: 1px; top: 0; border-radius: 5px; background: #94A3B8; cursor: grab; touch-action: none; }
+.tc-ranh b:hover, .tc-ranh b.keo { background: #64748B; }
+.tc-ranh b.keo { cursor: grabbing; }
+html.android .co-cuon { padding-right: 26px !important; }
+html.android .tc-ranh { width: 18px; border-radius: 9px; }
+html.android .tc-ranh b { border-radius: 8px; }

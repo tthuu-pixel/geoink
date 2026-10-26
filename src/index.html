@@ -87,7 +87,7 @@
   <button data-lenh="nhapPdf"><i data-bt="pdf"></i>Nhập tệp PDF…</button>
   <button data-lenh="xuatAnh"><i data-bt="anh"></i>Xuất trang ra ảnh PNG</button>
   <button data-lenh="guiBang" class="chi-android"><i data-bt="luu"></i>Gửi bảng (Zalo, Drive, Gmail…)</button>
-  <button data-lenh="nhapTikz"><i data-bt="tikz"></i>Nhập hình từ mã TikZ…</button>
+  <button data-lenh="nhapTikz"><i data-bt="tikz"></i>Nhập hình từ mã TikZ<span class="an-android"> / đề LaTeX (ex, bt)</span>…</button>
   <hr>
   <div class="tieu-de-menu">Nền trang</div>
   <div class="nen-menu" id="nen-menu"></div>
@@ -131,8 +131,8 @@
 
 <div id="hop-tikz" class="hop an" role="dialog" aria-label="Nhập hình từ mã TikZ">
   <div class="hop-noi-dung rong">
-    <h2>Nhập hình từ mã TikZ</h2>
-    <p class="ghi-chu">Dán mã <b>TikZ thuần</b> (cả khối <code>\begin{tikzpicture}…\end{tikzpicture}</code>). Điểm dựng bằng <code>calc</code>, <code>intersection of</code>, <code>name intersections</code> vẫn giữ cách dựng: kéo điểm gốc thì hình đổi theo. Mẹo: dán thẳng lên bảng bằng Ctrl+V cũng được.</p>
+    <h2>Nhập hình từ mã TikZ<span class="an-android"> / đề LaTeX</span></h2>
+    <p class="ghi-chu">Dán mã <b>TikZ thuần</b> (cả khối <code>\begin{tikzpicture}…\end{tikzpicture}</code>). Điểm dựng bằng <code>calc</code>, <code>intersection of</code>, <code>name intersections</code> vẫn giữ cách dựng: kéo điểm gốc thì hình đổi theo. Mẹo: dán thẳng lên bảng bằng Ctrl+V cũng được.<span class="an-android"> Dán cả đề <code>\begin{ex}…\end{ex}</code> hoặc <code>\begin{bt}…\end{bt}</code> thì GeoInk đưa đề lên bảng: chữ, công thức, phương án, hình TikZ đặt bên phải và lời giải được che sẵn.</span></p>
     <textarea id="tikz-ma" spellcheck="false" rows="14" placeholder="\begin{tikzpicture}[scale=1, font=\footnotesize, declare function={r=3;}]
 \path (0,0) coordinate (O) (110:r) coordinate (A) (210:r) coordinate (B) (-30:r) coordinate (C)
       ($(B)!(A)!(C)$) coordinate (H);
@@ -289,6 +289,7 @@
 <script src="bieuthuc.js"></script>
 <script src="vanban.js"></script>
 <script src="congthuc.js"></script>
+<script src="debai.js"></script>
 <script src="dungcu.js"></script>
 <script src="maytinh-loi.js"></script>
 <script src="maytinh.js"></script>
