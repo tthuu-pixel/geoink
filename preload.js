@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('mayTinh', {
   khiMoTep: (f) => ipcRenderer.on('mo-tep', (e, d) => f(d)),
   khiHoiDong: (f) => ipcRenderer.on('hoi-dong', () => f()),
   dongThat: () => ipcRenderer.send('dong-that'),
+  anCuaSo: () => ipcRenderer.send('an-cua-so'),
   chepAnh: (duLieu) => ipcRenderer.invoke('chep-anh', duLieu),
   docClipboard: () => ipcRenderer.invoke('doc-clipboard'),
   // thư viện sổ trên máy
