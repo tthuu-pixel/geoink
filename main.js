@@ -12,7 +12,7 @@ function taoCuaSo() {
     height: 900,
     minWidth: 900,
     minHeight: 600,
-    backgroundColor: '#DCEBFF',   // trùng màu nền màn chào, không bị chớp trắng lúc mở
+    backgroundColor: '#F6F8FC',
     title: 'GeoInk',
     icon: path.join(__dirname, 'src', 'icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, spellcheck: false },
