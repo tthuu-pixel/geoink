@@ -40,7 +40,8 @@ GI.deBai = (function () {
     return ds;
   }
   function phanTich(ma) {
-    ma = boChuThich(String(ma || ''));
+    // một dấu \ đứng cuối dòng (thường do chép mất một dấu của \\) coi như xuống dòng / hết hàng bảng
+    ma = boChuThich(String(ma || '')).replace(/(^|[^\\])\\[ \t]*\r?\n/g, '$1\\\\\n');
     var ds = [];
     ['ex', 'bt', 'vd'].forEach(function (ten) {
       timMoiTruong(ma, ten).forEach(function (k) { ds.push({ vt: k.dau, kieu: ten, trong: k.trong, ma: ma.slice(k.dau, k.cuoi) }); });

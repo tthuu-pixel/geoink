@@ -127,7 +127,7 @@ GI.tikz = (function () {
     function mu() { var v = don(); bo(); if (s[i] === '^') { i++; v = Math.pow(v, mu()); } return v; }
     function don() {
       bo(); var c = s[i];
-      if (c === '-') { i++; return -don(); } if (c === '+') { i++; return don(); }
+      if (c === '-') { i++; return -mu(); } if (c === '+') { i++; return mu(); }   // -x^2 = -(x^2) như TikZ
       if (c === '(' || c === '{') { var j = khop(s, i), v = soHoc(s.slice(i + 1, j), ham); i = j + 1; return v; }
       var m = /^(\d*\.\d+|\d+\.?)(\s*(pt|cm|mm|in|bp|ex|em)\b)?/.exec(s.slice(i));
       if (m) { i += m[0].length; var x = parseFloat(m[1]); if (m[3]) return x * DON_VI[m[3]]; return coDV ? x * PT : x; }
@@ -164,7 +164,7 @@ GI.tikz = (function () {
   function nhap(ma, cfg) {
     cfg = cfg || {};
     var canhBao = [], macro = {}, ham = {}, ten = {}, nut = [], tyLe = 1;
-    var duongTen = {}, doan = [], tron = [], cung = [], goc = [], gocVuong = [], nhan = [], xuatHien = {}, conLai = [];
+    var duongTen = {}, doan = [], tron = [], cung = [], dsPlot = [], goc = [], gocVuong = [], nhan = [], xuatHien = {}, conLai = [];
     function bao(s) { if (canhBao.indexOf(s) < 0 && canhBao.length < 30) canhBao.push(s); }
     function nutMoi(bt, tenTZ) { nut.push({ bt: bt, ten: tenTZ }); return { t: 'ref', id: nut.length - 1 }; }
     function datTen(t, bt) { t = t.trim().replace(/\.(center|north|south|east|west).*$/, ''); var r = bt.t === 'ref' ? bt : nutMoi(bt, t); ten[t] = r.id; if (!nut[r.id].ten) nut[r.id].ten = t; return r; }
@@ -343,6 +343,29 @@ GI.tikz = (function () {
           if (ve) cung.push({ c: tamA, a: g2 >= g1 ? cur : cuoiA, b: g2 >= g1 ? cuoiA : cur, kieu: kieu });
           cur = cuoiA; goc0 = cuoiA; noi = false; continue;
         }
+        if (/^plot\b/.test(r)) {   // plot (\x,{f(\x)}) với domain, samples, variable · plot coordinates {(…) (…)}
+          i += 4; bo(); var oPl = {}; if (s[i] === '[') { var jPl = khop(s, i); oPl = tuyChon(s.slice(i + 1, jPl)); i = jPl + 1; bo(); }
+          var lay = function (k, md) { return oPl[k] !== undefined ? oPl[k] : opt[k] !== undefined ? opt[k] : md; };
+          var ptsPl = [];
+          if (/^coordinates\b/.test(s.slice(i))) {
+            i += 11; bo(); if (s[i] !== '{') { bao('plot coordinates thiếu { }'); break; }
+            var jCo = khop(s, i), noiCo = s.slice(i + 1, jCo); i = jCo + 1;
+            var reCo = /\(([^()]*)\)/g, mCo2; while ((mCo2 = reCo.exec(noiCo))) { var Pc = gt(toaDo(mCo2[1])); if (Pc) ptsPl.push(Pc); }
+          } else if (s[i] === '(') {
+            var jPt = khop(s, i), haiVe = tach(s.slice(i + 1, jPt), ','); i = jPt + 1;
+            if (haiVe.length !== 2) { bao('plot cần dạng (x, y)'); break; }
+            var bien = String(lay('variable', '\\x')).replace(/^\\/, '').trim() || 'x', dom = String(lay('domain', '-5:5')).split(':');
+            var a0 = so(boNgoac(dom[0])), b0 = so(boNgoac(dom[1] || '5')), nMau = Math.max(2, Math.min(240, Math.round(so(String(lay('samples', '25'))))));
+            var reBien = new RegExp('\\\\' + bien + '(?![A-Za-z])', 'g'), fx = haiVe[0].replace(reBien, bien), fy = haiVe[1].replace(reBien, bien);
+            for (var kPl = 0; kPl < nMau; kPl++) {
+              var tPl = a0 + (b0 - a0) * kPl / (nMau - 1), hPl = {}; for (var kh in ham) hPl[kh] = ham[kh]; hPl[bien] = tPl;
+              try { var xPl = soHoc(boNgoac(fx), hPl), yPl = soHoc(boNgoac(fy), hPl); if (isFinite(xPl) && isFinite(yPl)) ptsPl.push({ x: xPl * tyLe, y: yPl * tyLe }); } catch (ePl) { bao('Không tính được plot: ' + (ePl.message || ePl)); break; }
+            }
+          } else { bao('plot không hợp lệ'); break; }
+          if (ptsPl.length >= 2 && ve) dsPlot.push({ pts: ptsPl, kieu: kieu });
+          if (ptsPl.length) { var cuoiPl = ptsPl[ptsPl.length - 1]; cur = { t: 'xy', x: cuoiPl.x, y: cuoiPl.y }; goc0 = cur; }
+          noi = false; continue;
+        }
         if (/^(rectangle|grid|parabola|sin|cos|plot|edge|\.\.)\b/.test(r) || /^\.\./.test(r)) {
           var tu = /^\S+/.exec(r)[0];
           if (tu === 'rectangle') { i += 9; bo(); var jR = khop(s, i), Q2 = toaDo(s.slice(i + 1, jR)); i = jR + 1; var P0 = cur, A1 = { t: 'xyTu', x: Q2, y: P0 }, A3 = { t: 'xyTu', x: P0, y: Q2 }; if (ve) doanTrongLenh.push({ a: P0, b: A1 }, { a: A1, b: Q2 }, { a: Q2, b: A3 }, { a: A3, b: P0 }); cur = Q2; continue; }
@@ -519,6 +542,7 @@ GI.tikz = (function () {
       tron.forEach(function (t) { moRongBao(gt(t.c), banKinh(t.r, gtNut)); });
       cung.forEach(function (k) { moRongBao(gt(k.a)); moRongBao(gt(k.b)); moRongBao(gt(k.c)); });
       nhan.forEach(function (n) { moRongBao(gt(n.P)); });
+      dsPlot.forEach(function (c) { c.pts.forEach(function (P) { moRongBao(P); }); });
       if (!isFinite(bao2.x0)) return { hinh: [], so: {}, canhBao: [] };
       // cỡ hình trên bảng: vừa khoảng 3/4 khung nhìn, không quá 2 lần cỡ thật
       KT = cfg.heSo || 1.5;
@@ -567,6 +591,7 @@ GI.tikz = (function () {
         if (g.cung !== 1) o.cung = g.cung; if (g.gach) o.gach = Math.min(2, g.gach); if (g.nhan.length) o.nhanGoc = g.nhan;
         hinh.push(o); so2.goc++;
       });
+      dsPlot.forEach(function (c) { var o = { id: taoId('h'), loai: 'duongTZ', goc: idGoc, kt: KT, pts: c.pts.map(function (P) { return [Math.round(P.x * 1e4) / 1e4, Math.round(P.y * 1e4) / 1e4]; }) }; if (c.kieu) o.kieuNet = c.kieu; hinh.push(o); so2.doan++; });
       gocVuong.forEach(function (g) { hinh.push({ id: taoId('h'), loai: 'gocVuong', a: idCua(g.a.id), o: idCua(g.o.id), b: idCua(g.b.id) }); so2.goc++; });
       nhan.forEach(function (n) { var refs = [idGoc], bt = moBT(n.P, refs); hinh.push({ id: taoId('h'), loai: 'nhanTZ', goc: idGoc, ds: refs, bt: bt, kt: KT, nd: n.chu, huong: n.huong, kc: n.kc }); });
       // điểm tự do nằm trên đường tròn đã vẽ → điểm thuộc đường tròn (kéo vẫn nằm trên đường tròn)

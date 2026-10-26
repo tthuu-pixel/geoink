@@ -3563,7 +3563,7 @@
         giaTri = H.tinh(trang().hinh);
         var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
         function them(x, y2) { b.x0 = Math.min(b.x0, x); b.x1 = Math.max(b.x1, x); b.y0 = Math.min(b.y0, y2); b.y1 = Math.max(b.y1, y2); }
-        kq.hinh.forEach(function (h) { var v = giaTri[h.id]; if (!v) return; if (v.k === 'diem') them(v.x, v.y); else if (v.k === 'tron' || v.k === 'cung') { them(v.c.x - v.r, v.c.y - v.r); them(v.c.x + v.r, v.c.y + v.r); } });
+        kq.hinh.forEach(function (h) { var v = giaTri[h.id]; if (!v) return; if (v.k === 'diem') them(v.x, v.y); else if (v.k === 'tron' || v.k === 'cung') { them(v.c.x - v.r, v.c.y - v.r); them(v.c.x + v.r, v.c.y + v.r); } else if (v.k === 'gapKhuc') v.ds.forEach(function (P) { them(P.x, P.y); }); });
         if (!isFinite(b.x0)) return null;
         var le = 26; b.x0 -= le; b.y0 -= le; b.x1 += le; b.y1 += le;
         return { hinh: kq.hinh, b: b, w: b.x1 - b.x0, h: b.y1 - b.y0 };
