@@ -940,8 +940,6 @@
         c.restore();
       }
     });
-    // khung che đang đóng phải nằm trên chữ, công thức, đề bài (để che được lời giải)
-    t.hinh.forEach(function (o) { if (o.loai === 'che' && !o.mo && gt[o.id] && hien(o)) veKhungChe(c, o, px, sang(o)); });
     // điểm và tên điểm
     t.hinh.forEach(function (o) {
       var v = gt[o.id]; if (!v || v.k !== 'diem' || !hien(o)) return;
@@ -960,6 +958,8 @@
         } else veTen(c, o.ten, v.x + (r + 2) * px, v.y - (r) * px, px, mauChu, o);
       }
     });
+    // khung che đang đóng phải nằm trên chữ, công thức, đề bài, điểm (để che được lời giải)
+    t.hinh.forEach(function (o) { if (o.loai === 'che' && !o.mo && gt[o.id] && hien(o)) veKhungChe(c, o, px, sang(o)); });
   }
 
   var giaTri = {};   // toạ độ đã tính của trang hiện tại
@@ -3484,8 +3484,7 @@
     var dem = {}; trang().hinh.forEach(function (o) { if (o.loai === 'deBai' && o.kieu && !o.laLoiGiai && o !== cu) dem[o.kieu] = Math.max(dem[o.kieu] || 0, o.so || 0); });
     ds.forEach(function (d) {
       d.so = cu && ds.length === 1 && cu.kieu === d.kieu ? cu.so : (dem[d.kieu] = (dem[d.kieu] || 0) + 1);
-      var dau = GI.deBai.dauDe(d.kieu, d.so);
-      if (d.doan.length && d.doan[0].k === 'p' && !d.doan[0].nhan) d.doan[0].runs = dau.concat(d.doan[0].runs); else d.doan.unshift({ k: 'p', runs: dau });
+      GI.deBai.ganDau(d.doan, GI.deBai.dauDe(d.kieu, d.so));
       if (d.loiGiai) d.loiGiai.unshift({ k: 'p', runs: [{ t: 'Lời giải ' + GI.deBai.TEN[d.kieu].toLowerCase() + ' ' + d.so + '.', b: true, mau: '#15803D' }] });
     });
     thongBao('Đang đọc đề…');
@@ -3493,28 +3492,53 @@
       ghiLichSu();
       if (cu) trang().hinh = trang().hinh.filter(function (o) { return o !== cu && o.thuocDe !== cu.id; });
       var cx = document.createElement('canvas').getContext('2d'), soHinh = 0;
-      ds.forEach(function (d) {
-        var coHinh = d.tikz.length > 0, rong = Math.min(1100, rongNhin * (coHinh ? 0.58 : 0.9)), id = idMoi('d');
-        var o = { id: id, loai: 'deBai', kieu: d.kieu, so: d.so, x: x0, y: y, rong: rong, co: co, ma: d.ma, doan: d.doan };
-        var cao = GI.deBai.danTrang(cx, o).cao; trang().hinh.push(o);
-        // hình TikZ: xếp dọc bên phải đề
-        var rongH = Math.max(200, Math.min(rongNhin * 0.9 - rong - 40 / V.s, 700)), yH = y, xH = x0 + rong + 40 / V.s;
-        d.tikz.forEach(function (tz) {
-          var kq; try { kq = GI.tikz.nhap(tz, { taoId: idMoi, viTri: { x: 0, y: 0 }, khung: { w: rongH / 0.72, h: Math.min(caoNhin * 0.6, 520) / 0.68 } }); } catch (e) { return; }
-          if (!kq.hinh.length) return;
-          var gid = 'g' + (demId++) + Date.now().toString(36).slice(-3); kq.hinh.forEach(function (h) { h.nhomMau = gid; h.thuocDe = id; trang().hinh.push(h); });
-          giaTri = H.tinh(trang().hinh);
-          var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
-          kq.hinh.forEach(function (h) { var v = giaTri[h.id]; if (v && v.k === 'diem') { b.x0 = Math.min(b.x0, v.x); b.x1 = Math.max(b.x1, v.x); b.y0 = Math.min(b.y0, v.y); b.y1 = Math.max(b.y1, v.y); } });
-          if (!isFinite(b.x0)) return;
-          var dx = xH + 20 - b.x0, dy = yH + 24 - b.y0;
-          kq.hinh.forEach(function (h) { if (h.loai === 'diem') { h.x += dx; h.y += dy; } });
-          yH += (b.y1 - b.y0) + 60; soHinh++;
+      // dựng một hình TikZ ở gốc toạ độ, trả về các đối tượng và khung bao (theo điểm, thêm lề cho tên điểm)
+      function dungHinh(tz, wMax, hMax, id) {
+        var kq; try { kq = GI.tikz.nhap(tz, { taoId: idMoi, viTri: { x: 0, y: 0 }, khung: { w: wMax / 0.72, h: hMax / 0.68 } }); } catch (e) { return null; }
+        if (!kq.hinh.length) return null;
+        var gid = 'g' + (demId++) + Date.now().toString(36).slice(-3); kq.hinh.forEach(function (h) { h.nhomMau = gid; h.thuocDe = id; trang().hinh.push(h); });
+        giaTri = H.tinh(trang().hinh);
+        var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+        function them(x, y) { b.x0 = Math.min(b.x0, x); b.x1 = Math.max(b.x1, x); b.y0 = Math.min(b.y0, y); b.y1 = Math.max(b.y1, y); }
+        kq.hinh.forEach(function (h) { var v = giaTri[h.id]; if (!v) return; if (v.k === 'diem') them(v.x, v.y); else if (v.k === 'tron' || v.k === 'cung') { them(v.c.x - v.r, v.c.y - v.r); them(v.c.x + v.r, v.c.y + v.r); } });
+        if (!isFinite(b.x0)) return null;
+        var le = 26; b.x0 -= le; b.y0 -= le; b.x1 += le; b.y1 += le;
+        return { hinh: kq.hinh, b: b, w: b.x1 - b.x0, h: b.y1 - b.y0 };
+      }
+      function datHinh(doan, rong, o) {   // dựng các hình của các khối, ghi kích thước rồi dời hình về đúng chỗ dàn trang
+        var dung = {};
+        GI.deBai.cacHinh(doan).forEach(function (u) {
+          var w = 0, h = 0;
+          u.tz.forEach(function (i) {
+            var r = dungHinh(d0.tikz[i], u.vai === 'immini' ? rong * 0.4 : rong * 0.6, u.vai === 'immini' ? 380 : 340, o.thuocDe || o.id); if (!r) return;
+            dung[i] = r; w = Math.max(w, r.w); h += (h ? 16 : 0) + r.h; soHinh++;
+          });
+          u.khoi.kt = { w: Math.round(w), h: Math.round(h) };
         });
-        y += Math.max(cao, yH - y) + 34;
+        var L = GI.deBai.danTrang(cx, o);
+        L.hinh.forEach(function (vt) {
+          var yy = o.y + vt.y;
+          (Array.isArray(vt.tz) ? vt.tz : [vt.tz]).forEach(function (i) {
+            var r = dung[i]; if (!r) return;
+            var dx = o.x + vt.x + (vt.w - r.w) / 2 - r.b.x0, dy = yy - r.b.y0;
+            r.hinh.forEach(function (h) { if (h.loai === 'diem') { h.x += dx; h.y += dy; } });
+            yy += r.h + 16;
+          });
+        });
+        giaTri = H.tinh(trang().hinh);
+        return L.cao;
+      }
+      var d0 = null;
+      ds.forEach(function (d) {
+        d0 = d;
+        var rong = Math.min(1100, rongNhin * 0.9), id = idMoi('d');
+        var o = { id: id, loai: 'deBai', kieu: d.kieu, so: d.so, x: x0, y: y, rong: rong, co: co, ma: d.ma, doan: d.doan };
+        trang().hinh.push(o);
+        var cao = datHinh(d.doan, rong, o);
+        y += cao + 34;
         if (d.loiGiai) {   // lời giải nằm dưới, có khung che: bấm đúp vào khung để mở
           var rongG = Math.min(1100, rongNhin * 0.9), og = { id: idMoi('d'), loai: 'deBai', kieu: d.kieu, laLoiGiai: true, thuocDe: id, x: x0, y: y, rong: rongG, co: co, doan: d.loiGiai };
-          var caoG = GI.deBai.danTrang(cx, og).cao; trang().hinh.push(og);
+          trang().hinh.push(og); var caoG = datHinh(d.loiGiai, rongG, og);
           trang().hinh.push({ id: idMoi('c'), loai: 'che', thuocDe: id, x: x0 - 10, y: y - 10, w: rongG + 20, h: caoG + 20 });
           y += caoG + 50;
         }
