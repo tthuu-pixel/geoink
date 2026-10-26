@@ -1,6 +1,6 @@
 {
   "name": "geoink-android",
-  "version": "0.24.1",
+  "version": "0.25.0",
   "private": true,
   "description": "GeoInk cho máy tính bảng Android (bọc phần giao diện src/ bằng Capacitor)",
   "scripts": {
