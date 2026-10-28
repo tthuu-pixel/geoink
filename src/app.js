@@ -2157,6 +2157,7 @@
     khoaApp: function () { datKhoa(true); }, moKhoaApp: function () { datKhoa(false); },
     thuNho: function () { thuPhong(1 / 1.25); }, phongTo: function () { thuPhong(1.25); }, tiLeMacDinh: function () { thuPhong(1 / V.s); }, chenKhoang: function () { chonCongCu('chenKhoang'); }, che: function () { chonCongCu('che'); },
     vuaKhung: function () { thuPhong(1 / V.s); },
+    gioiThieu: function () { GI.gioiThieu.mo(); },
   };
 
   /* =====================================================================
