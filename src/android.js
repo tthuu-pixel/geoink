@@ -120,6 +120,20 @@
     return gmsToken(true).catch(function (e) { if (e && (e.code || e.errorCode) === 'HUY') throw e; return dangNhapTrinhDuyet(); });
   }
   var ngheDong = null;
+  // ----- Toàn màn hình / khoá GeoInk (ghim ứng dụng) -----
+  var toanMH = true, dangKhoa = false, cbManHinh = null, cbChanDong = null, henKhoa = null;
+  function baoManHinh() { if (cbManHinh) cbManHinh({ toan: toanMH, khoa: dangKhoa }); }
+  function theoDoiKhoa() {   // người dùng có thể tự bỏ ghim bằng thao tác của hệ thống: kiểm tra lại để nút trong app đúng trạng thái
+    clearInterval(henKhoa); if (!dangKhoa) return;
+    henKhoa = setInterval(function () { goi('CheDoManHinh', 'trangThai').then(function (r) { if (r && !r.khoa && dangKhoa) { dangKhoa = false; clearInterval(henKhoa); baoManHinh(); } }, function () { }); }, 3000);
+  }
+  // Đang khoá: không mở được trình duyệt, nên GeoLab hiện trong một khung ngay trong app
+  function moKhungGeoLab(url) {
+    var cu = document.getElementById('khung-geolab'); if (cu) cu.remove();
+    var k = document.createElement('div'); k.id = 'khung-geolab';
+    k.innerHTML = '<div class="kg-dau"><b>GeoLab</b><span>đang khoá GeoInk · mở trong app</span><button type="button">Đóng ✕</button></div><iframe allow="fullscreen" referrerpolicy="no-referrer"></iframe>';
+    document.body.appendChild(k); k.querySelector('iframe').src = url; k.querySelector('button').onclick = function () { k.remove(); };
+  }
   window.mayTinh = {
     nenTang: 'android',
     luu: function (noiDung, ten, hoiLai) {
@@ -147,8 +161,18 @@
     },
     // Gửi bảng / ảnh qua Zalo, Drive, Gmail…
     chiaSe: function (duLieu, ten, laChu) { return chiaSe(laChu ? duLieu : String(duLieu).split(',').pop(), ten, laChu); },
-    moLink: function (url) { if (/^https?:\/\//.test(url)) return goi('Browser', 'open', { url: url }).then(function () { return true; }, function () { return false; }); return Promise.resolve(false); },
-    toanManHinh: function () { return Promise.resolve(true); },   // app Android luôn toàn màn hình
+    moLink: function (url) {
+      if (dangKhoa) { if (/^https:\/\/(www\.)?nckh-geolab\.com\//.test(url)) { moKhungGeoLab(url); return Promise.resolve(true); } return Promise.resolve(false); }
+      if (/^https?:\/\//.test(url)) return goi('Browser', 'open', { url: url }).then(function () { return true; }, function () { return false; }); return Promise.resolve(false); },
+    toanManHinh: function () {   // bật / tắt toàn màn hình (ẩn / hiện thanh trạng thái và thanh điều hướng)
+      toanMH = !toanMH; return goi('CheDoManHinh', 'datToanManHinh', { toan: toanMH }).then(function () { baoManHinh(); return toanMH; }, function () { toanMH = !toanMH; return toanMH; });
+    },
+    khoaApp: function (bat) {
+      return goi('CheDoManHinh', bat ? 'khoa' : 'moKhoa').then(function () { dangKhoa = !!bat; if (!dangKhoa) { var kg = document.getElementById('khung-geolab'); if (kg) kg.remove(); } theoDoiKhoa(); return dangKhoa; },
+        function (e) { alert(loiChu(e)); return dangKhoa; });
+    },
+    khiManHinh: function (f) { cbManHinh = f; setTimeout(baoManHinh, 0); },
+    khiChanDong: function (f) { cbChanDong = f; },
     phienBan: layPhienBan,
     tepKhoiDong: function () { return Promise.resolve(null); },
     khiMoTep: function () { },
@@ -222,7 +246,9 @@
   // Nút Quay lại của Android: đóng hộp thoại / menu đang mở trước, không còn gì thì thoát (tự lưu như trên Windows)
   nghe('App', 'backButton', function () {
     var GI = window.GI;
+    var kg = document.getElementById('khung-geolab'); if (kg) { kg.remove(); return; }
     if (GI && GI.quayLai && GI.quayLai()) return;
+    if (dangKhoa) { if (cbChanDong) cbChanDong(); return; }   // đang khoá: không thoát
     if (!window.confirm('Thoát GeoInk?')) return;
     if (ngheDong) ngheDong(); else goi('App', 'exitApp');
   });

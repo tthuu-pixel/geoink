@@ -7,7 +7,7 @@ fs.cpSync(nguon, dich, { recursive: true });
 const f = path.join(dich, 'index.html');
 let html = fs.readFileSync(f, 'utf8');
 html = html.replace(/<meta http-equiv="Content-Security-Policy"[^>]*>/,
-  `<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://localhost capacitor: ; img-src 'self' data: blob: https://localhost; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://localhost; connect-src 'self' https://localhost">`);
+  `<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://localhost capacitor: ; img-src 'self' data: blob: https://localhost; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://localhost; connect-src 'self' https://localhost; frame-src https://nckh-geolab.com https://www.nckh-geolab.com">`);
 html = html.replace('<meta name="viewport" content="width=device-width, initial-scale=1">',
   '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">');
 fs.writeFileSync(f, html);
