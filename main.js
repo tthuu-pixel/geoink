@@ -148,6 +148,8 @@ ipcMain.handle('khoa-app', (e, bat) => {
   if (!cuaSo || cuaSo.isDestroyed()) return false;
   dangKhoa = !!bat; nhuongGeoLab = false; clearInterval(henGiu);
   if (dangKhoa) {
+    if (cuaSo.isMinimized()) cuaSo.restore();
+    if (!cuaSo.isFullScreen()) cuaSo.setFullScreen(true);   // đang thu nhỏ vừa khung: bật toàn màn hình rồi mới khoá
     cuaSo.setKiosk(true); cuaSo.setAlwaysOnTop(true, 'screen-saver'); cuaSo.setMinimizable(false); cuaSo.setSkipTaskbar(true);
     henGiu = setInterval(() => { if (dangKhoa && !nhuongGeoLab && !cuaSo.isFocused()) giuKhoa(); }, 1500);
     giuKhoa();

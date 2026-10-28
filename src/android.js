@@ -168,7 +168,7 @@
       toanMH = !toanMH; return goi('CheDoManHinh', 'datToanManHinh', { toan: toanMH }).then(function () { baoManHinh(); return toanMH; }, function () { toanMH = !toanMH; return toanMH; });
     },
     khoaApp: function (bat) {
-      return goi('CheDoManHinh', bat ? 'khoa' : 'moKhoa').then(function () { dangKhoa = !!bat; if (!dangKhoa) { var kg = document.getElementById('khung-geolab'); if (kg) kg.remove(); } theoDoiKhoa(); return dangKhoa; },
+      return goi('CheDoManHinh', bat ? 'khoa' : 'moKhoa').then(function () { dangKhoa = !!bat; if (dangKhoa) { toanMH = true; baoManHinh(); } if (!dangKhoa) { var kg = document.getElementById('khung-geolab'); if (kg) kg.remove(); } theoDoiKhoa(); return dangKhoa; },
         function (e) { alert(loiChu(e)); return dangKhoa; });
     },
     khiManHinh: function (f) { cbManHinh = f; setTimeout(baoManHinh, 0); },
