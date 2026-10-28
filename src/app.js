@@ -70,6 +70,9 @@
     dq: '<path d="M7.5 14.5l8.5-8.5 2.5 2.5-8.5 8.5H7.5z"/><path d="M14 8l2.5 2.5"/><path d="M5 20.5h14" stroke-dasharray="2.2 2"/>',
     xuong: '<path d="M7.5 10l4.5 4.5 4.5-4.5"/>',
     toanManHinh: '<path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/>',
+    vuaKhung: '<path d="M9 4.5V9H4.5M15 4.5V9h4.5M9 19.5V15H4.5M15 19.5V15h4.5"/>',
+    khoa: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/>',
+    moKhoa: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.6-1.7"/><path d="M12 14.5v2.5"/>',
   };
   var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1, nhapDe: 1, nhapTex: 1, xuatTex: 1, catHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
   function bieuTuong(k, hang2) {
@@ -2150,7 +2153,8 @@
       var el = $('#goi-y'); el.innerHTML = '<b>Xuất mã TeX:</b> kéo khung quanh hình cần xuất (Esc để huỷ)'; el.classList.remove('an');
     },
     nhapTikz: function (cheDo) { $('#menu').classList.add('an'); if (cheDo !== 'de') suaDeBai = null; datCheDoNhap(cheDo === 'de' ? 'de' : 'tikz'); $('#tikz-loi').innerHTML = ''; $('#hop-tikz').classList.remove('an'); setTimeout(function () { $('#tikz-ma').focus(); }, 30); },
-    toanManHinh: function () { if (MT) MT.toanManHinh(); else if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); },
+    toanManHinh: function () { if (document.body.classList.contains('dang-khoa')) return thongBao('GeoInk đang khoá · bấm Mở trước'); if (MT) MT.toanManHinh(); else if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); },
+    khoaApp: function () { datKhoa(true); }, moKhoaApp: function () { datKhoa(false); },
     thuNho: function () { thuPhong(1 / 1.25); }, phongTo: function () { thuPhong(1.25); }, tiLeMacDinh: function () { thuPhong(1 / V.s); }, chenKhoang: function () { chonCongCu('chenKhoang'); }, che: function () { chonCongCu('che'); },
     vuaKhung: function () { thuPhong(1 / V.s); },
   };
@@ -4175,6 +4179,18 @@
   chonCongCu('chon'); sauKhiDoiTrang(); requestAnimationFrame(vong);   // mở app: mặc định là trỏ chuột
   if (thietLap().kieu === 'trang') vuaTrangGiay();
   GI.taiKhoan.batDau();
+  // ----- Toàn màn hình (mặc định khi mở) / thu nhỏ vừa khung · Khoá GeoInk -----
+  function capNhatManHinh(tt) {
+    var nut = $('#nut-man-hinh'); if (nut && tt.toan != null) { nut.innerHTML = '<i>' + bieuTuong(tt.toan ? 'vuaKhung' : 'toanManHinh') + '</i>'; nut.title = tt.toan ? 'Thu nhỏ vừa khung màn hình (F11)' : 'Toàn màn hình (F11)'; }
+    if (tt.khoa != null) document.body.classList.toggle('dang-khoa', !!tt.khoa);
+  }
+  function datKhoa(bat) {
+    if (!MT || !MT.khoaApp) return thongBao('Khoá chỉ dùng được trong app GeoInk');
+    if (!!bat === document.body.classList.contains('dang-khoa')) return thongBao(bat ? 'GeoInk đang khoá rồi · bấm Mở để thoát chế độ khoá' : 'GeoInk chưa khoá');
+    MT.khoaApp(bat).then(function (k) { capNhatManHinh({ khoa: k, toan: true }); thongBao(k ? 'Đã khoá GeoInk: chỉ dùng GeoInk và mở GeoLab · bấm Mở để thoát chế độ khoá' : 'Đã mở khoá GeoInk'); });
+  }
+  if (MT && MT.khiManHinh) MT.khiManHinh(capNhatManHinh);
+  if (MT && MT.khiChanDong) MT.khiChanDong(function () { thongBao('GeoInk đang khoá · bấm Mở (góc trên bên phải) rồi mới thoát được'); });
   // Thư viện sổ: bảng mới tự thành một sổ khi có nội dung; sổ đang mở tự lưu sau mỗi thay đổi
   GI.thuVien.khoiTao({
     layNoiDung: noiDungLuu, anhBia: anhBia, daSua: function () { return daSua; }, hoiBoThayDoi: hoiBoThayDoi, thongBao: thongBao,

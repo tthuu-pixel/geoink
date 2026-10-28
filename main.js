@@ -12,20 +12,28 @@ function taoCuaSo() {
     height: 900,
     minWidth: 900,
     minHeight: 600,
-    backgroundColor: '#F6F8FC',
+    backgroundColor: '#DCEBFF',   // trùng màu nền màn chào, không bị chớp trắng lúc mở
     title: 'GeoInk',
     icon: path.join(__dirname, 'src', 'icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, spellcheck: false },
   });
   Menu.setApplicationMenu(null);
-  cuaSo.maximize();
+  cuaSo.maximize();   // thoát toàn màn hình thì về cửa sổ vừa khung màn hình laptop
+  cuaSo.setFullScreen(true);   // mở app: toàn màn hình
   cuaSo.loadFile(path.join(__dirname, 'src', 'index.html'));
+  const baoManHinh = () => { if (!cuaSo.isDestroyed()) cuaSo.webContents.send('trang-thai-man-hinh', { toan: cuaSo.isFullScreen() || cuaSo.isKiosk(), khoa: dangKhoa }); };
+  cuaSo.on('enter-full-screen', baoManHinh); cuaSo.on('leave-full-screen', baoManHinh);
+  cuaSo.webContents.on('did-finish-load', baoManHinh);
+  // Đang khoá: cửa sổ bị chuyển đi (Alt+Tab, phím Windows…) thì kéo về lại ngay, trừ lúc đang nhường cho trình duyệt mở GeoLab
+  cuaSo.on('blur', () => { if (dangKhoa && !nhuongGeoLab) setTimeout(giuKhoa, 120); });
+  cuaSo.on('focus', () => { if (dangKhoa && nhuongGeoLab) { nhuongGeoLab = false; cuaSo.setAlwaysOnTop(true, 'screen-saver'); } });
   // Mọi đường link ngoài (GeoLab) mở bằng trình duyệt mặc định
   cuaSo.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:\/\//.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   cuaSo.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('file://')) { e.preventDefault(); if (/^https?:\/\//.test(url)) shell.openExternal(url); } });
   // Hỏi trước khi đóng nếu còn thay đổi chưa lưu
   let choDong = false;
   cuaSo.on('close', (e) => {
+    if (dangKhoa && !choDong) { e.preventDefault(); cuaSo.webContents.send('khoa-chan-dong'); return; }   // đang khoá: không thoát được
     if (choDong) return;
     e.preventDefault();
     cuaSo.webContents.send('hoi-dong');
@@ -127,8 +135,29 @@ ipcMain.handle('thu-vien', (e, { hd, duong, noiDung }) => {
     return { ok: false, loi: 'Lệnh không hợp lệ' };
   } catch (err) { return { ok: false, loi: String(err.message || err) }; }
 });
-ipcMain.handle('mo-link', (e, url) => { if (/^https?:\/\//.test(url)) shell.openExternal(url); return true; });
-ipcMain.handle('toan-man-hinh', () => { if (cuaSo) cuaSo.setFullScreen(!cuaSo.isFullScreen()); return cuaSo ? cuaSo.isFullScreen() : false; });
+ipcMain.handle('mo-link', (e, url) => {
+  if (!/^https?:\/\//.test(url)) return true;
+  // đang khoá: chỉ cho mở GeoLab; tạm thôi "luôn nằm trên" để trình duyệt hiện lên, quay lại GeoInk là khoá tiếp
+  if (dangKhoa) { if (!/^https:\/\/(www\.)?nckh-geolab\.com\//.test(url)) return false; nhuongGeoLab = true; cuaSo.setAlwaysOnTop(false); }
+  shell.openExternal(url); return true;
+});
+// ----- Khoá GeoInk: chỉ dùng GeoInk (và mở GeoLab), không chuyển sang chương trình khác, không thoát -----
+let dangKhoa = false, nhuongGeoLab = false, henGiu = null;
+function giuKhoa() { if (!dangKhoa || nhuongGeoLab || !cuaSo || cuaSo.isDestroyed()) return; if (cuaSo.isMinimized()) cuaSo.restore(); cuaSo.show(); cuaSo.moveTop(); cuaSo.focus(); }
+ipcMain.handle('khoa-app', (e, bat) => {
+  if (!cuaSo || cuaSo.isDestroyed()) return false;
+  dangKhoa = !!bat; nhuongGeoLab = false; clearInterval(henGiu);
+  if (dangKhoa) {
+    cuaSo.setKiosk(true); cuaSo.setAlwaysOnTop(true, 'screen-saver'); cuaSo.setMinimizable(false); cuaSo.setSkipTaskbar(true);
+    henGiu = setInterval(() => { if (dangKhoa && !nhuongGeoLab && !cuaSo.isFocused()) giuKhoa(); }, 1500);
+    giuKhoa();
+  } else {
+    cuaSo.setAlwaysOnTop(false); cuaSo.setKiosk(false); cuaSo.setMinimizable(true); cuaSo.setSkipTaskbar(false); cuaSo.setFullScreen(true);
+  }
+  cuaSo.webContents.send('trang-thai-man-hinh', { toan: true, khoa: dangKhoa });
+  return dangKhoa;
+});
+ipcMain.handle('toan-man-hinh', () => { if (cuaSo && !dangKhoa) cuaSo.setFullScreen(!cuaSo.isFullScreen()); return cuaSo ? cuaSo.isFullScreen() : false; });
 ipcMain.handle('phien-ban', () => app.getVersion());
 
 // ----- Tài khoản GeoLab (dùng chung với trang nckh-geolab.com) -----

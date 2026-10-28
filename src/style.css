@@ -396,6 +396,14 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 .nut-cap-nhat i svg { width: 20px; height: 20px; display: block; }
 .nut-cap-nhat i circle { fill: #fff; } .nut-cap-nhat i path { stroke: #16A34A; }
 .nut-cap-nhat:hover { background: #15803D; }
+/* Khoá / Mở khoá GeoInk */
+.nut-khoa { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 11px 0 7px; margin-right: 4px; border: 1px solid #E2E8F0; border-radius: 15px; background: #fff; color: #334155; font: 600 13px Arial, sans-serif; cursor: pointer; }
+.nut-khoa i svg { width: 18px; height: 18px; display: block; }
+.nut-khoa:hover { background: #F1F5F9; }
+.nut-khoa.mo { opacity: .45; }
+body.dang-khoa #nut-khoa { background: #FEE2E2; border-color: #FCA5A5; color: #B91C1C; }
+body.dang-khoa .nut-khoa.mo { opacity: 1; background: #DCFCE7; border-color: #86EFAC; color: #15803D; margin-right: 8px; }
+body.dang-khoa #nut-man-hinh { opacity: .35; }
 .nut-cap-nhat.an { display: none; }
 @keyframes nhapNhay { 0%, 100% { box-shadow: 0 2px 8px rgba(22,163,74,.35); } 50% { box-shadow: 0 2px 16px rgba(22,163,74,.75); } }
 #the-cap-nhat { position: fixed; right: 18px; bottom: 18px; z-index: 60; width: 360px; max-width: calc(100vw - 36px); background: #fff; border-radius: 14px; box-shadow: 0 12px 40px rgba(15,23,42,.25); border: 1px solid #E2E8F0; padding: 14px 16px 14px; font-family: Arial, sans-serif; }
@@ -754,3 +762,10 @@ html.android #xo-nhom button i svg { width: 34px; height: 34px; }
 html.android .co-cuon { padding-right: 26px !important; }
 html.android .tc-ranh { width: 18px; border-radius: 9px; }
 html.android .tc-ranh b { border-radius: 8px; }
+
+/* Máy tính bảng đang khoá: GeoLab mở trong khung ngay trong app */
+#khung-geolab { position: fixed; inset: 0; z-index: 99990; display: flex; flex-direction: column; background: #fff; }
+#khung-geolab .kg-dau { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 12px 0 16px; background: #1E3A8A; color: #fff; font: 15px "Segoe UI", Roboto, Arial, sans-serif; }
+#khung-geolab .kg-dau span { opacity: .75; font-size: 13px; flex: 1; }
+#khung-geolab .kg-dau button { height: 38px; padding: 0 16px; border: 0; border-radius: 19px; background: #fff; color: #1E3A8A; font: 700 15px "Segoe UI", Roboto, Arial, sans-serif; }
+#khung-geolab iframe { flex: 1; width: 100%; border: 0; }
