@@ -3495,8 +3495,24 @@
   if (MT) MT.phienBan().then(function (v) { $('#phien-ban').textContent = 'GeoInk ' + v + ' · Nhóm nghiên cứu khoa học trường TH-THCS An Lạc'; });
   $$('.hop [data-dong]').forEach(function (b) { b.onclick = function () { b.closest('.hop').classList.add('an'); if (window.mathVirtualKeyboard) window.mathVirtualKeyboard.hide(); }; });
   $('#ct-chen').onclick = chenCongThuc;
+  // ----- Biểu đồ trong mã TikZ: lấy số liệu, vẽ bằng chức năng Biểu đồ thống kê -----
+  function bieuDoTuTikz(ma, rongMax) {
+    var bd = GI.tikzBieuDo ? GI.tikzBieuDo.doc(ma) : null; if (!bd) return null;
+    var soDay = Math.max(1, bd.ds.length), w = Math.round(Math.min(rongMax || 900, Math.max(440, bd.dm.length * soDay * 24 + 180)));
+    var o = { id: idMoi('h'), loai: 'bieuDo', kieu: bd.kieu, tieuDe: bd.tieuDe || '', tenX: bd.tenX || '', tenY: bd.tenY || '', dm: bd.dm, ds: bd.ds,
+      ghiSo: bd.ghiSo ? undefined : false, luoi: bd.luoi ? undefined : false, buoc: bd.buoc || undefined, w: w, h: Math.round(w / Math.min(1.9, Math.max(1.25, bd.tiLe || 1.35))), x: 0, y: 0 };
+    if (bd.kieu === 'tron') { o.w = Math.min(o.w, 560); o.h = Math.round(o.w * 0.72); }
+    return o;
+  }
   // ----- Nhập hình từ mã TikZ -----
   function nhapTikz(ma) {
+    var oBD = bieuDoTuTikz(ma);
+    if (oBD) {   // biểu đồ: vẽ bằng chức năng Biểu đồ (bấm đúp để sửa số liệu)
+      ghiLichSu(); var tamB = veTG(W / 2, Hh / 2); oBD.x = tamB.x - oBD.w / 2; oBD.y = tamB.y - oBD.h / 2; trang().hinh.push(oBD);
+      giaTri = H.tinh(trang().hinh); daSua = true; chonCongCu('chon'); nhom = [{ h: oBD.id }]; capNhatChon(false); canVe();
+      thongBao('Đã nhận ra biểu đồ trong mã TikZ: ' + oBD.dm.length + ' danh mục · ' + oBD.ds.length + ' dãy số liệu · bấm đúp để sửa');
+      return { hinh: [oBD], canhBao: [] };
+    }
     var kq;
     try { var vtTZ = veTG(W / 2, Hh / 2 + 10); kq = GI.tikz.nhap(ma, { taoId: idMoi, viTri: vtTZ, khung: { w: W / V.s, h: (Hh - 120) / V.s } }); }
     catch (e) { return { loi: 'Không đọc được mã: ' + (e.message || e) }; }
@@ -3561,6 +3577,8 @@
       if (cu) trang().hinh = trang().hinh.filter(function (o) { return o !== cu && o.thuocDe !== cu.id; });
       // dựng một hình TikZ ở gốc toạ độ, trả về các đối tượng và khung bao (điểm, đường tròn, thêm lề cho tên)
       function dungHinh(tz, wMax, hMax, id, iTz) {
+        var oBD = bieuDoTuTikz(tz, Math.round(wMax * 1.5));   // biểu đồ: dùng chức năng Biểu đồ, đặt vào ô giữ chỗ như một hình
+        if (oBD) { oBD.h = Math.min(oBD.h, Math.round(hMax * 1.3)); oBD.thuocDe = id; oBD.tzDe = iTz; trang().hinh.push(oBD); return { hinh: [oBD], b: { x0: 0, y0: 0, x1: oBD.w, y1: oBD.h }, w: oBD.w, h: oBD.h }; }
         var kq; try { kq = GI.tikz.nhap(tz, { taoId: idMoi, viTri: { x: 0, y: 0 }, khung: { w: wMax / 0.72, h: hMax / 0.68 } }); } catch (e) { return null; }
         if (!kq.hinh.length) return null;
         var gid = 'g' + (demId++) + Date.now().toString(36).slice(-3); kq.hinh.forEach(function (h) { h.nhomMau = gid; h.thuocDe = id; h.tzDe = iTz; trang().hinh.push(h); });
@@ -3593,7 +3611,7 @@
           (Array.isArray(vt.tz) ? vt.tz : [vt.tz]).forEach(function (i) {
             var r = dung[i]; if (!r) return;
             var dx = o.x + vt.x + (vt.w - r.w) / 2 - r.b.x0, dy = yy - r.b.y0;
-            r.hinh.forEach(function (h) { if (h.loai === 'diem') { h.x += dx; h.y += dy; } if (laLG[i]) { h.trongLG = true; h.an = true; } });
+            r.hinh.forEach(function (h) { if (h.loai === 'diem' || h.loai === 'bieuDo') { h.x += dx; h.y += dy; } if (laLG[i]) { h.trongLG = true; h.an = true; } });
             yy += r.h + 16;
           });
         });
@@ -3650,7 +3668,7 @@
         if (!cu) { o.vtHinh[k] = moi; return; }
         var dx = moi.x - cu.x, dy = moi.y - cu.y; if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) return;
         var ds = [].concat(vt.tz);
-        t.hinh.forEach(function (h) { if (h.thuocDe === o.id && h.loai === 'diem' && ds.indexOf(h.tzDe) >= 0) { h.x += dx; h.y += dy; } });
+        t.hinh.forEach(function (h) { if (h.thuocDe === o.id && (h.loai === 'diem' || h.loai === 'bieuDo') && ds.indexOf(h.tzDe) >= 0) { h.x += dx; h.y += dy; } });
         o.vtHinh[k] = moi;
       });
     });
@@ -3946,7 +3964,8 @@
   }
   // ---- Biểu đồ thống kê: hộp nhập số liệu + xem trước ----
   var bdSua = null, bdKieu = 'cot', bdNho = [];
-  function bdSoDay() { return bdKieu === 'cotKep' || bdKieu === 'duongKep' ? 2 : 1; }
+  var bdSoDayKep = 2;   // biểu đồ kép: số dãy (2, hoặc nhiều hơn khi sửa biểu đồ nhập từ TikZ)
+  function bdSoDay() { return bdKieu === 'cotKep' || bdKieu === 'duongKep' ? bdSoDayKep : 1; }
   function bdVeBang(dm, ds) {   // dựng lại bảng nhập theo kiểu biểu đồ
     var n = bdSoDay(), b = $('#bd-bang'), h = '<tr><th>Danh mục</th>';
     for (var j = 0; j < n; j++) h += '<th><span class="bd-day">' + (bdKieu === 'tron' ? 'Số liệu' : '<input type="color" class="bd-mau" data-j="' + j + '"><input class="bd-ten-day" data-j="' + j + '" placeholder="Dãy ' + (j + 1) + '">') + '</span></th>';
@@ -4008,7 +4027,7 @@
     $('#bd-tieu-de-hop').textContent = o ? 'Sửa biểu đồ thống kê' : 'Biểu đồ thống kê'; $('#bd-ve').textContent = o ? 'Cập nhật' : 'Vẽ biểu đồ';
     $('#bd-td').value = g.tieuDe || ''; $('#bd-tx').value = g.tenX || ''; $('#bd-ty').value = g.tenY || ''; $('#bd-buoc').value = g.buoc ? String(g.buoc).replace('.', ',') : '';
     $('#bd-ghiSo').checked = g.ghiSo !== false; $('#bd-luoi').checked = g.luoi !== false; $('#bd-ct').checked = g.chuThich !== false; $('#bd-dt').checked = !!g.denTrang; $('#bd-mau-to').checked = !g.denTrang;
-    bdKieu = g.kieu || 'cot'; bdNho = (g.ds || []).slice();
+    bdKieu = g.kieu || 'cot'; bdNho = (g.ds || []).slice(); bdSoDayKep = Math.max(2, Math.min(6, (g.ds || []).length));
     $$('#bd-kieu [data-k]').forEach(function (b) { b.classList.toggle('bat', b.dataset.k === bdKieu); }); $('#hop-bieu-do').classList.toggle('la-tron', bdKieu === 'tron');
     bdVeBang(g.dm || [], (g.ds || []).slice(0, bdSoDay()));
     $('#hop-bieu-do').classList.remove('an'); setTimeout(bdXem, 30);
