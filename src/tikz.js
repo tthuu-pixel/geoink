@@ -151,6 +151,21 @@ GI.tikz = (function () {
   // ---------- chữ trong nhãn ($...$) → chữ thường ----------
   var HY_LAP = { alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', varepsilon: 'ε', epsilon: 'ε', varphi: 'φ', phi: 'φ', theta: 'θ', lambda: 'λ', mu: 'μ', pi: 'π', rho: 'ρ', sigma: 'σ', tau: 'τ', omega: 'ω', Delta: 'Δ', Omega: 'Ω' };
   var MU = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  // Màu kiểu xcolor: red, gray!50, blue!30!green … → mã hex
+  var MAU_GOC = { black: [0, 0, 0], white: [255, 255, 255], red: [255, 0, 0], green: [0, 255, 0], blue: [0, 0, 255], cyan: [0, 255, 255], magenta: [255, 0, 255], yellow: [255, 255, 0],
+    gray: [128, 128, 128], grey: [128, 128, 128], darkgray: [64, 64, 64], lightgray: [191, 191, 191], brown: [191, 128, 64], lime: [191, 255, 0], olive: [128, 128, 0], orange: [255, 128, 0],
+    pink: [255, 191, 191], purple: [191, 0, 64], teal: [0, 128, 128], violet: [128, 0, 128] };
+  function mauTikz(t) {
+    t = String(t || '').trim(); if (!t || t === 'none') return null;
+    var m = /^#?([0-9a-fA-F]{6})$/.exec(t); if (m) return '#' + m[1];
+    var ph = t.split('!').map(function (x) { return x.trim(); }), c = MAU_GOC[ph[0]]; if (!c) return null;
+    for (var i = 1; i < ph.length; i += 2) {
+      var p = Math.max(0, Math.min(100, parseFloat(ph[i]))) / 100, d = MAU_GOC[ph[i + 1]] || MAU_GOC.white; if (!isFinite(p)) return null;
+      c = [0, 1, 2].map(function (k) { return c[k] * p + d[k] * (1 - p); });
+    }
+    return '#' + c.map(function (v) { return Math.round(v).toString(16).padStart(2, '0'); }).join('');
+  }
+  function laMau(k) { return /^[a-z]+(![0-9.]+(![a-z]+)?)*$/.test(k) && MAU_GOC[k.split('!')[0]] !== undefined; }
   function chuNhan(s) {
     s = String(s);
     s = s.replace(/\\text\{([^}]*)\}/g, '$1').replace(/\{,\}/g, ',').replace(/\^\\circ|\^\{\\circ\}|\\circ/g, '°').replace(/\\%/g, '%');
@@ -164,7 +179,8 @@ GI.tikz = (function () {
   function nhap(ma, cfg) {
     cfg = cfg || {};
     var canhBao = [], macro = {}, ham = {}, ten = {}, nut = [], tyLe = 1;
-    var duongTen = {}, doan = [], tron = [], cung = [], dsPlot = [], goc = [], gocVuong = [], nhan = [], xuatHien = {}, conLai = [];
+    var dvX = 1, dvY = 1, dich = { x: 0, y: 0 }, chongDich = [], hcnTZ = [],
+        duongTen = {}, doan = [], tron = [], cung = [], dsPlot = [], goc = [], gocVuong = [], nhan = [], xuatHien = {}, conLai = [];
     function bao(s) { if (canhBao.indexOf(s) < 0 && canhBao.length < 30) canhBao.push(s); }
     function nutMoi(bt, tenTZ) { nut.push({ bt: bt, ten: tenTZ }); return { t: 'ref', id: nut.length - 1 }; }
     function datTen(t, bt) { t = t.trim().replace(/\.(center|north|south|east|west).*$/, ''); var r = bt.t === 'ref' ? bt : nutMoi(bt, t); ten[t] = r.id; if (!nut[r.id].ten) nut[r.id].ten = t; return r; }
@@ -198,8 +214,9 @@ GI.tikz = (function () {
         return { t: 'giao', a: diemTrong(d1[0]), b: diemTrong(d1[1]), c: diemTrong(d2[0]), d: diemTrong(d2[1]) };
       }
       if (env && env.let && /^\\p\d+$/.test(s)) return env.let[s];
-      var p2 = tach(s, ':'); if (p2.length === 2) { var g = so(boNgoac(p2[0])), r = so(boNgoac(p2[1])); return { t: 'xy', x: r * Math.cos(g * RAD) * tyLe, y: r * Math.sin(g * RAD) * tyLe }; }
-      var p = tach(s, ','); if (p.length === 2) return { t: 'xy', x: so(boNgoac(p[0])) * tyLe, y: so(boNgoac(p[1])) * tyLe };
+      var dx0 = env && env.tuongDoi ? 0 : dich.x, dy0 = env && env.tuongDoi ? 0 : dich.y;   // dời theo scope[shift] (toạ độ tương đối ++ thì không)
+      var p2 = tach(s, ':'); if (p2.length === 2) { var g = so(boNgoac(p2[0])), r = so(boNgoac(p2[1])); return { t: 'xy', x: r * Math.cos(g * RAD) * tyLe * dvX + dx0, y: r * Math.sin(g * RAD) * tyLe * dvY + dy0 }; }
+      var p = tach(s, ','); if (p.length === 2) return { t: 'xy', x: so(boNgoac(p[0])) * tyLe * dvX + dx0, y: so(boNgoac(p[1])) * tyLe * dvY + dy0 };
       return goiTen(s);
     }
     function diemTrong(s) {   // điểm trong "intersection of A--B and …": tên, (toạ độ) hoặc {$…$}
@@ -259,6 +276,8 @@ GI.tikz = (function () {
       var ve = lenhVe === 'draw' || lenhVe === 'filldraw' || lenhVe === 'shadedraw' || (opt.draw !== undefined && opt.draw !== 'none');
       var to = lenhVe === 'fill' || lenhVe === 'filldraw' || opt.fill !== undefined;
       var kieu = opt.dashed || opt['densely dashed'] || opt['loosely dashed'] ? 'dut' : opt.dotted || opt['densely dotted'] || opt['loosely dotted'] ? 'cham' : null;
+      var khoaKieu = [lenhVe, opt.fill, opt.pattern, opt['pattern color'], opt.color, Object.keys(opt).filter(function (k) { return opt[k] === true && laMau(k); }).join('+')].join('|');   // nhận ra cùng một dãy số liệu (biểu đồ)
+      var mauToHCN = typeof opt.fill === 'string' ? mauTikz(opt.fill) : null;
       var mui = Object.keys(opt).filter(function (k) { return /^(<|)-(>|stealth|latex|Stealth|Latex)?$|^<-$|^<->$|^-(>|stealth)$|^(<|stealth)-/.test(k) && k !== '-'; })[0];
       var duong = { ds: [], loai: null }, cur = null, goc0 = null, dauDuong = null, noi = false, i = 0, doanTrongLenh = [], dangCham = null, letEnv = {};
       if (opt['name path'] || opt['name path global']) duong.ten = opt['name path'] || opt['name path global'];
@@ -274,7 +293,7 @@ GI.tikz = (function () {
         var mPlus = /^(\+\+|\+)\s*\(/.exec(r);
         if (r.charAt(0) === '(' || mPlus) {
           if (mPlus) i += mPlus[0].length - 1;
-          var j2 = khop(s, i), bt = toaDo(s.slice(i + 1, j2), { let: letEnv }); i = j2 + 1;
+          var j2 = khop(s, i), bt = toaDo(s.slice(i + 1, j2), { let: letEnv, tuongDoi: !!mPlus }); i = j2 + 1;
           if (mPlus) { if (!goc0) throw new Error('Toạ độ tương đối không có điểm gốc'); bt = { t: 'cong', a: goc0, b: bt }; if (mPlus[1] === '++') goc0 = bt; }
           else goc0 = bt;
           if (mPlus && mPlus[1] === '+' && !noi) { cur = bt; continue; }   // +(…) chỉ để đặt nhãn / di chuyển, không nối
@@ -368,7 +387,7 @@ GI.tikz = (function () {
         }
         if (/^(rectangle|grid|parabola|sin|cos|plot|edge|\.\.)\b/.test(r) || /^\.\./.test(r)) {
           var tu = /^\S+/.exec(r)[0];
-          if (tu === 'rectangle') { i += 9; bo(); var jR = khop(s, i), Q2 = toaDo(s.slice(i + 1, jR)); i = jR + 1; var P0 = cur, A1 = { t: 'xyTu', x: Q2, y: P0 }, A3 = { t: 'xyTu', x: P0, y: Q2 }; if (ve) doanTrongLenh.push({ a: P0, b: A1 }, { a: A1, b: Q2 }, { a: Q2, b: A3 }, { a: A3, b: P0 }); cur = Q2; continue; }
+          if (tu === 'rectangle') { i += 9; bo(); var jR = khop(s, i), Q2 = toaDo(s.slice(i + 1, jR)); i = jR + 1; var P0 = cur; hcnTZ.push({ a: P0, b: Q2, kieu: khoaKieu, mau: mauToHCN }); var A1 = { t: 'xyTu', x: Q2, y: P0 }, A3 = { t: 'xyTu', x: P0, y: Q2 }; if (ve) doanTrongLenh.push({ a: P0, b: A1 }, { a: A1, b: Q2 }, { a: Q2, b: A3 }, { a: A3, b: P0 }); cur = Q2; continue; }
           bao('Chưa hỗ trợ “' + tu + '” — phần này bị bỏ qua'); break;
         }
         if (s[i] === '[') { i = khop(s, i) + 1; continue; }
@@ -385,7 +404,7 @@ GI.tikz = (function () {
         var huong = null, kc = 0.25;
         var dir = { above: 90, below: -90, left: 180, right: 0, 'above left': 135, 'above right': 45, 'below left': -135, 'below right': -45, north: -90, south: 90, east: 180, west: 0 };
         Object.keys(oN).forEach(function (k) { if (k in dir) huong = dir[k]; if (/^(above|below|left|right)$/.test(k) && oN[k] !== true) { huong = dir[k]; kc = so(oN[k]); } if (k === 'anchor' && dir[oN[k]] !== undefined) huong = { north: -90, south: 90, east: 180, west: 0, 'north west': -45, 'north east': -135, 'south west': 45, 'south east': 135 }[oN[k]]; });
-        if (oN.shift) { var sh = boNgoac(oN.shift); var jj = sh.indexOf('('); var v = toaDo(sh.slice(jj + 1, khop(sh, jj))), vv = gt(v); if (vv) { huong = Math.atan2(vv.y, vv.x) / RAD; kc = Math.hypot(vv.x, vv.y) / tyLe; } }
+        if (oN.shift) { var sh = boNgoac(oN.shift); var jj = sh.indexOf('('); var v = toaDo(sh.slice(jj + 1, khop(sh, jj)), { tuongDoi: true }), vv = gt(v); if (vv) { huong = Math.atan2(vv.y, vv.x) / RAD; kc = Math.hypot(vv.x, vv.y) / tyLe; } }
         var P = viTriN || cur, tren = null;
         if (oN.midway || oN.pos !== undefined || oN['near start'] || oN['near end']) {
           var t = oN.midway ? 0.5 : oN.pos !== undefined ? so(oN.pos) : oN['near start'] ? 0.25 : 0.75, dcuoi = doanTrongLenh[doanTrongLenh.length - 1];
@@ -429,7 +448,17 @@ GI.tikz = (function () {
         var mSet = /^\\pgfmathsetmacro\s*\{?\\([A-Za-z@]+)\}?\s*\{/.exec(r);
         if (mSet) { var j0 = khop(s, i + mSet[0].length - 1); try { macro[mSet[1]] = String(so(moRong(s.slice(i + mSet[0].length, j0), env))); } catch (e) { bao(e.message); } i = j0 + 1; continue; }
         if (/^\\(tikzset|usetikzlibrary|tikzstyle)\b/.test(r)) { var k1 = s.indexOf('{', i); if (k1 < 0) break; var j1 = khop(s, k1); i = j1 + 1; if (/^\\tikzstyle/.test(r)) { var kc2 = s.indexOf(']', i); if (kc2 >= 0 && /^\s*=\s*\[/.test(s.slice(i))) i = kc2 + 1; } continue; }
-        if (/^\\(begin|end)\{scope\}/.test(r)) { var mS = /^\\(begin|end)\{scope\}\s*(\[[^\]]*\])?/.exec(r); i += mS[0].length; continue; }
+        if (/^\\(begin|end)\{scope\}/.test(r)) {   // scope[shift={(x,y)}, xshift=…, yshift=…]: dời các toạ độ bên trong
+          var mS = /^\\(begin|end)\{scope\}\s*/.exec(r); i += mS[0].length;
+          if (mS[1] === 'end') { dich = chongDich.pop() || { x: 0, y: 0 }; continue; }
+          var oS = {}; if (s[i] === '[') { var jS = khop(s, i); oS = tuyChon(moRong(s.slice(i + 1, jS), env)); i = jS + 1; }
+          chongDich.push(dich); var moi = { x: dich.x, y: dich.y };
+          try {
+            if (oS.shift) { var shS = boNgoac(oS.shift), kS = shS.indexOf('('); if (kS >= 0) { var vS = gt(toaDo(shS.slice(kS + 1, khop(shS, kS)), { tuongDoi: true })); if (vS) { moi.x += vS.x; moi.y += vS.y; } } }
+            if (oS.xshift) moi.x += so(boNgoac(oS.xshift)) * tyLe; if (oS.yshift) moi.y += so(boNgoac(oS.yshift)) * tyLe;
+          } catch (eS) { bao('scope: ' + (eS.message || eS)); }
+          dich = moi; continue;
+        }
         if (/^\\foreach\b/.test(r)) { i = foreach(s, i, env); continue; }
         if (r.charAt(0) === '{') { var jg = khop(s, i); chay(s.slice(i + 1, jg), env); i = jg + 1; continue; }
         // câu lệnh đến dấu ; ở độ sâu 0
@@ -477,9 +506,15 @@ GI.tikz = (function () {
       // \def đặt trước \begin{tikzpicture}
       (nguon.slice(0, mB.index).match(/\\def\s*\\[A-Za-z@]+\s*\{[^{}]*\}|\\pgfmathsetmacro\s*\{?\\[A-Za-z@]+\}?\s*\{[^{}]*\}/g) || []).forEach(function (d) { chay(d, {}); });
       if (optTP.scale) tyLe = so(optTP.scale);
+      try { if (optTP.x) dvX = so(boNgoac(optTP.x)); if (optTP.y) dvY = so(boNgoac(optTP.y)); } catch (eU) { bao('Đơn vị x / y: ' + (eU.message || eU)); }   // [x=1cm, y=0.7cm]
       if (optTP['declare function']) tach(optTP['declare function'], ';').forEach(function (p) { var q = p.split('='); if (q.length === 2) { try { ham[q[0].trim()] = so(q[1]); } catch (e) { bao(e.message); } } });
     }
     chay(than, {});
+    if (cfg.thuThap) return {   // chỉ lấy dữ liệu thô (để nhận ra biểu đồ)
+      hcn: hcnTZ.map(function (r) { var A = gt(r.a), B = gt(r.b); return A && B ? { x0: Math.min(A.x, B.x), x1: Math.max(A.x, B.x), y0: Math.min(A.y, B.y), y1: Math.max(A.y, B.y), kieu: r.kieu, mau: r.mau } : null; }).filter(Boolean),
+      nhan: nhan.map(function (n) { var P = gt(n.P); return P ? { x: P.x, y: P.y, chu: n.chu, huong: n.huong } : null; }).filter(Boolean),
+      doan: doan.map(function (d) { var A = gt(d.a), B = gt(d.b); return A && B ? { A: A, B: B } : null; }).filter(Boolean),
+      canhBao: canhBao };
     var ketQua = dung();
     ketQua.canhBao = canhBao;
     return ketQua;
@@ -610,5 +645,5 @@ GI.tikz = (function () {
     }
   }
 
-  return { nhap: nhap, tinh: tinh, chuNhan: chuNhan, soHoc: soHoc };
+  return { nhap: nhap, tinh: tinh, chuNhan: chuNhan, soHoc: soHoc, mau: mauTikz };
 })();

@@ -75,7 +75,7 @@ GI.bieuDo = (function () {
     var hh = o._hh = { X0: X0, Y0: Y0, cot: [], diem: [] };
     if (o.kieu === 'tron') { veTron(c, o, ds[0], dm, W, Hh, tren, themTD); c.restore(); return { x0: X0, y0: Y0, x1: X0 + W, y1: Y0 + Hh }; }
     // ---- trục ----
-    var soDay = laKep(o.kieu) ? Math.min(2, ds.length) : Math.min(1, ds.length), dsVe = ds.slice(0, soDay);
+    var soDay = laKep(o.kieu) ? Math.min(6, ds.length) : Math.min(1, ds.length), dsVe = ds.slice(0, soDay);   // kép: 2 dãy trở lên (tối đa 6)
     var lon = 0; dsVe.forEach(function (d) { dm.forEach(function (_, i) { var v = giaTriO(d, i); if (v != null) lon = Math.max(lon, v); }); });
     var buoc = o.buoc > 0 ? o.buoc : buocDep(lon || 1, 5), max = Math.max(buoc, Math.ceil((lon || 1) / buoc) * buoc);
     if (lon >= max - buoc * 0.05) max += buoc;   // chừa chỗ ghi số trên đỉnh
