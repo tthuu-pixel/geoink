@@ -30,6 +30,11 @@ public class CheDoManHinhPlugin extends Plugin {
     @PluginMethod
     public void khoa(PluginCall call) {
         getActivity().runOnUiThread(() -> {
+            if (getActivity() instanceof MainActivity) {   // khoá là bật toàn màn hình luôn (ẩn thanh trạng thái, thanh điều hướng)
+                MainActivity a = (MainActivity) getActivity();
+                a.toanManHinh = true;
+                a.apDungManHinh();
+            }
             try { getActivity().startLockTask(); JSObject r = new JSObject(); r.put("khoa", true); call.resolve(r); }
             catch (Exception e) { call.reject("Không khoá được: " + e.getMessage()); }
         });
