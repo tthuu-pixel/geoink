@@ -469,6 +469,9 @@ textarea.tt-o { height: auto; padding: 8px 10px; resize: vertical; line-height: 
 .nguoi-dung { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px 0 4px; margin-right: 6px; border: 1px solid #E2E8F0; border-radius: 16px; background: #fff; cursor: pointer; font: 600 13px Arial, sans-serif; color: #1E293B; max-width: 220px; }
 .nguoi-dung:hover { background: #F1F5F9; }
 .nguoi-dung.an { display: none; }
+.nguoi-dung.chua { padding: 0 12px; color: #2451C7; border-color: #BFD0F7; background: #F1F5FF; }
+.dn-bo-qua { display: block; width: 100%; margin-top: 10px; height: 42px; border: 1px solid #CBD5E1; border-radius: 12px; background: #fff; color: #334155; font: 600 15px var(--phong); cursor: pointer; }
+.dn-bo-qua:hover { background: #F1F5F9; }
 .nd-chu { width: 24px; height: 24px; border-radius: 50%; background: #2451C7; color: #fff; display: inline-grid; place-items: center; font-size: 12px; font-weight: 700; flex: none; }
 .nd-chu.lon { width: 38px; height: 38px; font-size: 17px; }
 .nd-ten { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

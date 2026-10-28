@@ -1,5 +1,6 @@
-// Đăng nhập bằng tài khoản GeoLab (dùng chung với trang nckh-geolab.com).
-//  - Mở app: chưa đăng nhập thì hiện trang đăng nhập che toàn bộ bảng.
+// Đăng nhập bằng tài khoản GeoLab (dùng chung với trang nckh-geolab.com) — KHÔNG bắt buộc.
+//  - Mở app là vào thẳng bảng. Nút "Đăng nhập GeoLab" ở góc trên mở trang đăng nhập (có nút "Để sau").
+//  - Chưa đăng nhập mà mở mô hình GeoLab: mở thẳng trang GeoLab, trang đó tự hỏi đăng nhập.
 //  - "Ghi nhớ đăng nhập": lần sau mở thẳng vào bảng; app hỏi lại máy chủ, phiên hết hạn thì đăng nhập lại.
 //    Mất mạng thì vẫn dùng tiếp bằng phiên đã ghi nhớ.
 //  - Mở trang GeoLab từ app: gắn phiên lên đường dẫn (#p=…) để vào thẳng, không phải đăng nhập lại.
@@ -44,15 +45,16 @@ GI.taiKhoan = (function () {
     var cu = phien; phien = null; ghi(null); veNguoiDung();
     if (cu) MT && MT.taiKhoan && MT.taiKhoan('dangXuat', { token: cu.token });
     khiDoi.forEach(function (f) { f(null); });
-    hienDangNhap('');
   }
 
   // ---------- người dùng trên thanh trên cùng ----------
   function chuCai(t) { var p = String(t || '?').trim().split(/\s+/); return (p.length > 1 ? p[p.length - 1].charAt(0) : p[0].charAt(0)).toUpperCase(); }
   function veNguoiDung() {
     var el = $('#nguoi-dung'); if (!el) return;
-    if (!phien) { el.classList.add('an'); return; }
-    el.classList.remove('an');
+    if (!phien) {   // chưa đăng nhập: nút mời đăng nhập (chỉ trong app; mở bằng trình duyệt thì ẩn)
+      el.classList.toggle('an', !MT); el.classList.add('chua'); el.textContent = 'Đăng nhập GeoLab'; el.title = 'Đăng nhập tài khoản GeoLab để mở mô hình không phải đăng nhập lại (không bắt buộc)'; return;
+    }
+    el.classList.remove('an', 'chua');
     el.innerHTML = '<span class="nd-chu">' + thoat(chuCai(phien.hoTen)) + '</span><span class="nd-ten">' + thoat(phien.hoTen) + '</span>';
     el.title = phien.hoTen + ' · ' + (TEN_VAI_TRO[phien.vaiTro] || '') + ' (tài khoản GeoLab)';
   }
@@ -84,15 +86,17 @@ GI.taiKhoan = (function () {
   function batDau() {
     $('#dn-form').addEventListener('submit', dangNhap);
     $('#dn-hien-mk').onclick = function () { var i = $('#dn-mk'); i.type = i.type === 'password' ? 'text' : 'password'; this.classList.toggle('bat', i.type === 'text'); i.focus(); };
-    $('#nguoi-dung').onclick = moMenu;
+    $('#nguoi-dung').onclick = function () { if (phien) moMenu(); else hienDangNhap(''); };
+    $('#dn-bo-qua').onclick = anDangNhap;
+    $('#dang-nhap').addEventListener('keydown', function (e) { if (e.key === 'Escape') anDangNhap(); });
     try { $('#dn-ten').value = localStorage.getItem('geoink_ten_cu') || ''; } catch (e) { }
     if (!MT) { veNguoiDung(); return; }   // mở bằng trình duyệt (chạy thử): không bắt đăng nhập
     phien = doc();
-    if (!phien || !phien.token) { hienDangNhap(''); return; }
+    if (!phien || !phien.token) { phien = null; veNguoiDung(); return; }   // không bắt đăng nhập: vào thẳng bảng
     veNguoiDung();
-    // hỏi máy chủ phiên còn hợp lệ không (mất mạng thì vẫn dùng tiếp)
+    // hỏi máy chủ phiên còn hợp lệ không (mất mạng thì vẫn dùng tiếp); hết hạn thì chỉ bỏ phiên, không chặn bảng
     goi('kiemTra').then(function (kq) {
-      if (kq && kq.ok === false && !kq.mang) { phien = null; ghi(null); veNguoiDung(); hienDangNhap('Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.'); }
+      if (kq && kq.ok === false && !kq.mang) { phien = null; ghi(null); veNguoiDung(); }
     });
   }
   return { batDau: batDau, link: link, moTrang: moTrang, phien: function () { return phien; }, khiDoi: function (f) { khiDoi.push(f); }, dangXuat: dangXuat };
