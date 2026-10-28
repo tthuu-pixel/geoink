@@ -769,3 +769,66 @@ html.android .tc-ranh b { border-radius: 8px; }
 #khung-geolab .kg-dau span { opacity: .75; font-size: 13px; flex: 1; }
 #khung-geolab .kg-dau button { height: 38px; padding: 0 16px; border: 0; border-radius: 19px; background: #fff; color: #1E3A8A; font: 700 15px "Segoe UI", Roboto, Arial, sans-serif; }
 #khung-geolab iframe { flex: 1; width: 100%; border: 0; }
+
+/* ===== Giới thiệu GeoInk & hướng dẫn sử dụng (src/gioithieu.js) ===== */
+#hop-gioi-thieu .gt-khung { width: min(1080px, 96vw); height: min(760px, 92vh); max-height: none; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.gt-dau { display: flex; align-items: center; gap: 12px; padding: 16px 20px 14px; border-bottom: 1px solid var(--vien); flex: none; }
+.gt-dau h2 { margin: 0; font-size: 20px; flex: 1; white-space: nowrap; }
+.gt-dau input { width: min(280px, 40vw); height: 36px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px; font-size: 14px; }
+.gt-dau input:focus { outline: 2px solid #93C5FD; border-color: #2563EB; }
+.gt-x { width: 36px; height: 36px; border: 0; border-radius: 10px; background: #F1F5F9; font-size: 16px; cursor: pointer; color: #334155; flex: none; }
+.gt-x:hover { background: #E2E8F0; }
+.gt-than { flex: 1; display: flex; min-height: 0; }
+.gt-nav { width: 230px; flex: none; overflow-y: auto; padding: 10px 10px 16px; border-right: 1px solid var(--vien); background: #F8FAFC; }
+.gt-nhom { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--chu-phu); padding: 12px 10px 6px; }
+.gt-nav button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 8px; font-size: 14px; color: var(--chu); cursor: pointer; }
+.gt-nav button:hover { background: #EEF2FF; }
+.gt-nav button.chon { background: #2452C4; color: #fff; font-weight: 600; }
+.gt-noi { flex: 1; overflow-y: auto; padding: 18px 26px 28px; font-size: 14.5px; line-height: 1.6; color: var(--chu); }
+.gt-noi ul { padding-left: 20px; margin: 8px 0; }
+.gt-noi li { margin: 7px 0; }
+.gt-noi code { background: #F1F5F9; border-radius: 4px; padding: 0 4px; font-size: 13px; }
+.gt-noi kbd { display: inline-block; min-width: 22px; text-align: center; padding: 1px 6px; border: 1px solid #CBD5E1; border-bottom-width: 2px; border-radius: 5px; background: #fff; font: 600 12.5px/1.5 Arial, sans-serif; color: #334155; }
+.gt-tieu-de { margin: 0 0 10px; font-size: 19px; color: #1A3A9C; }
+.gt-ic { display: inline-flex; width: 22px; height: 22px; vertical-align: -6px; margin-right: 2px; }
+.gt-ic svg { width: 100%; height: 100%; }
+.gt-bia { display: flex; align-items: center; gap: 18px; padding: 18px 20px; border-radius: 16px; background: linear-gradient(135deg, #2452C4, #1A3A9C); color: #fff; margin-bottom: 14px; }
+.gt-bia img { width: 72px; height: 72px; border-radius: 16px; background: #fff; flex: none; }
+.gt-bia h3 { margin: 0; font-size: 28px; letter-spacing: .01em; }
+.gt-bia p { margin: 2px 0 4px; font-size: 15px; opacity: .95; }
+.gt-bia small { font-size: 12.5px; opacity: .8; }
+.gt-the-luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 14px; }
+.gt-the { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--vien); border-radius: 12px; background: #FCFCFD; }
+.gt-the .gt-ic { width: 30px; height: 30px; margin-bottom: 2px; }
+.gt-the b { font-size: 14.5px; }
+.gt-the span { font-size: 13px; color: var(--chu-phu); line-height: 1.45; }
+.gt-tv { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin: 14px 0; }
+.gt-tv-the { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--vien); border-radius: 12px; }
+.gt-tv-the > div { display: flex; flex-direction: column; line-height: 1.35; }
+.gt-tv-the small { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #2452C4; }
+.gt-tv-the b { font-size: 15px; }
+.gt-tv-the span { font-size: 13px; color: var(--chu-phu); }
+.gt-tv-chu { width: 42px; height: 42px; border-radius: 50%; background: #E0E8FB; color: #1A3A9C; display: grid; place-items: center; font-weight: 800; font-size: 18px; flex: none; }
+.gt-bang { border-collapse: collapse; margin: 6px 0 12px; font-size: 14px; }
+.gt-bang th { text-align: left; color: var(--chu-phu); font-weight: 600; padding: 5px 18px 5px 0; vertical-align: top; }
+.gt-bang td { padding: 5px 0; }
+.gt-bang a, .gt-kq a { color: #2452C4; }
+.gt-nho { font-size: 12.5px; color: var(--chu-phu); }
+.gt-cc { border-collapse: collapse; width: 100%; margin: 10px 0; }
+.gt-cc td { padding: 8px 6px; border-top: 1px solid #EEF0F3; vertical-align: top; }
+.gt-cc td:first-child { width: 34px; }
+.gt-cc .gt-ic { width: 28px; height: 28px; }
+.gt-phim { border-collapse: collapse; width: 100%; max-width: 620px; }
+.gt-phim td { padding: 6px 8px; border-top: 1px solid #EEF0F3; }
+.gt-phim td:first-child { width: 190px; white-space: nowrap; }
+.gt-kq { margin: 16px 0 2px; font-size: 15px; }
+.gt-kq:first-child { margin-top: 0; }
+.gt-kq a { text-decoration: none; }
+@media (max-width: 720px) {
+  .gt-than { flex-direction: column; }
+  .gt-nav { width: auto; display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; border-right: 0; border-bottom: 1px solid var(--vien); padding: 8px 10px; flex: none; }
+  .gt-nhom { display: none; }
+  .gt-nav button { white-space: nowrap; width: auto; flex: none; }
+  .gt-dau h2 { font-size: 17px; }
+  .gt-noi { padding: 14px 16px 22px; }
+}
