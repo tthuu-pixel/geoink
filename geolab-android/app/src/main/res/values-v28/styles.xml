@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="GiaoDien" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/nen</item>
+        <item name="android:colorPrimary">@color/chinh</item>
+        <item name="android:colorAccent">@color/chinh</item>
+        <item name="android:statusBarColor">@color/chinh</item>
+        <!-- máy có tai thỏ / camera đục lỗ: dùng cả phần màn hình quanh camera -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

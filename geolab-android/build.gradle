@@ -1,0 +1,8 @@
+// App GeoLab cho máy tính bảng: khung WebView mở trang nckh-geolab.com
+buildscript {
+    repositories { google(); mavenCentral() }
+    dependencies { classpath 'com.android.tools.build:gradle:8.13.0' }
+}
+allprojects {
+    repositories { google(); mavenCentral() }
+}

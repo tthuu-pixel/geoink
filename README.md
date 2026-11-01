@@ -35,6 +35,10 @@ Khác bản Windows:
 - Thư viện sổ lưu trong bộ nhớ riêng của app (gỡ app là mất — hãy *Gửi bảng* ra Drive những sổ quan trọng). Tự lưu cả khi chuyển sang app khác.
 - Có bản mới: GeoInk báo, bấm **Cập nhật** để tải tệp APK mới rồi cài đè (không mất dữ liệu).
 
+### App GeoLab cho máy tính bảng
+
+Thư mục `geolab-android/` là app Android nhỏ mở trang [nckh-geolab.com](https://nckh-geolab.com) toàn màn hình (đăng nhập bằng tài khoản GeoLab; trang web cập nhật thì app mới theo, không phải cài lại). Tải **GeoLab-Android.apk** tại [bản phát hành geolab-android](https://github.com/tthuu-pixel/geoink/releases/tag/geolab-android). Đổi số trong `geolab-android/version.txt` rồi đẩy lên `main` để đóng gói bản mới (quy trình `.github/workflows/geolab-apk.yml`, ký bằng cùng khoá với GeoInk).
+
 ## Giao diện
 
 Ba hàng công cụ phía trên, tab trang ở đáy (giống Scrble Ink, biểu tượng nét mảnh; công cụ đang dùng hiện trong ô đỏ sẫm):

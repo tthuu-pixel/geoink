@@ -1,0 +1,58 @@
+# Đóng gói app GeoLab cho máy tính bảng Android (khung mở trang nckh-geolab.com).
+# Chạy khi đẩy thay đổi trong geolab-android/ lên nhánh main, hoặc chạy tay ở tab Actions.
+# APK đăng vào bản phát hành cố định "geolab-android" (đánh dấu bản thử để không làm hỏng
+# đường dẫn /releases/latest và tính năng tự cập nhật của GeoInk).
+name: Đóng gói app GeoLab
+
+on:
+  push:
+    branches: [main]
+    paths: ['geolab-android/**', '.github/workflows/geolab-apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Khoá ký APK (dùng chung với GeoInk)
+        env:
+          KHOA_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          MAT_KHAU: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+        run: |
+          if [ -n "$KHOA_B64" ] && [ -n "$MAT_KHAU" ]; then
+            echo "$KHOA_B64" | base64 -d > "$RUNNER_TEMP/geoink.jks"
+            echo "GEOINK_KEYSTORE_PASS=$MAT_KHAU" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Chưa có secrets ANDROID_KEYSTORE_B64 / ANDROID_KEYSTORE_PASS: APK được ký bằng khoá tạm."
+            keytool -genkeypair -keystore "$RUNNER_TEMP/geoink.jks" -alias geoink -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass khoatamthoi -keypass khoatamthoi -dname "CN=GeoLab thu, O=GeoLab, C=VN"
+            echo "GEOINK_KEYSTORE_PASS=khoatamthoi" >> "$GITHUB_ENV"
+          fi
+          echo "GEOINK_KEYSTORE=$RUNNER_TEMP/geoink.jks" >> "$GITHUB_ENV"
+      - name: Đóng gói APK
+        working-directory: geolab-android
+        run: chmod +x gradlew && ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Đăng APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VER=$(cat geolab-android/version.txt)
+          cp geolab-android/app/build/outputs/apk/release/app-release.apk GeoLab-Android.apk
+          gh release view geolab-android >/dev/null 2>&1 || gh release create geolab-android --prerelease --latest=false --target "$GITHUB_SHA" \
+            --title "GeoLab – app máy tính bảng" --notes "App GeoLab cho máy tính bảng Android."
+          gh release upload geolab-android GeoLab-Android.apk --clobber
+          gh release edit geolab-android --prerelease --latest=false --title "GeoLab – app máy tính bảng $VER" \
+            --notes "App GeoLab $VER cho máy tính bảng Android: mở trang nckh-geolab.com toàn màn hình, đăng nhập bằng tài khoản GeoLab. Tải GeoLab-Android.apk bên dưới rồi cài (cài đè được, không mất dữ liệu). Cập nhật $(date -u +%Y-%m-%d\ %H:%M) UTC."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeoLab-android
+          path: GeoLab-Android.apk
+          if-no-files-found: error

@@ -10,6 +10,7 @@ name: Đóng gói GeoInk
 on:
   push:
     branches: [main, may-tinh-bang]
+    paths-ignore: ['geolab-android/**', '.github/workflows/geolab-apk.yml']   # app GeoLab có quy trình đóng gói riêng
   workflow_dispatch:
 
 permissions:

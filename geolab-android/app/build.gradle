@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+
+// Phiên bản lấy từ ../version.txt: 1.2.3 → mã 10203
+def phienBan = file('../version.txt').text.trim()
+def soPB = phienBan.tokenize('.').collect { it as int }
+def maPhienBan = soPB[0] * 10000 + soPB[1] * 100 + soPB[2]
+// Khoá ký: dùng chung khoá với GeoInk (GitHub Actions đặt đường dẫn và mật khẩu từ secrets)
+def tepKhoa = System.getenv('GEOINK_KEYSTORE')
+
+android {
+    namespace = "vn.geolab.app"
+    compileSdk = 36
+    defaultConfig {
+        applicationId "vn.geolab.app"
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode maPhienBan
+        versionName phienBan
+    }
+    signingConfigs {
+        release {
+            if (tepKhoa) {
+                storeFile file(tepKhoa)
+                storePassword System.getenv('GEOINK_KEYSTORE_PASS')
+                keyAlias System.getenv('GEOINK_KEY_ALIAS') ?: 'geoink'
+                keyPassword System.getenv('GEOINK_KEY_PASS') ?: System.getenv('GEOINK_KEYSTORE_PASS')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (tepKhoa) signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

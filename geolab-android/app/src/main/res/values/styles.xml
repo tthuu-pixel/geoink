@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nền xanh nhạt khi mở app (trước khi trang web hiện ra), không thanh tiêu đề -->
+    <style name="GiaoDien" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/nen</item>
+        <item name="android:colorPrimary">@color/chinh</item>
+        <item name="android:colorAccent">@color/chinh</item>
+        <item name="android:statusBarColor">@color/chinh</item>
+    </style>
+</resources>
