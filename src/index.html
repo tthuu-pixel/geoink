@@ -112,6 +112,7 @@
   <button data-lenh="xoaTrangNay"><i data-bt="xoa"></i>Xoá trang này</button>
   <hr>
   <button data-lenh="toanManHinh" class="an-android"><i data-bt="toanManHinh"></i>Toàn màn hình<kbd>F11</kbd></button>
+  <button data-lenh="caiDatAi"><i data-bt="ai"></i>Cài đặt AI (khoá API, chọn mô hình)…</button>
   <button data-lenh="caiDatBut"><i data-bt="caiDatBut"></i>Bút cảm ứng (nút bút, phím tắt)…</button>
   <button data-lenh="kiemTraCapNhat"><i data-bt="capNhat"></i>Kiểm tra cập nhật</button>
   <button data-lenh="gioiThieu"><i data-bt="thongTin"></i>Giới thiệu GeoInk &amp; hướng dẫn sử dụng</button>
@@ -193,6 +194,8 @@
     <h2 id="bd-tieu-de-hop">Biểu đồ thống kê</h2>
     <div class="dt-khung"><div class="dt-trai">
       <div class="bd-kieu" id="bd-kieu"><button data-k="cot">▮ Cột</button><button data-k="cotKep">▮▮ Cột kép</button><button data-k="duong">╱ Đoạn thẳng</button><button data-k="duongKep">╱╲ Đoạn thẳng kép</button><button data-k="tron">◔ Hình quạt tròn</button></div>
+      <div class="bd-ai"><span class="bd-ai-nhan">Đọc số liệu bằng AI</span><button class="nut chu" id="bd-ai-anh" title="Chọn ảnh biểu đồ (hoặc dán ảnh bằng Ctrl+V vào hộp này)">Từ ảnh…</button><button class="nut chu chi-android" id="bd-ai-chup">Chụp ảnh</button><button class="nut chu an" id="bd-ai-ma" title="Gửi mã TikZ vừa nhập cho AI đọc lại">Đọc lại mã TikZ</button><button class="nut chu bd-ai-cd" id="bd-ai-cd" title="Cài đặt AI">⚙</button>
+        <div class="bd-ai-tb" id="bd-ai-tb"></div></div>
       <div class="dt-nhom"><div class="dt-nhan">Tiêu đề và trục</div>
         <div class="dt-dong">Tiêu đề <input id="bd-td" class="dt-bt" spellcheck="false"></div>
         <div class="dt-dong bd-truc">Trục ngang <input id="bd-tx" class="dt-bt" spellcheck="false"> Trục đứng <input id="bd-ty" class="dt-bt" spellcheck="false"></div></div>
@@ -278,13 +281,12 @@
     <svg class="dn-tt" style="left:26%;bottom:2%;width:120px;animation-delay:-2s" viewBox="0 0 200 200" stroke-width="4"><path d="M20 160 C 60 20, 140 20, 180 160"/><path d="M10 170 H190 M100 190 V10" stroke-dasharray="6 6"/></svg>
     <form id="dn-form" class="dn-the" autocomplete="on">
       <h2>Đăng nhập</h2>
-      <p class="dn-phu">Dùng tài khoản <b>GeoLab</b> do quản trị viên cấp. Đăng nhập rồi thì mở mô hình GeoLab từ GeoInk không phải đăng nhập lại. Không đăng nhập vẫn dùng GeoInk bình thường.</p>
+      <p class="dn-phu">Dùng tài khoản <b>GeoLab</b> do quản trị viên cấp. Một tài khoản dùng cho cả GeoInk và GeoLab.</p>
       <div class="dn-loi" id="dn-loi" role="alert"></div>
       <label class="dn-truong"><span>Tên đăng nhập</span><input id="dn-ten" autocomplete="username" spellcheck="false" autocapitalize="off"></label>
       <label class="dn-truong"><span>Mật khẩu</span><span class="dn-mk"><input id="dn-mk" type="password" autocomplete="current-password"><button type="button" id="dn-hien-mk" title="Hiện / ẩn mật khẩu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
       <label class="dn-nho"><input type="checkbox" id="dn-nho" checked> Ghi nhớ đăng nhập trên máy này</label>
       <button class="dn-nut" id="dn-nut" type="submit"><span>Đăng nhập</span></button>
-      <button class="dn-bo-qua" id="dn-bo-qua" type="button">Để sau, vào bảng</button>
       <p class="dn-ghi-chu">Quên mật khẩu? Hãy nhờ thầy cô quản trị GeoLab đặt lại.</p>
     </form>
   </section>
@@ -318,6 +320,7 @@
 <script src="dothi.js"></script>
 <script src="bieudo.js"></script>
 <script src="taikhoan.js"></script>
+<script src="ai.js"></script>
 <script src="thuvien.js"></script>
 <script src="dongbo.js"></script>
 <script src="gioithieu.js"></script>

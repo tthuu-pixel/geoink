@@ -2158,6 +2158,7 @@
     thuNho: function () { thuPhong(1 / 1.25); }, phongTo: function () { thuPhong(1.25); }, tiLeMacDinh: function () { thuPhong(1 / V.s); }, chenKhoang: function () { chonCongCu('chenKhoang'); }, che: function () { chonCongCu('che'); },
     vuaKhung: function () { thuPhong(1 / V.s); },
     gioiThieu: function () { GI.gioiThieu.mo(); },
+    caiDatAi: function () { $('#menu').classList.add('an'); GI.ai.moCaiDat(); },
   };
 
   /* =====================================================================
@@ -2466,6 +2467,7 @@
   }
   // Chèn ảnh (data URL) lên bảng: vừa khoảng 60% khung nhìn, tâm ở giữa màn hình (hoặc chỗ chỉ định)
   function chenAnh(duLieu, ten, viTri) {
+    if (!$('#hop-bieu-do').classList.contains('an')) return aiDocBieuDo({ anh: duLieu });   // đang mở hộp biểu đồ: ảnh dán là để AI đọc số liệu
     var img = new Image();
     img.onload = function () {
       var id = 'anh' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); taiNguyen[id] = { ten: ten || 'Ảnh', duLieu: duLieu, loai: 'anh' }; boNhoAnh[id] = img;
@@ -3497,8 +3499,9 @@
   $$('.hop [data-dong]').forEach(function (b) { b.onclick = function () { b.closest('.hop').classList.add('an'); if (window.mathVirtualKeyboard) window.mathVirtualKeyboard.hide(); }; });
   $('#ct-chen').onclick = chenCongThuc;
   // ----- Biểu đồ trong mã TikZ: lấy số liệu, vẽ bằng chức năng Biểu đồ thống kê -----
-  function bieuDoTuTikz(ma, rongMax) {
-    var bd = GI.tikzBieuDo ? GI.tikzBieuDo.doc(ma) : null; if (!bd) return null;
+  function bieuDoTuTikz(ma, rongMax) { return bdTuDuLieu(GI.tikzBieuDo ? GI.tikzBieuDo.doc(ma) : null, rongMax); }
+  function bdTuDuLieu(bd, rongMax) {   // số liệu đọc được (quy tắc hoặc AI) → đối tượng biểu đồ, chưa đặt lên bảng
+    if (!bd || !bd.dm || !bd.dm.length || !bd.ds || !bd.ds.length) return null;
     var soDay = Math.max(1, bd.ds.length), w = Math.round(Math.min(rongMax || 900, Math.max(440, bd.dm.length * soDay * 24 + 180)));
     var o = { id: idMoi('h'), loai: 'bieuDo', kieu: bd.kieu, tieuDe: bd.tieuDe || '', tenX: bd.tenX || '', tenY: bd.tenY || '', dm: bd.dm, ds: bd.ds,
       ghiSo: bd.ghiSo ? undefined : false, luoi: bd.luoi ? undefined : false, buoc: bd.buoc || undefined, w: w, h: Math.round(w / Math.min(1.9, Math.max(1.25, bd.tiLe || 1.35))), x: 0, y: 0 };
@@ -3508,12 +3511,17 @@
   // ----- Nhập hình từ mã TikZ -----
   function nhapTikz(ma) {
     var oBD = bieuDoTuTikz(ma);
-    if (oBD) {   // biểu đồ: vẽ bằng chức năng Biểu đồ (bấm đúp để sửa số liệu)
-      ghiLichSu(); var tamB = veTG(W / 2, Hh / 2); oBD.x = tamB.x - oBD.w / 2; oBD.y = tamB.y - oBD.h / 2; trang().hinh.push(oBD);
-      giaTri = H.tinh(trang().hinh); daSua = true; chonCongCu('chon'); nhom = [{ h: oBD.id }]; capNhatChon(false); canVe();
-      thongBao('Đã nhận ra biểu đồ trong mã TikZ: ' + oBD.dm.length + ' danh mục · ' + oBD.ds.length + ' dãy số liệu · bấm đúp để sửa');
-      return { hinh: [oBD], canhBao: [] };
+    if (oBD) {   // biểu đồ: đọc số liệu theo quy tắc rồi mở hộp "Sửa số liệu" để thầy cô kiểm tra trước khi vẽ
+      moHopBieuDo(null, null, oBD, ma);
+      bdTB('Đã đọc số liệu từ mã TikZ (không cần mạng): ' + oBD.dm.length + ' danh mục · ' + oBD.ds.length + ' dãy. Kiểm tra lại rồi bấm "Vẽ biểu đồ".');
+      return { hinh: [], canhBao: [], hopBD: true };
     }
+    if (coVeBieuDo(ma) && GI.ai && GI.ai.coMoHinh()) { aiDocBieuDo({ ma: ma }); return { hinh: [], canhBao: [], hopBD: true }; }
+    return dungHinhTikz(ma);
+  }
+  // mã có dáng biểu đồ thống kê (pgfplots, \pie, nhiều cột hình chữ nhật, chữ "biểu đồ")
+  function coVeBieuDo(ma) { return /\\begin\{axis\}|\\addplot|\\pie\b|ybar|xbar|bi[eể]u\s*đ[oồ]/i.test(ma) || (ma.match(/rectangle/g) || []).length >= 3; }
+  function dungHinhTikz(ma) {
     var kq;
     try { var vtTZ = veTG(W / 2, Hh / 2 + 10); kq = GI.tikz.nhap(ma, { taoId: idMoi, viTri: vtTZ, khung: { w: W / V.s, h: (Hh - 120) / V.s } }); }
     catch (e) { return { loi: 'Không đọc được mã: ' + (e.message || e) }; }
@@ -3964,7 +3972,7 @@
     ghiLichSu(); var ten = o.dm[i]; o.dm.splice(i, 1); o.ds.forEach(function (d) { d.so.splice(i, 1); }); o._chonCot = null; daSua = true; canVe(); capNhatThanhNhanh(); thongBao('Đã xoá ' + ten);
   }
   // ---- Biểu đồ thống kê: hộp nhập số liệu + xem trước ----
-  var bdSua = null, bdKieu = 'cot', bdNho = [];
+  var bdSua = null, bdKieu = 'cot', bdNho = [], bdMoi = null, bdMaTZ = '';   // bdMoi: biểu đồ vừa đọc (chưa đặt), bdMaTZ: mã TikZ nguồn
   var bdSoDayKep = 2;   // biểu đồ kép: số dãy (2, hoặc nhiều hơn khi sửa biểu đồ nhập từ TikZ)
   function bdSoDay() { return bdKieu === 'cotKep' || bdKieu === 'duongKep' ? bdSoDayKep : 1; }
   function bdVeBang(dm, ds) {   // dựng lại bảng nhập theo kiểu biểu đồ
@@ -3997,7 +4005,7 @@
     var buoc = bdSo($('#bd-buoc').value);
     return { loi: loi, o: { kieu: bdKieu, tieuDe: $('#bd-td').value.trim(), tenX: $('#bd-tx').value.trim(), tenY: $('#bd-ty').value.trim(), dm: dm, ds: ds,
       ghiSo: $('#bd-ghiSo').checked ? undefined : false, luoi: $('#bd-luoi').checked ? undefined : false, chuThich: $('#bd-ct').checked ? undefined : false,
-      denTrang: $('#bd-dt').checked || undefined, buoc: buoc > 0 ? buoc : undefined, w: bdSua ? bdSua.w : undefined, h: bdSua ? bdSua.h : undefined } };
+      denTrang: $('#bd-dt').checked || undefined, buoc: buoc > 0 ? buoc : undefined, w: bdSua ? bdSua.w : bdMoi ? bdMoi.w : undefined, h: bdSua ? bdSua.h : bdMoi ? bdMoi.h : undefined } };
   }
   function bdXem() {
     var cv = $('#bd-xem'), hop = cv.parentNode, W0 = hop.clientWidth, H0 = hop.clientHeight, tl2 = window.devicePixelRatio || 1; if (!W0) return;
@@ -4022,22 +4030,99 @@
     duongKep: { tieuDe: 'Doanh thu hai cửa hàng (triệu đồng)', tenX: 'Tháng', tenY: 'Doanh thu', dm: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'], ds: [{ ten: 'Cửa hàng A', so: [12, 15, 14, 18, 21, 24] }, { ten: 'Cửa hàng B', so: [8, 10, 13, 12, 16, 17] }] },
     tron: { tieuDe: 'Môn thể thao yêu thích của lớp 7A', dm: ['Bóng đá', 'Cầu lông', 'Bơi', 'Cờ vua'], ds: [{ ten: 'Số bạn', so: [12, 8, 6, 4] }] },
   };
-  function moHopBieuDo(o, kieuDau) {
-    bdSua = o; $('#bd-loi').textContent = '';
-    var k0 = kieuDau || 'cot', g = o || Object.assign({ kieu: k0 }, JSON.parse(JSON.stringify(MAU_BD[k0] || MAU_BD.cot)));
-    $('#bd-tieu-de-hop').textContent = o ? 'Sửa biểu đồ thống kê' : 'Biểu đồ thống kê'; $('#bd-ve').textContent = o ? 'Cập nhật' : 'Vẽ biểu đồ';
+  function moHopBieuDo(o, kieuDau, moi, maTZ) {
+    bdSua = o; bdMoi = moi || null; bdMaTZ = maTZ || ''; $('#bd-loi').textContent = ''; bdTB('');
+    var k0 = kieuDau || 'cot', g = o || moi || Object.assign({ kieu: k0 }, JSON.parse(JSON.stringify(MAU_BD[k0] || MAU_BD.cot)));
+    $('#bd-tieu-de-hop').textContent = o ? 'Sửa biểu đồ thống kê' : moi ? 'Kiểm tra số liệu biểu đồ' : 'Biểu đồ thống kê'; $('#bd-ve').textContent = o ? 'Cập nhật' : 'Vẽ biểu đồ';
+    $('#bd-ai-ma').classList.toggle('an', !bdMaTZ);
+    bdNap(g);
+    $('#hop-bieu-do').classList.remove('an'); setTimeout(bdXem, 30);
+  }
+  function bdNap(g) {   // đổ số liệu vào hộp
     $('#bd-td').value = g.tieuDe || ''; $('#bd-tx').value = g.tenX || ''; $('#bd-ty').value = g.tenY || ''; $('#bd-buoc').value = g.buoc ? String(g.buoc).replace('.', ',') : '';
     $('#bd-ghiSo').checked = g.ghiSo !== false; $('#bd-luoi').checked = g.luoi !== false; $('#bd-ct').checked = g.chuThich !== false; $('#bd-dt').checked = !!g.denTrang; $('#bd-mau-to').checked = !g.denTrang;
     bdKieu = g.kieu || 'cot'; bdNho = (g.ds || []).slice(); bdSoDayKep = Math.max(2, Math.min(6, (g.ds || []).length));
     $$('#bd-kieu [data-k]').forEach(function (b) { b.classList.toggle('bat', b.dataset.k === bdKieu); }); $('#hop-bieu-do').classList.toggle('la-tron', bdKieu === 'tron');
     bdVeBang(g.dm || [], (g.ds || []).slice(0, bdSoDay()));
-    $('#hop-bieu-do').classList.remove('an'); setTimeout(bdXem, 30);
   }
+  function bdTB(s, loi) { var e = $('#bd-ai-tb'); e.textContent = s || ''; e.className = 'bd-ai-tb' + (loi ? ' loi' : ''); }
+  // ---- Nhờ AI đọc số liệu biểu đồ (mã TikZ hoặc ảnh). Khoá API do thầy cô nhập trong "Cài đặt AI" ----
+  var AI_BD = 'Bạn là trợ lí đọc số liệu biểu đồ thống kê trong đề Toán THCS (Việt Nam). Đầu vào là mã TikZ/pgfplots hoặc ảnh chụp biểu đồ.\n' +
+    'Trả về DUY NHẤT một đối tượng JSON: {"kieu":"cot"|"cotKep"|"duong"|"duongKep"|"tron"|null,"tieuDe":"","tenX":"","tenY":"","dm":["..."],"ds":[{"ten":"","so":[số,...]}],"ghiSo":true|false,"luoi":true|false,"buoc":số|null}\n' +
+    'Quy tắc:\n- cot: biểu đồ cột một dãy; cotKep: cột kép/nhóm (≥2 dãy); duong: biểu đồ đoạn thẳng một dãy; duongKep: ≥2 đường; tron: biểu đồ hình quạt tròn.\n' +
+    '- dm là các danh mục trên trục ngang (hoặc tên các hình quạt), theo đúng thứ tự từ trái sang phải (hình quạt: theo chiều kim đồng hồ từ đỉnh).\n' +
+    '- Mỗi dãy trong ds có "so" dài bằng dm; "ten" là tên dãy trong chú thích (nếu không có thì để tên đại lượng trục đứng).\n' +
+    '- Ưu tiên số ghi trên cột/điểm; nếu không ghi số thì ước lượng theo vạch chia trục đứng, làm tròn theo bước hợp lí. Hình quạt ghi % thì lấy số phần trăm.\n' +
+    '- tieuDe, tenX, tenY giữ nguyên tiếng Việt; bỏ kí hiệu LaTeX (ví dụ $^\\circ$C → °C, \\% → %). Không có thì để "".\n' +
+    '- ghiSo: có ghi số liệu trên cột/điểm không; luoi: có lưới ngang không; buoc: khoảng cách giữa hai vạch chia trục đứng (null nếu không rõ).\n' +
+    '- Nếu đầu vào không phải biểu đồ thống kê (ví dụ hình hình học) thì trả {"kieu":null}.';
+  function bdChuanAI(j) {
+    if (!j || !j.kieu || !Array.isArray(j.dm) || !Array.isArray(j.ds)) return null;
+    var dm = j.dm.map(function (t) { return String(t == null ? '' : t).trim(); }), n = dm.length;
+    var ds = j.ds.filter(function (d) { return d && Array.isArray(d.so); }).slice(0, 6).map(function (d) {
+      var so = d.so.slice(0, n).map(function (v) { var x = typeof v === 'number' ? v : bdSo(String(v).replace('%', '')); return isFinite(x) ? x : null; });
+      while (so.length < n) so.push(null); return { ten: String(d.ten || '').trim(), so: so };
+    });
+    if (!n || !ds.length) return null;
+    var k = { cot: 1, cotKep: 1, duong: 1, duongKep: 1, tron: 1 }[j.kieu] ? j.kieu : 'cot';
+    if (k === 'cot' && ds.length > 1) k = 'cotKep'; if (k === 'duong' && ds.length > 1) k = 'duongKep'; if (k === 'tron') ds = ds.slice(0, 1);
+    var buoc = +j.buoc;
+    return { kieu: k, tieuDe: String(j.tieuDe || ''), tenX: String(j.tenX || ''), tenY: String(j.tenY || ''), dm: dm, ds: ds, ghiSo: j.ghiSo !== false, luoi: j.luoi !== false, buoc: buoc > 0 ? buoc : null };
+  }
+  // nguon: { ma } hoặc { anh: dataURL }. Mở hộp ngay, AI đọc xong thì đổ số liệu vào để kiểm tra.
+  function aiDocBieuDo(nguon) {
+    if (!GI.ai || !GI.ai.coMoHinh()) { thongBao('Chưa cài AI: vào Menu → Cài đặt AI để nhập khoá API và chọn mô hình'); GI.ai && GI.ai.moCaiDat(); return; }
+    if ($('#hop-bieu-do').classList.contains('an')) moHopBieuDo(null, null, null, nguon.ma);
+    else if (nguon.ma) { bdMaTZ = nguon.ma; $('#bd-ai-ma').classList.remove('an'); }
+    var lan = (aiDocBieuDo.lan = (aiDocBieuDo.lan || 0) + 1);
+    bdTB('Đang nhờ AI đọc số liệu (' + GI.ai.moTa() + ')…'); $('#hop-bieu-do').classList.add('dang-ai');
+    var p = nguon.anh ? thuNhoAnh(nguon.anh, 1600).then(function (a) { return GI.ai.hoi({ heThong: AI_BD, chu: 'Đọc số liệu biểu đồ trong ảnh.', anh: [a], json: true, toiDa: 4000 }); })
+      : GI.ai.hoi({ heThong: AI_BD, chu: 'Mã TikZ của biểu đồ:\n' + nguon.ma, json: true, toiDa: 4000 });
+    p.then(function (j) {
+      if (lan !== aiDocBieuDo.lan || $('#hop-bieu-do').classList.contains('an')) return;
+      $('#hop-bieu-do').classList.remove('dang-ai');
+      var bd = bdChuanAI(j);
+      if (!bd) {
+        if (nguon.ma && !bdSua) { $('#hop-bieu-do').classList.add('an'); var kq = dungHinhTikz(nguon.ma); if (kq.loi) thongBao(kq.loi.replace(/<[^>]+>/g, ' ')); return; }
+        return bdTB('AI không thấy biểu đồ thống kê trong ' + (nguon.anh ? 'ảnh' : 'mã') + ' này.', true);
+      }
+      var o = bdTuDuLieu(bd); if (!bdSua) { bdMoi = o; $('#bd-tieu-de-hop').textContent = 'Kiểm tra số liệu biểu đồ'; } bdNap(o); bdXem();
+      bdTB('AI đã đọc: ' + bd.dm.length + ' danh mục · ' + bd.ds.length + ' dãy. Hãy kiểm tra lại số liệu trước khi vẽ.');
+    }, function (e) {
+      if (lan !== aiDocBieuDo.lan) return; $('#hop-bieu-do').classList.remove('dang-ai');
+      bdTB('AI chưa đọc được: ' + (e && e.message || e) + ' · Có thể nhập số liệu bằng tay.', true);
+    });
+  }
+  function thuNhoAnh(url, max) {   // ảnh lớn → JPEG cạnh dài tối đa max px (đỡ tốn lượt gửi)
+    return new Promise(function (ok) {
+      var im = new Image();
+      im.onload = function () {
+        var k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)); if (k >= 1 && url.length < 1.5e6) return ok(url);
+        var c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+        var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); ok(c.toDataURL('image/jpeg', 0.9));
+      };
+      im.onerror = function () { ok(url); }; im.src = url;
+    });
+  }
+  function bdChonAnh(chup) {
+    var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; if (chup) inp.setAttribute('capture', 'environment');
+    inp.onchange = function () { var f = inp.files[0]; if (!f) return; var fr = new FileReader(); fr.onload = function () { aiDocBieuDo({ anh: fr.result }); }; fr.readAsDataURL(f); };
+    inp.click();
+  }
+  $('#bd-ai-anh').onclick = function () { bdChonAnh(false); };
+  $('#bd-ai-chup').onclick = function () { bdChonAnh(true); };
+  $('#bd-ai-ma').onclick = function () { if (bdMaTZ) aiDocBieuDo({ ma: bdMaTZ }); };
+  $('#bd-ai-cd').onclick = function () { GI.ai.moCaiDat(); };
+  $('#hop-bieu-do').addEventListener('paste', function (e) {   // dán ảnh biểu đồ vào hộp → AI đọc
+    var cd = e.clipboardData, tep = cd && Array.prototype.filter.call(cd.items || [], function (it) { return it.kind === 'file' && /^image\//.test(it.type); })[0];
+    if (!tep) return; e.preventDefault(); e.stopPropagation();
+    var fr = new FileReader(); fr.onload = function () { aiDocBieuDo({ anh: fr.result }); }; fr.readAsDataURL(tep.getAsFile());
+  });
   function veBieuDoTuHop() {
     var kq = docHopBD(); if (kq.loi) return ($('#bd-loi').textContent = kq.loi);
     ghiLichSu(); var o = bdSua || { id: idMoi('h'), loai: 'bieuDo' };
     Object.assign(o, kq.o); delete o._khung;
-    if (!bdSua) { var tam = veTG(W / 2, Hh / 2); o.w = 440; o.h = 330; o.x = tam.x - o.w / 2; o.y = tam.y - o.h / 2; trang().hinh.push(o); }
+    if (!bdSua) { var tam = veTG(W / 2, Hh / 2); o.w = (bdMoi && bdMoi.w) || 440; o.h = (bdMoi && bdMoi.h) || 330; o.x = tam.x - o.w / 2; o.y = tam.y - o.h / 2; trang().hinh.push(o); }
     giaTri = H.tinh(trang().hinh); daSua = true;
     $('#hop-bieu-do').classList.add('an'); chonCongCu('chon'); nhom = [{ h: o.id }]; capNhatChon(false); canVe();
     thongBao(bdSua ? 'Đã cập nhật biểu đồ' : 'Đã vẽ biểu đồ · bấm đúp để sửa số liệu, kéo góc dưới phải để đổi cỡ');

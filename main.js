@@ -176,6 +176,41 @@ ipcMain.handle('tai-khoan', async (e, { hd, duLieu }) => {
   }
 });
 
+// ----- AI (đọc biểu đồ, ảnh → LaTeX): khoá API do từng thầy cô tự nhập -----
+// Khoá cất mã hoá trên máy (safeStorage của Windows), KHÔNG bao giờ gửi sang giao diện: giao diện chỉ gửi yêu cầu,
+// tiến trình chính gắn khoá rồi gọi thẳng nhà cung cấp.
+const AI_NCC = {
+  openai: { goc: 'https://api.openai.com/', dau: (k) => ({ Authorization: 'Bearer ' + k }) },
+  deepseek: { goc: 'https://api.deepseek.com/', dau: (k) => ({ Authorization: 'Bearer ' + k }) },
+  claude: { goc: 'https://api.anthropic.com/', dau: (k) => ({ 'x-api-key': k, 'anthropic-version': '2023-06-01' }) },
+  gemini: { goc: 'https://generativelanguage.googleapis.com/', dau: (k) => ({ 'x-goog-api-key': k }) },
+};
+function aiTep() { return path.join(app.getPath('userData'), 'ai-khoa.dat'); }
+function aiDoc() {
+  try { const raw = fs.readFileSync(aiTep()); return JSON.parse(safeStorage.isEncryptionAvailable() ? safeStorage.decryptString(raw) : raw.toString('utf8')) || {}; } catch (e) { return {}; }
+}
+function aiGhi(d) {
+  try { const s = JSON.stringify(d || {}); fs.writeFileSync(aiTep(), safeStorage.isEncryptionAvailable() ? safeStorage.encryptString(s) : s); } catch (e) { }
+}
+ipcMain.handle('ai-khoa', (e, { hd, ncc, khoa }) => {
+  const d = aiDoc();
+  if ((hd === 'ghi' || hd === 'xoa') && !AI_NCC[ncc]) return { ok: false };
+  if (hd === 'ghi') { d[ncc] = String(khoa || '').trim(); aiGhi(d); }
+  if (hd === 'xoa') { delete d[ncc]; aiGhi(d); }
+  const tt = {};   // chỉ trả về có khoá hay không và 4 kí tự cuối để nhận ra
+  Object.keys(AI_NCC).forEach((k) => { tt[k] = d[k] ? { co: true, duoi: d[k].slice(-4) } : { co: false }; });
+  return { ok: true, trangThai: tt };
+});
+ipcMain.handle('ai-goi', async (e, yc) => {
+  const n = AI_NCC[yc && yc.ncc], url = String((yc && yc.url) || '');
+  if (!n || !url.startsWith(n.goc)) return { status: 0, text: 'Địa chỉ không hợp lệ' };
+  const khoa = aiDoc()[yc.ncc]; if (!khoa) return { status: 401, text: 'Chưa nhập khoá API', chuaCoKhoa: true };
+  try {
+    const r = await net.fetch(url, { method: yc.method || 'GET', headers: Object.assign({ 'Content-Type': 'application/json' }, n.dau(khoa)), body: yc.body == null ? undefined : yc.body });
+    return { status: r.status, text: await r.text() };
+  } catch (err) { return { status: 0, text: 'Không kết nối được: ' + (err && err.message || err) }; }
+});
+
 // ----- Google Drive: đồng bộ thư viện sổ (mỗi giáo viên dùng Drive của chính mình) -----
 // Đăng nhập kiểu "ứng dụng trên máy" của Google: mở trình duyệt, Google trả mã về 127.0.0.1 (PKCE).
 // Chỉ xin quyền drive.file: app chỉ thấy các tệp do chính GeoInk tạo trên Drive.

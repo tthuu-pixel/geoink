@@ -9,6 +9,12 @@
   var THU_MUC_TV = 'GeoInk Thư viện';   // thư viện sổ: trong bộ nhớ riêng của app
 
   function goi(plugin, ham, tuyChon) { return cap.nativePromise(plugin, ham, tuyChon || {}); }
+  var AI_NCC = {
+    openai: { goc: 'https://api.openai.com/', dau: function (k) { return { Authorization: 'Bearer ' + k }; } },
+    deepseek: { goc: 'https://api.deepseek.com/', dau: function (k) { return { Authorization: 'Bearer ' + k }; } },
+    claude: { goc: 'https://api.anthropic.com/', dau: function (k) { return { 'x-api-key': k, 'anthropic-version': '2023-06-01' }; } },
+    gemini: { goc: 'https://generativelanguage.googleapis.com/', dau: function (k) { return { 'x-goog-api-key': k }; } },
+  };
   function nghe(plugin, su, f) { try { return cap.addListener(plugin, su, f); } catch (e) { return null; } }
   var FS = function (ham, tc) { return goi('Filesystem', ham, tc); };
   function loiChu(e) { return String((e && (e.message || e.errorMessage)) || e || 'Lỗi không rõ'); }
@@ -203,6 +209,25 @@
           var d = r.data; if (d && typeof d === 'object') return d;
           try { return JSON.parse(d); } catch (e) { return { ok: false, mang: true, loi: 'Máy chủ trả lời không hợp lệ. Thử lại sau.' }; }
         }, function () { return { ok: false, mang: true, loi: 'Không kết nối được máy chủ GeoLab. Kiểm tra mạng rồi thử lại.' }; });
+    },
+    // ---- AI: khoá API lưu trong bộ nhớ riêng của app, gọi nhà cung cấp bằng HTTP gốc (không bị chặn CORS) ----
+    aiKhoa: function (hd, ncc, khoa) {
+      var K = 'geoink_ai_khoa', d = {}; try { d = JSON.parse(localStorage.getItem(K) || '{}') || {}; } catch (e) { }
+      if (hd === 'ghi' && AI_NCC[ncc]) d[ncc] = String(khoa || '').trim();
+      if (hd === 'xoa') delete d[ncc];
+      if (hd === 'ghi' || hd === 'xoa') try { localStorage.setItem(K, JSON.stringify(d)); } catch (e) { }
+      var tt = {}; Object.keys(AI_NCC).forEach(function (k) { tt[k] = d[k] ? { co: true, duoi: d[k].slice(-4) } : { co: false }; });
+      return Promise.resolve({ ok: true, trangThai: tt });
+    },
+    aiGoi: function (yc) {
+      var n = AI_NCC[yc && yc.ncc], url = String((yc && yc.url) || ''), d = {};
+      if (!n || url.indexOf(n.goc) !== 0) return Promise.resolve({ status: 0, text: 'Địa chỉ không hợp lệ' });
+      try { d = JSON.parse(localStorage.getItem('geoink_ai_khoa') || '{}') || {}; } catch (e) { }
+      if (!d[yc.ncc]) return Promise.resolve({ status: 401, text: 'Chưa nhập khoá API', chuaCoKhoa: true });
+      var tc = { url: url, method: yc.method || 'GET', headers: Object.assign({ 'Content-Type': 'application/json' }, n.dau(d[yc.ncc])), responseType: 'text', readTimeout: 180000, connectTimeout: 30000 };
+      if (yc.body != null) tc.data = yc.body;
+      return goi('CapacitorHttp', 'request', tc).then(function (r) { return { status: r.status, text: typeof r.data === 'string' ? r.data : JSON.stringify(r.data) }; },
+        function (e) { return { status: 0, text: 'Không kết nối được: ' + loiChu(e) }; });
     },
     // ---- Google Drive (đồng bộ thư viện sổ) ----
     ggTrangThai: function () { var d = ggDoc(); return Promise.resolve({ cauHinh: true, daKetNoi: !!d.daKetNoi, email: d.email || '' }); },

@@ -832,3 +832,32 @@ html.android .tc-ranh b { border-radius: 8px; }
   .gt-dau h2 { font-size: 17px; }
   .gt-noi { padding: 14px 16px 22px; }
 }
+
+/* ===== Cài đặt AI (src/ai.js) ===== */
+#hop-ai .ai-khung { width: min(680px, 96vw); }
+.ai-ncc { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0; }
+.ai-ncc button { text-align: left; padding: 10px 12px; border: 1.5px solid #E2E8F0; border-radius: 12px; background: #fff; cursor: pointer; display: flex; flex-direction: column; gap: 2px; font: inherit; color: #1E293B; }
+.ai-ncc button.chon { border-color: #7C3AED; background: #F5F3FF; }
+.ai-ncc small { color: #94A3B8; font-size: 12.5px; }
+.ai-ncc small.co { color: #16A34A; font-weight: 600; }
+.ai-chi-tiet { border-top: 1px solid #E2E8F0; padding-top: 10px; }
+.ai-ghi { font-size: 13px; color: #64748B; margin-bottom: 10px; }
+.ai-dong { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 14px; }
+.ai-dong > span:first-child { width: 80px; flex: none; color: #334155; font-weight: 600; }
+.ai-khoa { flex: 1; display: flex; gap: 6px; }
+.ai-khoa input, .ai-khoa select { flex: 1; min-width: 0; height: 36px; border: 1px solid #CBD5E1; border-radius: 9px; padding: 0 10px; font: 14px Arial, sans-serif; }
+.ai-nut { display: flex; align-items: center; gap: 8px; margin: 4px 0 10px 90px; flex-wrap: wrap; }
+.ai-nut a { font-size: 13px; color: #2451C7; }
+.ai-tb { min-height: 20px; font-size: 13.5px; margin-left: 90px; }
+.ai-tb.loi { color: #B91C1C; } .ai-tb.tot { color: #15803D; }
+/* Hộp biểu đồ: đọc số liệu bằng AI */
+html:not(.android) .chi-android { display: none !important; }
+.bd-ai { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 4px; padding: 8px 10px; border: 1px dashed #C4B5FD; border-radius: 10px; background: #F7F4FF; }
+.bd-ai-nhan { font-weight: 600; color: #6D28D9; margin-right: 4px; }
+.bd-ai .nut.chu { padding: 4px 10px; font-size: 13px; }
+.bd-ai-cd { margin-left: auto; }
+.bd-ai-tb { flex-basis: 100%; font-size: 13px; color: #4B5563; min-height: 0; }
+.bd-ai-tb:empty { display: none; }
+.bd-ai-tb.loi { color: #B91C1C; }
+#hop-bieu-do.dang-ai .bd-ai-tb::before { content: ''; display: inline-block; width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; border: 2px solid #8B5CF6; border-right-color: transparent; border-radius: 50%; animation: bd-xoay .8s linear infinite; }
+@keyframes bd-xoay { to { transform: rotate(360deg); } }

@@ -180,7 +180,7 @@ GI.tikz = (function () {
     cfg = cfg || {};
     var canhBao = [], macro = {}, ham = {}, ten = {}, nut = [], tyLe = 1;
     var dvX = 1, dvY = 1, dich = { x: 0, y: 0 }, chongDich = [], hcnTZ = [],
-        duongTen = {}, doan = [], tron = [], cung = [], dsPlot = [], goc = [], gocVuong = [], nhan = [], xuatHien = {}, conLai = [];
+        duongTen = {}, doan = [], tron = [], cung = [], gapTZ = [], cungTZ = [], tronTZ = [], dsPlot = [], goc = [], gocVuong = [], nhan = [], xuatHien = {}, conLai = [];
     function bao(s) { if (canhBao.indexOf(s) < 0 && canhBao.length < 30) canhBao.push(s); }
     function nutMoi(bt, tenTZ) { nut.push({ bt: bt, ten: tenTZ }); return { t: 'ref', id: nut.length - 1 }; }
     function datTen(t, bt) { t = t.trim().replace(/\.(center|north|south|east|west).*$/, ''); var r = bt.t === 'ref' ? bt : nutMoi(bt, t); ten[t] = r.id; if (!nut[r.id].ten) nut[r.id].ten = t; return r; }
@@ -278,6 +278,7 @@ GI.tikz = (function () {
       var kieu = opt.dashed || opt['densely dashed'] || opt['loosely dashed'] ? 'dut' : opt.dotted || opt['densely dotted'] || opt['loosely dotted'] ? 'cham' : null;
       var khoaKieu = [lenhVe, opt.fill, opt.pattern, opt['pattern color'], opt.color, Object.keys(opt).filter(function (k) { return opt[k] === true && laMau(k); }).join('+')].join('|');   // nhận ra cùng một dãy số liệu (biểu đồ)
       var mauToHCN = typeof opt.fill === 'string' ? mauTikz(opt.fill) : null;
+      var mauVeTZ = typeof opt.color === 'string' ? mauTikz(opt.color) : (function () { var k = Object.keys(opt).filter(function (x) { return opt[x] === true && laMau(x); })[0]; return k ? mauTikz(k) : (typeof opt.draw === 'string' && opt.draw !== 'none' ? mauTikz(opt.draw) : null); })();
       var mui = Object.keys(opt).filter(function (k) { return /^(<|)-(>|stealth|latex|Stealth|Latex)?$|^<-$|^<->$|^-(>|stealth)$|^(<|stealth)-/.test(k) && k !== '-'; })[0];
       var duong = { ds: [], loai: null }, cur = null, goc0 = null, dauDuong = null, noi = false, i = 0, doanTrongLenh = [], dangCham = null, letEnv = {};
       if (opt['name path'] || opt['name path global']) duong.ten = opt['name path'] || opt['name path global'];
@@ -330,6 +331,7 @@ GI.tikz = (function () {
           else if (s[i] === '(') { var j9 = khop(s, i), noiR = boNgoac(s.slice(i + 1, j9)); i = j9 + 1; rBt = banKinhTu(noiR, letEnv); }
           if (!cur || !rBt) { bao('Đường tròn thiếu tâm hoặc bán kính'); continue; }
           var rso = banKinh(rBt, gtNut);
+          tronTZ.push({ c: cur, r: rso, to: to, mau: mauToHCN || mauVeTZ });
           if (rBt.t === 'so' && rso <= 0.12) { dangCham = { P: cur, rong: rso, mau: to }; datCham(cur, to, rso < 0.6 * PT); }
           else { var tr = { c: cur, r: rBt, ve: ve, kieu: kieu }; if (ve) tron.push(tr); duong.loai = 'tron'; duong.c = cur; duong.r = rBt; }
           continue;
@@ -360,6 +362,7 @@ GI.tikz = (function () {
           if (!cur || !isFinite(rA)) { bao('Cung tròn thiếu thông tin'); continue; }
           var tamA = { t: 'cong', a: cur, b: { t: 'xy', x: -rA * Math.cos(g1 * RAD), y: -rA * Math.sin(g1 * RAD) } }, cuoiA = { t: 'cong', a: tamA, b: { t: 'xy', x: rA * Math.cos(g2 * RAD), y: rA * Math.sin(g2 * RAD) } };
           if (ve) cung.push({ c: tamA, a: g2 >= g1 ? cur : cuoiA, b: g2 >= g1 ? cuoiA : cur, kieu: kieu });
+          cungTZ.push({ c: tamA, r: rA, g1: g1, g2: g2, khoa: khoaKieu, mau: mauToHCN || mauVeTZ, to: to });
           cur = cuoiA; goc0 = cuoiA; noi = false; continue;
         }
         if (/^plot\b/.test(r)) {   // plot (\x,{f(\x)}) với domain, samples, variable · plot coordinates {(…) (…)}
@@ -382,6 +385,7 @@ GI.tikz = (function () {
             }
           } else { bao('plot không hợp lệ'); break; }
           if (ptsPl.length >= 2 && ve) dsPlot.push({ pts: ptsPl, kieu: kieu });
+          if (ptsPl.length >= 2) gapTZ.push({ pts: ptsPl.map(function (P) { return { t: 'xy', x: P.x, y: P.y }; }), khoa: khoaKieu, mau: mauVeTZ, dut: kieu });
           if (ptsPl.length) { var cuoiPl = ptsPl[ptsPl.length - 1]; cur = { t: 'xy', x: cuoiPl.x, y: cuoiPl.y }; goc0 = cur; }
           noi = false; continue;
         }
@@ -396,6 +400,7 @@ GI.tikz = (function () {
       }
       // ghi nhận
       if (duong.ten) duongTen[duong.ten] = duong.loai === 'tron' ? { loai: 'tron', c: duong.c, r: duong.r } : { loai: 'gap', ds: duong.ds.slice() };
+      if (doanTrongLenh.length) gapTZ.push({ pts: [doanTrongLenh[0].a].concat(doanTrongLenh.map(function (d) { return d.b; })), khoa: khoaKieu, mau: mauVeTZ, dut: kieu, lien: doanTrongLenh.every(function (d, k) { return !k || d.a === doanTrongLenh[k - 1].b; }) });
       doanTrongLenh.forEach(function (d, k) { doan.push({ a: d.a, b: d.b, kieu: kieu, muiDau: mui && /^</.test(mui) && k === 0, muiCuoi: mui && />|stealth|latex/i.test(mui.replace(/^<|^stealth-/, '')) && k === doanTrongLenh.length - 1 }); });
 
       function datCham(P, coTo, rat) { if (P.t !== 'ref') { P = nutMoi(P, null); cur = P; dangCham.P = P; } xuatHien[P.id] = xuatHien[P.id] || { to: coTo, khongCham: rat }; }
@@ -514,6 +519,9 @@ GI.tikz = (function () {
       hcn: hcnTZ.map(function (r) { var A = gt(r.a), B = gt(r.b); return A && B ? { x0: Math.min(A.x, B.x), x1: Math.max(A.x, B.x), y0: Math.min(A.y, B.y), y1: Math.max(A.y, B.y), kieu: r.kieu, mau: r.mau } : null; }).filter(Boolean),
       nhan: nhan.map(function (n) { var P = gt(n.P); return P ? { x: P.x, y: P.y, chu: n.chu, huong: n.huong } : null; }).filter(Boolean),
       doan: doan.map(function (d) { var A = gt(d.a), B = gt(d.b); return A && B ? { A: A, B: B } : null; }).filter(Boolean),
+      gap: gapTZ.map(function (g) { var ps = g.pts.map(gt); return ps.every(Boolean) ? { pts: ps, khoa: g.khoa, mau: g.mau, dut: g.dut, lien: g.lien !== false } : null; }).filter(Boolean),
+      cung: cungTZ.map(function (c) { var O = gt(c.c); return O ? { x: O.x, y: O.y, r: c.r, g1: c.g1, g2: c.g2, khoa: c.khoa, mau: c.mau, to: c.to } : null; }).filter(Boolean),
+      tron: tronTZ.map(function (c) { var O = gt(c.c); return O ? { x: O.x, y: O.y, r: c.r, to: c.to, mau: c.mau } : null; }).filter(Boolean),
       canhBao: canhBao };
     var ketQua = dung();
     ketQua.canhBao = canhBao;
