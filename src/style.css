@@ -924,3 +924,15 @@ html.android .tc-ranh b { border-radius: 8px; }
 .al-gc li { margin-bottom: 6px; }
 .al-rong { color: #9CA3AF; font: 14px system-ui, sans-serif; }
 @media (max-width: 900px) { .al-khung { grid-template-columns: 1fr; } }
+/* Gõ công thức: chip công thức trong khung chữ, bảng gợi ý lệnh */
+.lg-ct { display: inline-block; padding: 0 1px; border-radius: 3px; cursor: default; user-select: none; vertical-align: baseline; }
+.lg-ct svg { vertical-align: middle; }
+#soan-chu .lg-ct:hover { background: rgba(124, 58, 237, .1); outline: 1px dashed #A78BFA; }
+.lg-ct.loi { color: #B91C1C; font-family: Consolas, monospace; font-size: .8em; }
+#lg-goi-y { position: fixed; z-index: 9999; min-width: 220px; max-width: 360px; background: #fff; border: 1px solid #D1D5DB; border-radius: 10px; box-shadow: 0 10px 28px rgba(15, 23, 42, .18); padding: 4px; font-size: 14px; }
+#lg-goi-y > div { display: flex; align-items: center; gap: 10px; padding: 4px 8px; border-radius: 6px; cursor: pointer; }
+#lg-goi-y > div.chon { background: #EDE9FE; }
+#lg-goi-y code { font: 13px Consolas, "Cascadia Mono", monospace; color: #4C1D95; }
+#lg-goi-y .lg-xem { margin-left: auto; font-size: 16px; color: #111827; }
+#lg-goi-y .lg-xem svg { vertical-align: middle; max-height: 26px; }
+#lg-goi-y small { display: block; padding: 4px 8px 2px; color: #9CA3AF; font-size: 11px; border-top: 1px solid #F3F4F6; margin-top: 2px; }

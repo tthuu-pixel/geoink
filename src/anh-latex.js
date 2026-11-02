@@ -240,6 +240,7 @@ GI.anhLatex = (function () {
       '<div class="al-xem" id="al-xem"><p class="al-rong">Kết quả sẽ hiện ở đây.</p></div><textarea class="al-ma an" id="al-ma" spellcheck="false" placeholder="Mã LaTeX (sửa được)"></textarea><div class="al-gc an" id="al-gc"></div></div></div>' +
       '<div class="hanh-dong"><button class="nut chu" id="al-dong">Đóng</button><button class="nut chu" id="al-chep">Sao chép mã</button><button class="nut chu" id="al-luu">Lưu .tex</button><button class="nut chu chinh" id="al-bang">Đưa lên bảng</button></div></div>';
     document.body.appendChild(hop);
+    if (GI.latexGo) GI.latexGo.ganO($('#al-ma'));
     $('#al-dong').onclick = function () { hop.classList.add('an'); };
     hop.addEventListener('pointerdown', function (e) { if (e.target === hop) hop.classList.add('an'); });
     $('#al-chon').onclick = function () {

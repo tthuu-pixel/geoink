@@ -26,9 +26,10 @@ GI.vanBan = (function () {
     function di(n, kieu, canh, ds) {
       if (n.nodeType === 3) {
         if (!hien) moiDoan(canh, ds);
-        var t = n.nodeValue.replace(/\s+/g, ' '); if (t) hien.runs.push(Object.assign({ t: t }, kieu)); return;
+        var t = n.nodeValue.replace(/\u200B/g, '').replace(/\s+/g, ' '); if (t) hien.runs.push(Object.assign({ t: t }, kieu)); return;
       }
       if (n.nodeType !== 1) return;
+      if (n.dataset && n.dataset.tex != null) { if (!hien) moiDoan(canh, ds); hien.runs.push(Object.assign({ t: '$' + n.dataset.tex + '$' }, kieu)); return; }   // công thức đã hiện (gõ $…$ + Tab)
       var tag = n.tagName, k = Object.assign({}, kieu), st = n.style || {};
       if (tag === 'B' || tag === 'STRONG' || st.fontWeight === 'bold' || +st.fontWeight >= 600) k.b = true;
       if (tag === 'I' || tag === 'EM' || st.fontStyle === 'italic') k.i = true;
@@ -64,7 +65,7 @@ GI.vanBan = (function () {
     chuan(o).forEach(function (d) {
       if (d.ds !== ds) { if (ds) h += ds === 'so' ? '</ol>' : '</ul>'; if (d.ds) h += d.ds === 'so' ? '<ol>' : '<ul>'; ds = d.ds; }
       var noi = d.runs.map(function (r) {
-        var t = esc(r.t); if (r.mau) t = '<font color="' + r.mau + '">' + t + '</font>';
+        var t = GI.vanBan.toan && GI.latexGo && r.t.indexOf('$') >= 0 ? tachToan(r.t).map(function (m) { return m.m != null ? GI.latexGo.htmlChip(m.m) : esc(m.t); }).join('') : esc(r.t); if (r.mau) t = '<font color="' + r.mau + '">' + t + '</font>';
         if (r.s) t = '<s>' + t + '</s>'; if (r.u) t = '<u>' + t + '</u>'; if (r.i) t = '<i>' + t + '</i>'; if (r.b) t = '<b>' + t + '</b>'; return t;
       }).join('') || '<br>';
       var st = d.canh === 'giua' ? ' style="text-align:center"' : d.canh === 'phai' ? ' style="text-align:right"' : '';

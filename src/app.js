@@ -2803,6 +2803,7 @@
     el.querySelector('.sc-co').onchange = function (e) { dangSoan.co = +e.target.value; datKieuSoan(); noi.focus(); };
     el.querySelector('.sc-khoa').onclick = function () { dangSoan.coDinh = dangSoan.coDinh ? undefined : true; veNutKhoa(); };
     el.querySelector('.sc-xong').onclick = xongSoan;
+    if (!LA_BANG && GI.latexGo) GI.latexGo.ganKhungChu(noi);   // $x^2$ + Tab → công thức; gợi ý lệnh \tri → \triangle
     noi.addEventListener('keyup', capNhatNutSoan); noi.addEventListener('mouseup', capNhatNutSoan);
     noi.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); xongSoan(); } e.stopPropagation(); });
     noi.addEventListener('paste', function (e) { e.preventDefault(); document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain')); });
@@ -2836,7 +2837,7 @@
     if (!moi) ghiLichSu();
     dangSoan = o; soanMoi = moi; chonCongCu('chon'); nhom = [{ h: o.id }];
     var el = $('#soan-chu'), noi = el.querySelector('.sc-noi');
-    noi.innerHTML = GI.vanBan.sangHtml(o); datKieuSoan(); datViTriSoan(); veNutKhoa();
+    noi.innerHTML = GI.vanBan.sangHtml(o); if (GI.latexGo) GI.latexGo.lamDayChip(noi); datKieuSoan(); datViTriSoan(); veNutKhoa();
     el.classList.remove('an'); rongDau = noi.offsetWidth; canVe();
     setTimeout(function () { noi.focus(); var r = document.createRange(); r.selectNodeContents(noi); r.collapse(false); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); capNhatNutSoan(); }, 20);
   }
@@ -2845,7 +2846,7 @@
     o.doan = GI.vanBan.tuHtml(noi); delete o.nd; delete o.dam;
     // người dùng kéo góc khung (resize) thì trình duyệt ghi bề rộng px → dùng làm bề rộng xuống dòng
     if (/px$/.test(noi.style.width)) o.rong = Math.max(40, (parseFloat(noi.style.width) - 8) / V.s); else delete o.rong;
-    dangSoan = null; el.classList.add('an'); noi.blur();
+    dangSoan = null; el.classList.add('an'); noi.blur(); if (GI.latexGo) GI.latexGo.dongGoiY();
     if (GI.vanBan.laTrong(o)) { trang().hinh = trang().hinh.filter(function (x) { return x !== o; }); nhom = []; if (soanMoi) truoc.pop(); }
     daSua = true; capNhatTieuDe(); canVe();
   }
@@ -4239,6 +4240,7 @@
   };
   function escHtml(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   $('#tikz-tep').onclick = chonTepTex;
+  if (!LA_BANG && GI.latexGo) GI.latexGo.ganO($('#tikz-ma'));   // gợi ý lệnh LaTeX khi gõ mã
   $('#tikz-dung').onclick = function () {
     var maDB = $('#tikz-ma').value;
     if (!LA_BANG && GI.deBai.coMa(maDB)) {   // đề bài LaTeX (ex, bt, vd): chỉ bản máy tính
