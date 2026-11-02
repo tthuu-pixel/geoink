@@ -211,6 +211,29 @@ ipcMain.handle('ai-goi', async (e, yc) => {
   } catch (err) { return { status: 0, text: 'Không kết nối được: ' + (err && err.message || err) }; }
 });
 
+// ----- Quy tắc chuẩn hoá LaTeX gửi kèm cho AI: lấy bản mới nhất trên GitHub, lưu tạm trên máy, không có mạng thì dùng bản đóng gói -----
+const QT_URL = 'https://raw.githubusercontent.com/tthuu-pixel/geoink/main/src/quytac/chuan-hoa-latex-toan.md';
+function qtPhienBan(t) { const m = String(t || '').match(/phien-ban:\s*([\d-]+)/); return m ? m[1] : ''; }
+ipcMain.handle('quy-tac-latex', async () => {
+  const tepTam = path.join(app.getPath('userData'), 'quy-tac-latex.md');
+  let ds = [];
+  try { ds.push({ ma: fs.readFileSync(path.join(__dirname, 'src', 'quytac', 'chuan-hoa-latex-toan.md'), 'utf8'), nguon: 'đóng gói' }); } catch (e) { }
+  try { ds.push({ ma: fs.readFileSync(tepTam, 'utf8'), nguon: 'đã tải' }); } catch (e) { }
+  try {
+    const ctl = new AbortController(), hen = setTimeout(() => ctl.abort(), 8000);
+    const r = await net.fetch(QT_URL + '?t=' + Date.now(), { signal: ctl.signal }); clearTimeout(hen);
+    const t = r.ok ? await r.text() : '';
+    if (t.length > 5000 && qtPhienBan(t)) { ds.push({ ma: t, nguon: 'mới tải' }); try { fs.writeFileSync(tepTam, t, 'utf8'); } catch (e) { } }
+  } catch (e) { }
+  ds = ds.filter((x) => qtPhienBan(x.ma)).sort((a, b) => qtPhienBan(b.ma).localeCompare(qtPhienBan(a.ma)));
+  return ds.length ? { ma: ds[0].ma, phienBan: qtPhienBan(ds[0].ma), nguon: ds[0].nguon } : { loi: 'Không có bộ quy tắc' };
+});
+ipcMain.handle('luu-chu', async (e, { noiDung, ten, loai }) => {   // lưu tệp chữ (.tex) qua hộp thoại Lưu
+  const kq = await dialog.showSaveDialog(cuaSo, { title: 'Lưu tệp', defaultPath: ten || 'de.tex', filters: [{ name: loai || 'Tệp LaTeX', extensions: [String(ten || 'de.tex').split('.').pop()] }] });
+  if (kq.canceled || !kq.filePath) return { huy: true };
+  try { fs.writeFileSync(kq.filePath, noiDung, 'utf8'); return { ten: kq.filePath }; } catch (err) { return { loi: String(err.message || err) }; }
+});
+
 // ----- Google Drive: đồng bộ thư viện sổ (mỗi giáo viên dùng Drive của chính mình) -----
 // Đăng nhập kiểu "ứng dụng trên máy" của Google: mở trình duyệt, Google trả mã về 127.0.0.1 (PKCE).
 // Chỉ xin quyền drive.file: app chỉ thấy các tệp do chính GeoInk tạo trên Drive.

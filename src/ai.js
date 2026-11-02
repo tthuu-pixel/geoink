@@ -69,12 +69,19 @@ GI.ai = (function () {
       p = goiHttp(ncc, NCC.gemini.goc + 'v1beta/models/' + encodeURIComponent(mh) + ':generateContent', bd).then(function (j) {
         var cd = j.candidates && j.candidates[0];
         if (!cd) throw new Error('Gemini không trả lời' + (j.promptFeedback && j.promptFeedback.blockReason ? ' (bị chặn: ' + j.promptFeedback.blockReason + ')' : '') + '.');
+        if (cd.finishReason === 'MAX_TOKENS' && o.khiCat) o.khiCat();
         return ((cd.content && cd.content.parts) || []).map(function (x) { return x.text || ''; }).join('');
       });
     } else if (ncc === 'claude') {
       var nd = anh.map(function (a) { return { type: 'image', source: { type: 'base64', media_type: a.loai, data: a.b64 } }; }).concat([{ type: 'text', text: chu }]);
-      p = goiHttp(ncc, NCC.claude.goc + 'v1/messages', { model: mh, max_tokens: o.toiDa || 16000, system: he, messages: [{ role: 'user', content: nd }] }).then(function (j) {
+      // phần hệ thống dài (bộ quy tắc) được nhớ đệm: các lần gọi sau rẻ hơn
+      var heC = he.length > 4000 ? [{ type: 'text', text: he, cache_control: { type: 'ephemeral' } }] : he;
+      var bdC = { model: mh, max_tokens: o.toiDa || 16000, system: heC, messages: [{ role: 'user', content: nd }] };
+      p = goiHttp(ncc, NCC.claude.goc + 'v1/messages', bdC).catch(function (e) {   // mô hình cũ giới hạn độ dài trả lời thấp hơn: thử lại với 8192
+        if (!/max_tokens/i.test(e.message) || bdC.max_tokens <= 8192) throw e; bdC.max_tokens = 8192; return goiHttp(ncc, NCC.claude.goc + 'v1/messages', bdC);
+      }).then(function (j) {
         if (j.stop_reason === 'refusal') throw new Error('Claude từ chối yêu cầu này.');
+        if (j.stop_reason === 'max_tokens' && o.khiCat) o.khiCat();
         return (j.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('');
       });
     } else {   // openai, deepseek: cùng dạng chat/completions
@@ -86,6 +93,7 @@ GI.ai = (function () {
         var m = j.choices && j.choices[0] && j.choices[0].message;
         if (!m) throw new Error('Không nhận được trả lời.');
         if (m.refusal) throw new Error('Mô hình từ chối: ' + m.refusal);
+        if (j.choices[0].finish_reason === 'length' && o.khiCat) o.khiCat();
         return typeof m.content === 'string' ? m.content : (m.content || []).map(function (x) { return x.text || ''; }).join('');
       });
     }

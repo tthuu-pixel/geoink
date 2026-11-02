@@ -861,3 +861,67 @@ html:not(.android) .chi-android { display: none !important; }
 .bd-ai-tb.loi { color: #B91C1C; }
 #hop-bieu-do.dang-ai .bd-ai-tb::before { content: ''; display: inline-block; width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; border: 2px solid #8B5CF6; border-right-color: transparent; border-radius: 50%; animation: bd-xoay .8s linear infinite; }
 @keyframes bd-xoay { to { transform: rotate(360deg); } }
+/* Ảnh → LaTeX bằng AI */
+.al-hop { width: min(1240px, 96vw); max-width: none; }
+.al-hop h2 small { font-size: 13px; font-weight: 400; color: #6B7280; margin-left: 6px; }
+.al-khung { display: grid; grid-template-columns: 340px 1fr; gap: 16px; min-height: 0; }
+.al-trai { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.al-tha { border: 2px dashed #C4B5FD; border-radius: 12px; background: #F7F4FF; padding: 18px 12px; text-align: center; color: #4B5563; font-size: 14px; line-height: 1.6; }
+.al-tha.co-anh { padding: 10px; }
+.al-tha .nut { margin-top: 6px; }
+.al-pdf { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; padding: 8px; border-radius: 10px; background: #FFF7ED; border: 1px solid #FED7AA; }
+.al-pdf input { width: 80px; padding: 4px 6px; border: 1px solid #D1D5DB; border-radius: 6px; font: inherit; }
+.al-ds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 200px; overflow: auto; }
+.al-ds:empty { display: none; }
+.al-ds figure { position: relative; margin: 0; border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; background: #fff; }
+.al-ds img { display: block; width: 100%; height: 76px; object-fit: cover; object-position: top; }
+.al-ds figcaption { font-size: 10.5px; padding: 2px 4px; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.al-ds button { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border: 0; border-radius: 50%; background: rgba(17, 24, 39, .7); color: #fff; cursor: pointer; line-height: 18px; padding: 0; }
+.al-tuy { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.al-tuy label { display: flex; gap: 6px; align-items: center; }
+.al-tuy select { flex: 1; padding: 4px; border: 1px solid #D1D5DB; border-radius: 6px; font: inherit; }
+.al-tuy textarea { resize: vertical; padding: 6px 8px; border: 1px solid #D1D5DB; border-radius: 8px; font: inherit; font-size: 13px; }
+.al-mh { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #6D28D9; }
+.al-mh span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.al-mh .nut { padding: 2px 10px; font-size: 12.5px; }
+.al-chay { width: 100%; }
+.al-chay:disabled { opacity: .5; cursor: default; }
+.al-tb { font-size: 13px; color: #374151; min-height: 18px; }
+.al-tb.loi { color: #B91C1C; }
+#hop-anh-latex.dang-ai .al-tb::before { content: ''; display: inline-block; width: 11px; height: 11px; margin-right: 6px; vertical-align: -1px; border: 2px solid #8B5CF6; border-right-color: transparent; border-radius: 50%; animation: bd-xoay .8s linear infinite; }
+.al-luu-y { font-size: 11.5px; color: #9CA3AF; margin: 0; }
+.al-phai { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.al-tab { display: flex; gap: 4px; border-bottom: 1px solid #E5E7EB; }
+.al-tab button { border: 0; background: none; padding: 8px 12px; font: inherit; font-size: 14px; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.al-tab button.bat { color: #6D28D9; border-bottom-color: #6D28D9; font-weight: 600; }
+.al-tab button b { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 9px; background: #F59E0B; color: #fff; font-size: 11px; }
+.al-tab button b:empty { display: none; }
+.al-xem, .al-ma, .al-gc { height: min(62vh, 640px); overflow: auto; }
+.al-xem { padding: 22px 30px; background: #fff; border: 1px solid #E5E7EB; border-top: 0; font: 16px/1.6 "Times New Roman", "Cambria", serif; color: #111827; }
+.al-xem svg { vertical-align: middle; }
+.al-cau { margin-bottom: 16px; }
+.al-nhan { color: #1D4ED8; }
+.al-pa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 16px; margin: 6px 0 0 18px; }
+.al-pa.tf { grid-template-columns: 1fr; }
+.al-pa .dung b { color: #fff; background: #16A34A; border-radius: 50%; padding: 0 5px; }
+.al-ds-tf { margin-left: 8px; font: 600 12px system-ui, sans-serif; color: #6B7280; }
+.al-pa.tf .dung .al-ds-tf { color: #16A34A; }
+.al-pa.tf .dung b { background: none; color: inherit; padding: 0; }
+.al-tln { margin: 6px 0 0 18px; }
+.al-ds-y { margin: 4px 0 4px 18px; }
+.al-y { display: flex; gap: 8px; }
+.al-y > b { font-weight: 400; min-width: 20px; }
+.al-giua { text-align: center; }
+.al-ct-lon { text-align: center; margin: 6px 0; overflow-x: auto; }
+.al-hinh { display: inline-block; margin: 8px auto; padding: 18px 22px; border: 1.5px dashed #A78BFA; border-radius: 10px; color: #6D28D9; background: #FAF7FF; font: 13px system-ui, sans-serif; }
+.al-immini { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+.al-bang { border-collapse: collapse; margin: 6px auto; }
+.al-bang td { border: 1px solid #374151; padding: 3px 10px; text-align: center; }
+.al-lg { margin-top: 8px; border-left: 3px solid #A78BFA; background: #FAF7FF; padding: 6px 12px; border-radius: 0 8px 8px 0; }
+.al-lg summary { cursor: pointer; font: 600 13px system-ui, sans-serif; color: #6D28D9; }
+.al-loi-ct { color: #B91C1C; font-size: 13px; }
+.al-ma { width: 100%; box-sizing: border-box; resize: none; border: 1px solid #E5E7EB; border-top: 0; padding: 12px; font: 13px/1.5 Consolas, "Cascadia Mono", monospace; }
+.al-gc { border: 1px solid #E5E7EB; border-top: 0; padding: 12px 18px; font-size: 14px; line-height: 1.6; background: #FFFBEB; }
+.al-gc li { margin-bottom: 6px; }
+.al-rong { color: #9CA3AF; font: 14px system-ui, sans-serif; }
+@media (max-width: 900px) { .al-khung { grid-template-columns: 1fr; } }

@@ -2143,6 +2143,14 @@
     nhapTex: function () { LENH.nhapTikz(); },
     nhapDe: function () { if (LA_BANG) return; suaDeBai = null; LENH.nhapTikz('de'); },
     nhapTepTex: function () { if (LA_BANG) return; $('#menu').classList.add('an'); chonTepTex(); },
+    anhLatex: function () {
+      if (LA_BANG) return; $('#menu').classList.add('an');
+      GI.anhLatex.mo({ duaLenBang: function (ma) {   // trả về lỗi (chuỗi) hoặc rỗng khi đã đưa lên
+        if (GI.deBai.coMa(ma)) { suaDeBai = null; var kq = nhapDeBai(ma); return kq.loi || ''; }
+        if (/\\begin\{tikzpicture\}/.test(ma)) { var kt = nhapTikz(ma); return kt.loi || ''; }
+        return 'Mã chưa có \\begin{ex}, \\begin{bt} hay hình TikZ.';
+      } });
+    },
     catHinh: function () { batDauCat(); },
     kiemTraCapNhat: function () { $('#menu').classList.add('an'); if (!MT || !MT.kiemTraCapNhat) return thongBao('Chỉ kiểm tra cập nhật được trong app đã cài'); capNhat.tay = true; thongBao('Đang kiểm tra bản mới…'); MT.kiemTraCapNhat(); },
     xuatTex: function () {
@@ -2467,7 +2475,8 @@
   }
   // Chèn ảnh (data URL) lên bảng: vừa khoảng 60% khung nhìn, tâm ở giữa màn hình (hoặc chỗ chỉ định)
   function chenAnh(duLieu, ten, viTri) {
-    if (!$('#hop-bieu-do').classList.contains('an')) return aiDocBieuDo({ anh: duLieu });   // đang mở hộp biểu đồ: ảnh dán là để AI đọc số liệu
+    if (!$('#hop-bieu-do').classList.contains('an')) return aiDocBieuDo({ anh: duLieu });
+    if (GI.anhLatex && GI.anhLatex.dangMo()) return GI.anhLatex.themAnh(duLieu, ten);   // đang mở hộp Ảnh → LaTeX   // đang mở hộp biểu đồ: ảnh dán là để AI đọc số liệu
     var img = new Image();
     img.onload = function () {
       var id = 'anh' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); taiNguyen[id] = { ten: ten || 'Ảnh', duLieu: duLieu, loai: 'anh' }; boNhoAnh[id] = img;

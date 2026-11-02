@@ -555,5 +555,5 @@ GI.deBai = (function () {
   }
   function dauDe(kieu, so) { return [{ t: TEN[kieu] + ' ' + so + '. ', b: true, mau: MAU_NHAN }]; }
   function coMa(s) { return /\\begin\{(ex|bt|vd)\}/.test(String(s || '')); }
-  return { phanTich: phanTich, ve: ve, veNen: veNen, danTrang: danTrang, chuanBi: chuanBi, dauDe: dauDe, ganDau: ganDau, cacHinh: cacHinh, coMa: coMa, TEN: TEN };
+  return { phanTich: phanTich, chuanTex: chuanTex, ve: ve, veNen: veNen, danTrang: danTrang, chuanBi: chuanBi, dauDe: dauDe, ganDau: ganDau, cacHinh: cacHinh, coMa: coMa, TEN: TEN };
 })();

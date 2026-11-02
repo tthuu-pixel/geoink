@@ -29,6 +29,8 @@ contextBridge.exposeInMainWorld('mayTinh', {
   // AI: khoá API (cất mã hoá trong tiến trình chính) và gọi nhà cung cấp
   aiKhoa: (hd, ncc, khoa) => ipcRenderer.invoke('ai-khoa', { hd, ncc, khoa }),
   aiGoi: (yc) => ipcRenderer.invoke('ai-goi', yc),
+  quyTacLatex: () => ipcRenderer.invoke('quy-tac-latex'),
+  luuChu: (noiDung, ten, loai) => ipcRenderer.invoke('luu-chu', { noiDung, ten, loai }),
   // tài khoản GeoLab
   taiKhoan: (hd, duLieu) => ipcRenderer.invoke('tai-khoan', { hd, duLieu }),
   // tự cập nhật
