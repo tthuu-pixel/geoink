@@ -35,6 +35,7 @@
         the('k_hop', 'Hình không gian 3D', 'Hộp, lăng trụ, chóp, trụ, nón, cầu: xoay, tô mặt, nét khuất, trải phẳng.') +
         the('bieuDo', 'Đồ thị & biểu đồ', 'Đồ thị hàm số, hệ trục Oxy, biểu đồ cột, đoạn thẳng, hình quạt theo kiểu SGK.') +
         the('tikz', 'TikZ & LaTeX', 'Dán mã TikZ để dựng hình (cả biểu đồ)<span class="an-android">, xuất mã TikZ, nhập đề \\begin{ex}, \\begin{bt}</span>.') +
+        the('ai', 'Trợ lí AI', 'Đọc số liệu biểu đồ từ mã TikZ, ảnh<span class="an-android">; chuyển ảnh đề thành LaTeX chuẩn kèm lời giải</span>. Dùng khoá API của thầy cô.') +
         the('moHinh', 'Mô hình GeoLab', (soMH ? soMH + ' mô hình' : 'Các mô hình') + ' hình phẳng, hình không gian lớp 6–9 mở ngay từ bảng.') +
         '</div>';
     } },
@@ -113,10 +114,11 @@
         '<li><b>Hệ trục toạ độ Oxy</b> và <b>Điểm có toạ độ</b> (cùng nhóm, bấm ▽): nhập tên và toạ độ “x; y” (nhận 1,5 và 1/2), điểm ghi kiểu A(2; 3).</li>' +
         '<li>' + bt('bieuDo') + ' <b>Biểu đồ thống kê</b>: cột, cột kép, đoạn thẳng, đoạn thẳng kép, hình quạt tròn. Nhập tiêu đề, tên trục, bảng số liệu (dán thẳng từ Excel được), chọn tô màu hoặc đen trắng để in đề.</li>' +
         '<li>Trên bảng: bấm đúp để <b>sửa số liệu</b>; khi đã chọn biểu đồ thì kéo đỉnh cột lên xuống để đổi số, kéo thân cột sang ngang để đổi chỗ, thanh nổi có thêm / xoá cột, ẩn số liệu (để học sinh tự điền), đổi kiểu.</li>' +
-        '<li><b>Biểu đồ từ mã TikZ</b>: dán mã TikZ của một biểu đồ (vẽ bằng <code>rectangle</code>, pgfplots hoặc <code>\\pie</code>), GeoInk tự đọc danh mục, các dãy số liệu và tên chú thích rồi vẽ bằng chức năng Biểu đồ, sửa số liệu được như biểu đồ thường.</li></ul>';
+        '<li><b>Biểu đồ từ mã TikZ</b>: dán mã TikZ của một biểu đồ (cột vẽ bằng <code>rectangle</code>, đoạn thẳng, hình quạt, pgfplots hoặc <code>\\pie</code>). Không cần mạng, GeoInk đọc theo quy tắc danh mục, các dãy số liệu, tên chú thích rồi mở hộp <b>kiểm tra số liệu</b> để thầy cô xem lại trước khi bấm Vẽ biểu đồ.</li>' +
+        '<li>' + bt('ai') + ' <b>Đọc số liệu bằng AI</b> (cần mạng và khoá API): mã TikZ quá lạ thì AI tự đọc; trong hộp Biểu đồ có nút <b>Từ ảnh…</b><span class="chi-android">, <b>Chụp ảnh</b></span><span class="an-android"> hoặc dán ảnh bằng Ctrl+V</span> để AI đọc số liệu từ ảnh chụp biểu đồ.</li></ul>';
     } },
     { id: 'cong-cu', ten: 'Chữ, công thức, máy tính, dụng cụ', nhom: 'Hướng dẫn sử dụng', html: function () {
-      return '<ul><li>' + bt('chu') + ' <b>Văn bản</b>: bấm lên bảng để gõ chữ; thanh định dạng có phông, cỡ, đậm, nghiêng, gạch chân, màu, danh sách, căn lề. Bấm đúp để sửa, bấm ổ khoá để cố định.</li>' +
+      return '<ul><li>' + bt('chu') + ' <b>Văn bản</b>: bấm lên bảng để gõ chữ; thanh định dạng có phông, cỡ, đậm, nghiêng, gạch chân, màu, danh sách, căn lề. Bấm đúp để sửa, bấm ổ khoá để cố định.<span class="an-android"> Gõ công thức giữa hai dấu <code>$…$</code> (ví dụ <code>$x^2+1$</code>) thì khi gõ xong hiện thành công thức; bấm đúp thấy lại mã.</span></li>' +
         '<li>' + bt('congThuc') + ' <b>Công thức</b>: soạn bằng bàn phím toán hoặc gõ LaTeX, chọn màu, cỡ. Bấm đúp để sửa.</li>' +
         '<li>' + bt('mayTinh') + ' <b>Máy tính khoa học</b> (kiểu fx-880BTG): phân số, căn, luỹ thừa, lượng giác, độ phút giây, biến nhớ; MENU có thống kê, bảng giá trị, giải hệ phương trình, phương trình và bất phương trình bậc 2–4.</li>' +
         '<li>' + bt('dungCu') + ' <b>Dụng cụ học tập</b>: thước 20 cm, thước đo độ, ê-ke 30°–60° và 45°, thước parabol, compa, đúng tỉ lệ thật. Kéo để dời, nút ↻ để xoay, nút − % + để phóng to. Viết sát mép thước thì nét bám theo mép. Compa: kéo đầu kim, đầu bút, núm trên để quay vẽ cung.<span class="an-android"> Phím R cất dụng cụ.</span></li>' +
@@ -125,13 +127,16 @@
     } },
     { id: 'tex', ten: 'TikZ, LaTeX', nhom: 'Hướng dẫn sử dụng', html: function () {
       return '<ul><li>' + bt('tikz') + ' <b>Nhập hình từ mã TikZ</b> (menu ☰ hoặc nút Nhập mã TeX<span class="an-android">, hoặc dán thẳng lên bảng bằng Ctrl+V</span>): đọc TikZ thuần: <code>\\def</code>, <code>declare function</code>, <code>\\foreach</code>, <code>coordinate</code>, <code>calc</code>, <code>intersection of</code>, <code>name intersections</code>, đường tròn, cung, <code>plot</code>, <code>scope</code>, góc, nhãn. Điểm giữ cách dựng nên kéo điểm gốc thì hình đổi theo.</li>' +
+        '<li class="an-android">' + bt('anhLatex') + ' <b>Ảnh → LaTeX bằng AI</b> (menu ☰ hoặc nút trên thanh công cụ): thêm nhiều ảnh, trang PDF (dán, kéo thả, chọn tệp), AI chuyển thành mã <code>ex</code> / <code>bt</code> chuẩn theo bộ quy tắc chuẩn hoá LaTeX Toán, viết lời giải và ghi chú kiểm tra số liệu. Có xem trước, sao chép, lưu .tex, đưa thẳng lên bảng.</li>' +
         '<li class="an-android">' + bt('xuatTex') + ' <b>Xuất mã TeX</b>: bấm nút rồi kéo khung quanh hình (hoặc chọn sẵn hình) để lấy mã TikZ thuần theo khung 4 bước, có nút sao chép.</li>' +
         '<li class="an-android">' + bt('nhapDe') + ' <b>Nhập đề từ mã LaTeX</b>: dán đề có <code>\\begin{ex}</code> (trắc nghiệm → khung <b>Câu</b>, màu đỏ nâu) và <code>\\begin{bt}</code> (tự luận → khung <b>Bài</b>, màu xanh). Mỗi câu, mỗi bài thành một khung xếp thẳng hàng; lời giải nằm trong khung, <b>bấm đúp vào thanh “Lời giải”</b> để mở / đóng. Đọc được bảng Đúng/Sai, <code>tabular</code>, <code>multicols</code>, <code>immini</code>, hình TikZ đi kèm. Kéo góc dưới phải khung để đổi cỡ.</li>' +
+        '<li class="an-android"><b>Khoá khung Câu / Bài</b>: bấm ổ khoá ở góc trên bên phải khung. Khung đã khoá không sửa, kéo, đổi cỡ hay xoá được; dải Lời giải vẫn bấm đúp để mở / đóng. Chuột phải chỗ trống: <b>Khoá / Mở khoá tất cả khung Câu / Bài</b>.</li>' +
         '<li class="an-android"><b>Nhập tệp .tex</b> (menu ☰): chọn tệp trên máy, có ex / bt thì đưa đề lên bảng, có tikzpicture thì dựng hình.</li></ul>';
     } },
-    { id: 'geolab', ten: 'Mô hình GeoLab, tài khoản', nhom: 'Hướng dẫn sử dụng', html: function () {
+    { id: 'geolab', ten: 'GeoLab, tài khoản, AI', nhom: 'Hướng dẫn sử dụng', html: function () {
       return '<ul><li>' + bt('moHinh') + ' <b>Chèn mô hình GeoLab</b>: chọn mô hình hình phẳng, hình không gian lớp 6–9 để đặt lên bảng. Bấm <b>“Mở mô hình GeoLab ↗”</b> trên thẻ để mở mô hình tương tác (cần mạng).</li>' +
-        '<li><b>Đăng nhập GeoLab</b> là tuỳ chọn: bấm nút <b>Đăng nhập GeoLab</b> ở góc trên, dùng tài khoản được cấp trên nckh-geolab.com, hoặc bấm <b>Để sau</b> để dùng GeoInk ngay. Đã đăng nhập thì mọi liên kết sang GeoLab vào thẳng, không phải đăng nhập lại.</li></ul>';
+        '<li><b>Đăng nhập</b>: mở GeoInk cần đăng nhập bằng tài khoản GeoLab (cấp trên nckh-geolab.com). Tích <b>Ghi nhớ đăng nhập</b> để lần sau vào thẳng. Đã đăng nhập thì mọi liên kết sang GeoLab vào thẳng, không phải đăng nhập lại.</li>' +
+        '<li>' + bt('ai') + ' <b>Cài đặt AI</b> (menu ☰): chọn Google Gemini, OpenAI, Claude hoặc DeepSeek, dán <b>khoá API của thầy cô</b> (bấm “Lấy khoá API ở đâu?” để xem cách lấy), bấm <b>Lưu khoá và kiểm tra</b> rồi chọn mô hình trong danh sách (mới nhất ở đầu). Khoá được mã hoá, chỉ nằm trên máy này, không gửi lên GeoLab. Gemini có gói miễn phí.</li></ul>';
     } },
     { id: 'luu', ten: 'Lưu, thư viện, đồng bộ', nhom: 'Hướng dẫn sử dụng', html: function () {
       return '<ul><li>' + bt('thuVien') + ' <b>Thư viện sổ</b>: mọi bảng tự thành một <i>sổ</i> và tự lưu sau mỗi thay đổi, không cần bấm Lưu. Có Project (thư mục), ảnh bìa, đổi tên, nhân bản, <b>lịch sử phiên bản</b> (khôi phục được), Thùng rác giữ 30 ngày.</li>' +
@@ -148,7 +153,7 @@
         '<li>Chạm vào nhóm công cụ có ▽ là xổ danh sách ngay dưới nút.</li>' +
         '<li>Nút <b>Quay lại</b> của Android đóng hộp thoại, menu đang mở; ở màn hình chính thì hỏi trước khi thoát.</li>' +
         '<li>Thư viện sổ lưu trong bộ nhớ riêng của app: nên bật đồng bộ Google Drive hoặc Gửi bảng ra Drive cho sổ quan trọng.</li>' +
-        '<li>Bản máy tính bảng không có xuất mã TikZ và nhập đề LaTeX (chỉ có trên máy tính).</li></ul>';
+        '<li>Bản máy tính bảng không có xuất mã TikZ, nhập đề LaTeX, Ảnh → LaTeX, công thức $…$ trong khung chữ và khoá khung đề (chỉ có trên máy tính).</li></ul>';
     } },
     { id: 'phim-tat', ten: 'Phím tắt', nhom: 'Hướng dẫn sử dụng', chi: 'pc', html: function () {
       var ds = [['Ctrl+Z', 'Hoàn tác'], ['Ctrl+Y', 'Làm lại'], ['Ctrl+S', 'Lưu'], ['Ctrl+Shift+S', 'Lưu thành tệp khác'], ['Ctrl+O', 'Mở'], ['Ctrl+N', 'Bảng mới'],

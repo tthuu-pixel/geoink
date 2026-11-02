@@ -851,7 +851,6 @@ html.android .tc-ranh b { border-radius: 8px; }
 .ai-tb { min-height: 20px; font-size: 13.5px; margin-left: 90px; }
 .ai-tb.loi { color: #B91C1C; } .ai-tb.tot { color: #15803D; }
 /* Hộp biểu đồ: đọc số liệu bằng AI */
-html:not(.android) .chi-android { display: none !important; }
 .bd-ai { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 4px; padding: 8px 10px; border: 1px dashed #C4B5FD; border-radius: 10px; background: #F7F4FF; }
 .bd-ai-nhan { font-weight: 600; color: #6D28D9; margin-right: 4px; }
 .bd-ai .nut.chu { padding: 4px 10px; font-size: 13px; }
