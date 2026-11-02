@@ -3093,7 +3093,12 @@
     if (o) return { h: o.id, o: o };
     var mh = timMoHinh(M); if (mh) return { m: mh };
     var n = timNet(M); if (n) return { n: n };
+    var dg = trongVungDaGiac(M); if (dg) return { h: dg.id, o: dg };   // bấm vào phần trong đa giác: chọn đa giác
     return null;
+  }
+  function trongVungDaGiac(M) {   // đa giác trên cùng chứa M
+    var ds = trang().hinh.filter(function (x) { var v = giaTri[x.id]; return v && !x.an && v.k === 'daGiac' && trongDaGiac(v.ds, M); });
+    return ds[ds.length - 1] || null;
   }
   // chonId (bảng Thuộc tính) theo hình chọn sau cùng
   function capNhatChon(moBang) {
