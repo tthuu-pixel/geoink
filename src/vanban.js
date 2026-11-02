@@ -76,41 +76,79 @@ GI.vanBan = (function () {
 
   // ---------- dàn trang và vẽ ----------
   function fontChu(r, co, ff) { return (r.i ? 'italic ' : '') + (r.b ? '700 ' : '400 ') + co + 'px ' + ff; }
-  function danTrang(c, o) {
-    var co = o.co || 24, ff = css(o.font), lh = co * 1.38, rong = o.rong || 0, dong = [], so = 0;
+  // Công thức $...$ trong chữ (bản máy tính): tách mỗi mảnh chữ thành chữ thường và công thức
+  var EX = 0.45;
+  function tachToan(t) {
+    var ra = [], buf = '', i = 0;
+    while (i < t.length) {
+      var ch = t.charAt(i);
+      if (ch === '\\' && t.charAt(i + 1) === '$') { buf += '$'; i += 2; continue; }
+      if (ch === '$') {
+        var j = i + 1; while (j < t.length && (t.charAt(j) !== '$' || t.charAt(j - 1) === '\\')) j++;
+        if (j < t.length && j > i + 1 && /\S/.test(t.slice(i + 1, j))) { if (buf) ra.push({ t: buf }); buf = ''; ra.push({ m: t.slice(i + 1, j).trim() }); i = j + 1; continue; }
+      }
+      buf += ch; i++;
+    }
+    if (buf) ra.push({ t: buf });
+    return ra;
+  }
+  function soToan(tex, co, khiXong) {
+    var tx = GI.deBai && GI.deBai.chuanTex ? GI.deBai.chuanTex(tex) : tex, a = GI.congThuc && GI.congThuc.anh(tx, null, false, khiXong);
+    if (!a) return { tex: tx, w: co * 1.2, cao: co * 0.7, sau: 0, chua: true };
+    var sau = Math.max(0, -a.va * co * EX);
+    return { tex: tx, w: a.wEx * co * EX, cao: a.hEx * co * EX - sau, sau: sau };
+  }
+  function danTrang(c, o, khiXong) {
+    var co = o.co || 24, ff = css(o.font), lh = co * 1.38, rong = o.rong || 0, dong = [], so = 0, TREN = co * 1.02, DUOI = lh - TREN;
     chuan(o).forEach(function (d) {
       so = d.ds === 'so' ? so + 1 : 0;
       var thut = d.ds ? co * 1.4 : 0, tu = [];
-      d.runs.forEach(function (r) { r.t.split(/(\s+)/).forEach(function (p) { if (p) tu.push({ t: p, r: r }); }); });
-      var hang = { doan: d, thut: thut, dau: d.ds ? (d.ds === 'so' ? so + '.' : '•') : null, ds: [], w: 0 }, dau = true;
+      d.runs.forEach(function (r) {
+        (GI.vanBan.toan && r.t.indexOf('$') >= 0 ? tachToan(r.t) : [{ t: r.t }]).forEach(function (m) {
+          if (m.m != null) { tu.push({ m: m.m, r: r }); return; }
+          m.t.split(/(\s+)/).forEach(function (p) { if (p) tu.push({ t: p, r: r }); });
+        });
+      });
+      function hangMoi(dau) { return { doan: d, thut: thut, dau: dau, ds: [], w: 0, tren: TREN, duoi: DUOI }; }
+      var hang = hangMoi(d.ds ? (d.ds === 'so' ? so + '.' : '•') : null), dau = true;
       tu.forEach(function (w) {
-        c.font = fontChu(w.r, co, ff); var wd = c.measureText(w.t).width;
-        if (rong && !dau && hang.w + wd > rong - thut && /\S/.test(w.t)) { dong.push(hang); hang = { doan: d, thut: thut, dau: null, ds: [], w: 0 }; }
-        if (!hang.ds.length && /^\s+$/.test(w.t)) return;
-        hang.ds.push({ t: w.t, r: w.r, w: wd }); hang.w += wd; dau = false;
+        var wd, ct = null;
+        if (w.m != null) { ct = soToan(w.m, co, khiXong); wd = ct.w; }
+        else { c.font = fontChu(w.r, co, ff); wd = c.measureText(w.t).width; }
+        if (rong && !dau && hang.w + wd > rong - thut && (ct || /\S/.test(w.t))) { dong.push(hang); hang = hangMoi(null); }
+        if (!ct && !hang.ds.length && /^\s+$/.test(w.t)) return;
+        hang.ds.push(ct ? { ct: ct, r: w.r, w: wd } : { t: w.t, r: w.r, w: wd }); hang.w += wd; dau = false;
+        if (ct) { hang.tren = Math.max(hang.tren, ct.cao + co * 0.12); hang.duoi = Math.max(hang.duoi, ct.sau + co * 0.12); }
       });
       dong.push(hang);
     });
     var rongKhung = rong || Math.max.apply(null, dong.map(function (h) { return h.w + h.thut; }).concat([co]));
-    return { dong: dong, lh: lh, co: co, ff: ff, rong: rongKhung, cao: dong.length * lh };
+    var cao = dong.reduce(function (t, h) { return t + h.tren + h.duoi; }, 0);
+    return { dong: dong, lh: lh, co: co, ff: ff, rong: rongKhung, cao: cao };
   }
-  function ve(c, o, mauMD) {
-    var L = danTrang(c, o), y = o.y;
+  function ve(c, o, mauMD, khiXong) {
+    var L = danTrang(c, o, khiXong), y = o.y;
     c.save(); c.textBaseline = 'alphabetic';
     L.dong.forEach(function (h) {
       var tr = h.w, x = o.x + h.thut;
       if (h.doan.canh === 'giua') x = o.x + h.thut + (L.rong - h.thut - tr) / 2; else if (h.doan.canh === 'phai') x = o.x + L.rong - tr;
-      var nen = y + L.co * 1.02;
+      var nen = y + h.tren;
       if (h.dau) { c.font = fontChu({}, L.co, L.ff); c.fillStyle = o.mau || mauMD; c.textAlign = 'right'; c.fillText(h.dau, o.x + h.thut - L.co * 0.35, nen); c.textAlign = 'left'; }
       h.ds.forEach(function (w) {
-        c.font = fontChu(w.r, L.co, L.ff); var m = w.r.mau || o.mau || mauMD; c.fillStyle = m; c.fillText(w.t, x, nen);
+        var m = w.r.mau || o.mau || mauMD;
+        if (w.ct) {
+          if (!w.ct.chua) GI.congThuc.ve(c, { x: x, y: nen - w.ct.cao, latex: w.ct.tex, co: L.co }, m, khiXong);
+          else { c.font = (L.co * 0.6) + 'px Arial'; c.fillStyle = '#94A3B8'; c.fillText('…', x, nen); }
+          c.textBaseline = 'alphabetic'; x += w.w; return;
+        }
+        c.font = fontChu(w.r, L.co, L.ff); c.fillStyle = m; c.fillText(w.t, x, nen);
         if (w.r.u || w.r.s) { c.strokeStyle = m; c.lineWidth = Math.max(1, L.co / 16); c.beginPath(); var yy = w.r.u ? nen + L.co * 0.12 : nen - L.co * 0.3; c.moveTo(x, yy); c.lineTo(x + w.w, yy); c.stroke(); }
         x += w.w;
       });
-      y += L.lh;
+      y += h.tren + h.duoi;
     });
     c.restore();
     return { x0: o.x, y0: o.y, x1: o.x + L.rong, y1: o.y + Math.max(L.cao, L.lh) };
   }
-  return { FONT: FONT, css: css, chuan: chuan, laTrong: laTrong, tuHtml: tuHtml, sangHtml: sangHtml, ve: ve };
+  return { toan: false, FONT: FONT, css: css, chuan: chuan, laTrong: laTrong, tuHtml: tuHtml, sangHtml: sangHtml, ve: ve };
 })();

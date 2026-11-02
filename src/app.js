@@ -3,6 +3,7 @@
   'use strict';
   var MT = window.mayTinh || null;          // cầu nối Electron (null khi mở bằng trình duyệt)
   var LA_BANG = !!(MT && MT.nenTang === 'android');   // máy tính bảng Android: không có bàn phím, chuột
+  GI.vanBan.toan = !LA_BANG;   // khung văn bản: hiện công thức $...$ (bản máy tính)
   var DV = 40;   // 1 đơn vị (1 cm) = 40 điểm ảnh ở mức phóng 100%
   var FONT_TEX = 'Arial, "Liberation Sans", Helvetica, sans-serif';   // font chữ giống GeoGebra
   var FONT_TEN = '"LM Roman", "Times New Roman", serif';               // tên điểm, tên đường: font LaTeX (Latin Modern), in nghiêng như $A$
@@ -930,7 +931,7 @@
       }
       if (o.loai === 'chu' || o.loai === 'congThuc' || o.loai === 'deBai') {
         if (o === dangSoan) { o._khung = o._khung || { x0: o.x, y0: o.y, x1: o.x + 100, y1: o.y + 30 }; return; }   // đang mở khung soạn
-        o._khung = o.loai === 'chu' ? GI.vanBan.ve(c, o, mauChu) : o.loai === 'deBai' ? GI.deBai.ve(c, o, mauChu, canVe) : GI.congThuc.ve(c, o, mauChu, canVe);
+        o._khung = o.loai === 'chu' ? GI.vanBan.ve(c, o, mauChu, canVe) : o.loai === 'deBai' ? GI.deBai.ve(c, o, mauChu, canVe) : GI.congThuc.ve(c, o, mauChu, canVe);
         if (sang(o) && c === ctx) {
           var k = o._khung; c.save(); c.setLineDash([5 * px, 4 * px]); c.strokeStyle = mauSang; c.lineWidth = 1.5 * px; c.strokeRect(k.x0 - 5 * px, k.y0 - 5 * px, k.x1 - k.x0 + 10 * px, k.y1 - k.y0 + 10 * px); c.restore();
           if (o.loai === 'deBai' && !o.coDinh) { var kN = 7 * px; c.save(); c.setLineDash([]); c.fillStyle = '#fff'; c.strokeStyle = '#2457C5'; c.lineWidth = 1.6 * px; c.fillRect(k.x1 - kN, k.y1 - kN, 2 * kN, 2 * kN); c.strokeRect(k.x1 - kN, k.y1 - kN, 2 * kN, 2 * kN); c.restore(); }
