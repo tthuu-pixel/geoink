@@ -1,0 +1,60 @@
+# Đóng gói app GeoLab cho Windows (chạy GeoLab ngay trong máy, không cần mạng để mở mô hình).
+# Chạy khi đẩy thay đổi trong geolab-pc/ lên nhánh main, hoặc chạy tay ở tab Actions.
+# Nội dung GeoLab lấy mới nhất từ kho hinh-hoc-tuong-tac lúc đóng gói; sau khi cài, app tự tải
+# nội dung mới từ GitHub nên không cần đóng gói lại mỗi lần sửa GeoLab.
+# Bộ cài đăng vào bản phát hành cố định "geolab-pc" (đánh dấu bản thử để không ảnh hưởng
+# đường dẫn /releases/latest và tính năng tự cập nhật của GeoInk).
+name: Đóng gói GeoLab cho Windows
+
+on:
+  push:
+    branches: [main]
+    paths: ['geolab-pc/**', '.github/workflows/geolab-pc.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: geolab-pc
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: geolab-pc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: geolab-pc/package-lock.json
+      - run: npm ci
+      - name: Lấy nội dung GeoLab mới nhất
+        run: bash chuan-bi-web.sh
+      - name: Đóng gói
+        run: npx electron-builder --win --publish never
+      - name: Đăng bộ cài
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          gh release view geolab-pc >/dev/null 2>&1 || gh release create geolab-pc --prerelease --latest=false --target "$GITHUB_SHA" \
+            --title "GeoLab cho Windows" --notes "App GeoLab cho máy tính Windows."
+          # bỏ bộ cài của phiên bản cũ, giữ đúng một bộ cài mới nhất
+          gh release view geolab-pc --json assets -q '.assets[].name' | while read -r f; do
+            case "$f" in *"$VER"*|GeoLab-Setup.exe|latest.yml) ;; *) gh release delete-asset geolab-pc "$f" -y ;; esac
+          done
+          cp "dist/GeoLab-Setup-$VER.exe" dist/GeoLab-Setup.exe
+          gh release upload geolab-pc "dist/GeoLab-Setup-$VER.exe" "dist/GeoLab-Setup-$VER.exe.blockmap" dist/latest.yml dist/GeoLab-Setup.exe --clobber
+          gh release edit geolab-pc --prerelease --latest=false --title "GeoLab cho Windows $VER" \
+            --notes "App GeoLab $VER cho máy tính Windows: chạy mô hình ngay trong máy, không cần mạng (đăng nhập lần đầu cần mạng). Tải GeoLab-Setup.exe bên dưới rồi cài. App tự cập nhật nội dung mới khi có mạng. Đóng gói $(date -u +%Y-%m-%d\ %H:%M) UTC."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeoLab-windows
+          path: geolab-pc/dist/GeoLab-Setup-*.exe
+          if-no-files-found: error
