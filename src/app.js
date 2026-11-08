@@ -1769,7 +1769,9 @@
       var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
       if (!evs.length) evs = [e];
       evs.forEach(function (ev) { var q = toaDo(ev), W2 = veTG(q.x, q.y), cuoi = netDang.pts[netDang.pts.length - 1]; if (netDang.mep) W2 = GI.dungCu.chieuMep(netDang.mep, W2); if (Math.hypot(W2.x - cuoi[0], W2.y - cuoi[1]) * V.s >= 1.2) netDang.pts.push([W2.x, W2.y, lucNhan(ev)]); });
-      veNhap(); return;
+      // đoán trước vài điểm kế tiếp (chỉ để vẽ, không lưu): nét bám sát đầu bút hơn
+      netDang._du = netDang.mep ? null : duDoanNet(netDang, e);
+      veNhapSau(); return;
     }
     if (dangKeo) {
       if (dangKeo.loai === 'trang') { V.x = dangKeo.V.x - (p.x - dangKeo.p.x) / V.s; V.y = dangKeo.V.y - (p.y - dangKeo.p.y) / V.s; canVe(); return; }
@@ -1843,6 +1845,7 @@
       var laCompa = !!netDang.compa;
       delete netDang.thang; delete netDang.mep; delete netDang.compa;
       if (laCompa && netDang.pts.length < 3) { huyNetDang(); canVe(); return; }   // chỉ bấm núm, chưa quay
+      delete netDang._du; if (henVeNhap) { cancelAnimationFrame(henVeNhap); henVeNhap = 0; }
       ghiLichSu(); trang().net.push(netDang); netDang = null; nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, cvN.width, cvN.height); canVe(); return;
     }
     if (dangKeo && dangKeo.loai === 'trang') cv.style.cursor = conTroCC();
@@ -1921,10 +1924,25 @@
   }
 
   // Lớp nháp: nét đang viết, vòng tẩy, bút chỉ
+  // Nét đang viết: gom các điểm bút gửi về (có thể hơn 200 lần/giây) và chỉ vẽ một lần mỗi khung hình
+  var henVeNhap = 0;
+  function veNhapSau() { if (!henVeNhap) henVeNhap = requestAnimationFrame(function () { henVeNhap = 0; veNhap(); }); }
+  function duDoanNet(n, e) {
+    var ds = [], cuoi = n.pts[n.pts.length - 1];
+    var pr = e.getPredictedEvents ? e.getPredictedEvents() : [];
+    pr.slice(0, 3).forEach(function (ev) { var q = toaDo(ev), W2 = veTG(q.x, q.y); ds.push([W2.x, W2.y, cuoi[2]]); });
+    if (!ds.length && n.pts.length >= 3) {   // trình duyệt không đoán: tự kéo dài theo vận tốc nửa khung hình
+      var a = n.pts[n.pts.length - 3], dx = (cuoi[0] - a[0]) / 2, dy = (cuoi[1] - a[1]) / 2, d = Math.hypot(dx, dy) * V.s;
+      if (d > 0.8 && d < 40) ds.push([cuoi[0] + dx * 0.6, cuoi[1] + dy * 0.6, cuoi[2]]);
+    }
+    // bỏ điểm đoán quá xa (đổi hướng đột ngột)
+    return ds.filter(function (q) { return Math.hypot(q[0] - cuoi[0], q[1] - cuoi[1]) * V.s < 60; });
+  }
   function veNhap(M) {
+    if (henVeNhap) { cancelAnimationFrame(henVeNhap); henVeNhap = 0; }
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, cvN.width, cvN.height);
     nctx.setTransform(dpr * V.s, 0, 0, dpr * V.s, -V.x * V.s * dpr, -V.y * V.s * dpr);
-    if (netDang) veNet(nctx, netDang);
+    if (netDang) veNet(nctx, netDang._du && netDang._du.length ? Object.assign({}, netDang, { pts: netDang.pts.concat(netDang._du), _vien: null }) : netDang);
     // đang viết bằng bút cảm ứng / tay: tự vẽ cây bút chì ở đầu nét (con trỏ thật bị Windows giấu đi)
     if (netDang && netDang.kieu === 'but' && !netDang.compa && loaiConTroCuoi !== 'mouse' && GI.ANH_BUT && GI.ANH_BUT.complete && netDang.pts.length) {
       var dau = netDang.pts[netDang.pts.length - 1], Pm = raMH({ x: dau[0], y: dau[1] }), kb = GI.ANH_BUT_DIEM;
