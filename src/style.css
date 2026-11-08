@@ -46,7 +46,7 @@ i { font-style: normal; }
 .mui-xo { color: #2B2B2E; }
 #hang-dau .nut, #hang-viet .nut { border-radius: 14px; }
 #hang-dau .nut, #hang-viet .nut { width: 50px; height: 50px; }
-#hang-dau .nut i, #hang-viet .nut i { width: 34px; height: 34px; }   /* mọi icon hai hàng trên to đều nhau */
+#hang-dau .nut i, #hang-viet .nut i { width: 32px; height: 32px; }   /* mọi icon hai hàng trên to đều nhau */
 #hang-viet .mui-xo { height: 50px; }
 #hang-dau #thong-tin { font-size: 16px; font-weight: 400; color: #3F3F46; }
 .cap { display: flex; align-items: center; flex: none; }
@@ -936,3 +936,8 @@ html.android .tc-ranh b { border-radius: 8px; }
 #lg-goi-y .lg-xem { margin-left: auto; font-size: 16px; color: #111827; }
 #lg-goi-y .lg-xem svg { vertical-align: middle; max-height: 26px; }
 #lg-goi-y small { display: block; padding: 4px 8px 2px; color: #9CA3AF; font-size: 11px; border-top: 1px solid #F3F4F6; margin-top: 2px; }
+/* Nút con trỏ và bàn tay (góc trên phải): tông xanh, to hơn */
+#hang-viet .nut[data-cc="chon"], #hang-viet .nut[data-cc="keo"] { width: 56px; height: 56px; }
+#hang-viet .nut[data-cc="chon"] i, #hang-viet .nut[data-cc="keo"] i { width: 32px; height: 32px; }
+#hang-viet .nut[data-cc="chon"].bat, #hang-viet .nut[data-cc="keo"].bat { background: #DBEAFE; box-shadow: inset 0 0 0 2px #2563EB; }
+#hang-viet .nut[data-cc="chon"].bat:hover, #hang-viet .nut[data-cc="keo"].bat:hover { background: #BFDBFE; }
