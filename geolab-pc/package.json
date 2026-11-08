@@ -1,7 +1,7 @@
 {
   "name": "geolab-pc",
   "productName": "GeoLab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GeoLab – Hình học tương tác THCS, chạy trên máy tính Windows không cần mạng.",
   "main": "main.js",
   "author": "Nhóm nghiên cứu khoa học trường TH-THCS An Lạc",
