@@ -813,10 +813,13 @@
       if (o.loai === 'che' && hien(o)) { veKhungChe(c, o, px, sang(o)); return; }
       if (o.loai !== 'anh' || !hien(o)) return; var img = anhTaiNguyen(o.tn);
       if (img) c.drawImage(img, o.x, o.y, o.w, o.h); else { c.save(); c.fillStyle = '#F1F5F9'; c.fillRect(o.x, o.y, o.w, o.h); c.restore(); }
+      o._khung = { x0: o.x, y0: o.y, x1: o.x + o.w, y1: o.y + o.h };
       if (sang(o) && c === ctx) {
         c.save(); c.setLineDash([6 * px, 4 * px]); c.strokeStyle = mauSang; c.lineWidth = 1.6 * px; c.strokeRect(o.x, o.y, o.w, o.h); c.setLineDash([]);
-        var kN = 7 * px; c.fillStyle = '#fff'; c.strokeStyle = '#2457C5'; c.lineWidth = 1.6 * px; c.fillRect(o.x + o.w - kN, o.y + o.h - kN, 2 * kN, 2 * kN); c.strokeRect(o.x + o.w - kN, o.y + o.h - kN, 2 * kN, 2 * kN); c.restore();
-      }
+        if (!o.coDinh) { var kN = 7 * px; c.fillStyle = '#fff'; c.strokeStyle = '#2457C5'; c.lineWidth = 1.6 * px; c.fillRect(o.x + o.w - kN, o.y + o.h - kN, 2 * kN, 2 * kN); c.strokeRect(o.x + o.w - kN, o.y + o.h - kN, 2 * kN, 2 * kN); }
+        c.restore();
+        veKhoa(c, oKhoa(o), !!o.coDinh, px);   // ổ khoá: bấm để cố định ảnh
+      } else if (o.coDinh && c === ctx) { c.save(); c.globalAlpha = 0.75; veKhoa(c, oKhoa(o), true, px); c.restore(); }   // ảnh đã khoá: luôn hiện ổ khoá
     });
     // đa giác (tô) trước
     t.hinh.forEach(function (o) {
@@ -1702,6 +1705,10 @@
     if (cc === 'chon' && !LA_BANG) {   // ổ khoá ở góc khung đề: bấm là khoá / mở khoá
       var deK = trang().hinh.filter(function (o) { if (o.loai !== 'deBai' || o.an || !o._khung) return false; var P = oKhoa(o); return Math.hypot(M.x - P.x, M.y - P.y) < 13 / V.s; }).pop();
       if (deK) { doiKhoaDe([deK], !deK.coDinh); return; }
+    }
+    if (cc === 'chon') {   // ổ khoá của ảnh (đang chọn, hoặc đã khoá thì ổ khoá luôn hiện)
+      var anhK = trang().hinh.filter(function (o) { if (o.loai !== 'anh' || o.an || !o._khung || !(o.coDinh || trongNhom({ h: o.id }) || o.id === chonId)) return false; var P = oKhoa(o); return Math.hypot(M.x - P.x, M.y - P.y) < 13 / V.s; }).pop();
+      if (anhK) { doiKhoaDe([anhK], !anhK.coDinh); return; }
     }
     if (cc === 'chon' && chonId) {   // ổ khoá của chữ / công thức đang chọn
       var oc = timTheoId(chonId);
@@ -3253,16 +3260,17 @@
     ghiLichSu(); ds.forEach(function (o) { o.an = undefined; }); daSua = true; giaTri = H.tinh(trang().hinh); canVe(); thongBao('Đã hiện lại ' + ds.length + ' đối tượng');
   }
   // khung đề đã khoá (và hình TikZ thuộc khung đó): không sửa, kéo, đổi cỡ, xoá
-  function khoaDe(o) { if (!o) return false; if (o.loai === 'deBai') return !!o.coDinh; var d = o.thuocDe && timTheoId(o.thuocDe); return !!(d && d.coDinh); }
+  function khoaDe(o) { if (!o) return false; if (o.loai === 'deBai' || o.loai === 'anh') return !!o.coDinh; var d = o.thuocDe && timTheoId(o.thuocDe); return !!(d && d.coDinh); }
   function doiKhoaDe(ds, khoa) {
     if (!ds.length) return; ghiLichSu(); ds.forEach(function (o) { o.coDinh = khoa ? true : undefined; }); daSua = true;
-    thongBao((khoa ? 'Đã khoá ' : 'Đã mở khoá ') + (ds.length > 1 ? ds.length + ' khung' : 'khung') + (khoa ? ': không sửa, kéo, đổi cỡ hay xoá được · dải Lời giải vẫn bấm đúp để xem' : ''));
+    var laAnh = ds.every(function (o) { return o.loai === 'anh'; }), ten = laAnh ? 'ảnh' : 'khung';
+    thongBao((khoa ? 'Đã khoá ' : 'Đã mở khoá ') + (ds.length > 1 ? ds.length + ' ' + ten : ten) + (khoa ? (laAnh ? ': ảnh cố định, không kéo, đổi cỡ hay xoá được · bấm ổ khoá để mở' : ': không sửa, kéo, đổi cỡ hay xoá được · dải Lời giải vẫn bấm đúp để xem') : ''));
     if (!$('#thuoc-tinh').classList.contains('an')) veThuocTinh(); canVe();
   }
   function xoaNhom() {
     if (!nhom.length) return;
     var conKhoa = nhom.filter(function (x) { return x.h && khoaDe(timTheoId(x.h)); });
-    if (conKhoa.length) { nhom = nhom.filter(function (x) { return conKhoa.indexOf(x) < 0; }); thongBao('Khung đã khoá nên không xoá' + (nhom.length ? ' (đã xoá các đối tượng khác)' : ' · mở khoá trước khi xoá')); if (!nhom.length) { capNhatChon(false); canVe(); return; } }
+    if (conKhoa.length) { nhom = nhom.filter(function (x) { return conKhoa.indexOf(x) < 0; }); thongBao('Đối tượng đã khoá nên không xoá' + (nhom.length ? ' (đã xoá các đối tượng khác)' : ' · bấm ổ khoá để mở trước khi xoá')); if (!nhom.length) { capNhatChon(false); canVe(); return; } }
     ghiLichSu(); var t = trang(), bo = {};
     nhom.forEach(function (x) {
       if (x.h) { var b = H.phuThuoc(t.hinh, x.h); Object.keys(b).forEach(function (k) { bo[k] = 1; }); t.hinh.forEach(function (h) { if (h.thuocDe === x.h) Object.keys(H.phuThuoc(t.hinh, h.id)).forEach(function (k) { bo[k] = 1; }); }); }
@@ -3344,6 +3352,8 @@
         h += nutTN('doDai', '<span class="tn-so">' + soVN(dai, 1) + ' cm</span>' + (coDo ? 'Ẩn độ dài' : 'Ghi độ dài'), !!coDo, 'Ghi / ẩn số đo độ dài trên hình');
       }
       h += '<i class="tn-ke"></i>';
+      var dsAnhTN = hs.filter(function (o) { return o.loai === 'anh'; });
+      if (dsAnhTN.length && dsAnhTN.length === hs.length) { var khoaA = dsAnhTN.every(function (o) { return o.coDinh; }); h += nutTN('khoaAnh', '<span class="tn-so">' + (khoaA ? '🔒' : '🔓') + '</span>' + (khoaA ? 'Mở khoá' : 'Khoá'), khoaA, 'Khoá ảnh: cố định, không kéo, đổi cỡ hay xoá được'); }
       if (hs.length) h += nutTN('an', '<i data-bt="an"></i>Ẩn', false, 'Ẩn hình (mở lại trong bảng Thuộc tính → danh sách)');
       h += nutTN('chep', '<i data-bt="chep"></i>Sao chép', false, 'Sao chép (Ctrl+C) rồi Ctrl+V để dán') + nutTN('nhanBan', '<i data-bt="nhanBan"></i>Nhân bản', false, 'Nhân bản (Ctrl+D)') +
         nutTN('cat', '<i data-bt="cat"></i>Cắt', false, 'Cắt (Ctrl+X)') + nutTN('xoa', '<i data-bt="xoa"></i>Xoá', false, 'Xoá (Delete)');
@@ -3454,6 +3464,7 @@
     if (k === 'mau') return moDsTN(b, k, dsMau(hs[0] && hs[0].mau, true), function (gt) { suaChon(function (o) { if (gt) o.mau = gt; else delete o.mau; }); });
     if (k === 'to') { var coTo = hs.filter(function (o) { return laToDuoc(o); }).some(function (o) { return o.doMo !== 0; }); return suaChon(function (o) { if (laToDuoc(o)) { if (coTo) o.doMo = 0; else delete o.doMo; } }); }
     if (k === 'doDai') { var o1 = hs[0], dd = timDoDai(o1); ghiLichSu(); if (dd) trang().hinh = trang().hinh.filter(function (x) { return x !== dd; }); else themHinh({ id: idMoi('h'), loai: 'doDai', a: o1.a, b: o1.b }); giaTri = H.tinh(trang().hinh); daSua = true; canVe(); return capNhatThanhNhanh(); }
+    if (k === 'khoaAnh') { var dsA = hs.filter(function (o) { return o.loai === 'anh'; }); doiKhoaDe(dsA, !dsA.every(function (o) { return o.coDinh; })); capNhatThanhNhanh(); return; }
     if (k === 'an') { ghiLichSu(); hs.forEach(function (o) { o.an = true; }); nhom = []; dongThuocTinh(); daSua = true; canVe(); capNhatThanhNhanh(); return thongBao('Đã ẩn · mở lại trong bảng Thuộc tính (danh sách đối tượng)'); }
     if (k === 'chep') return chepNhom(false);
     if (k === 'cat') return chepNhom(true);
@@ -3515,6 +3526,8 @@
       h += '<hr>';
     }
     var deChon = hs.filter(function (o) { return o.loai === 'deBai'; }), deHet = LA_BANG ? [] : trang().hinh.filter(function (o) { return o.loai === 'deBai'; });
+    var anhChon = hs.filter(function (o) { return o.loai === 'anh'; });
+    if (anhChon.length) h += '<button data-mp="khoaAnh">' + tich(anhChon.every(function (o) { return o.coDinh; }) ? 1 : anhChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá ảnh (cố định)</button>';
     if (deChon.length && !LA_BANG) h += '<button data-mp="khoaDe">' + tich(deChon.every(function (o) { return o.coDinh; }) ? 1 : deChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá khung</button>';
     if (deHet.length) h += '<button data-mp="khoaHet"><span class="o-tich" style="border:0">🔒</span>Khoá tất cả khung Câu / Bài</button><button data-mp="moHet"><span class="o-tich" style="border:0">🔓</span>Mở khoá tất cả khung Câu / Bài</button>' + (nhom.length ? '<hr>' : '');
     if (nhom.length) h += '<button data-mp="xoa" class="do"><span class="o-tich" style="border:0">🗑</span>Xoá' + (nhom.length > 1 ? ' ' + nhom.length + ' đối tượng' : '') + '</button>';
@@ -3535,6 +3548,7 @@
         else if (k === 'xoa') xoaNhom();
         else if (k === 'khoaDe') doiKhoaDe(deChon, !deChon.every(function (o) { return o.coDinh; }));
         else if (k === 'khoaHet') doiKhoaDe(deHet, true);
+        else if (k === 'khoaAnh') doiKhoaDe(anhChon, !anhChon.every(function (o) { return o.coDinh; }));
         else if (k === 'moHet') doiKhoaDe(deHet, false);
         else if (k === 'thuocTinh') { chonId = hs[hs.length - 1].id; moThuocTinh(chonId); }
         if (chonId && !$('#thuoc-tinh').classList.contains('an')) veThuocTinh();
