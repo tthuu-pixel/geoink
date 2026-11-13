@@ -708,7 +708,8 @@
   }
   function timTen(M) { for (var i = vungTen.length - 1; i >= 0; i--) { var k = vungTen[i]; if (M.x >= k.x0 && M.x <= k.x1 && M.y >= k.y0 && M.y <= k.y1) return k; } return null; }
   function datViTriTen(o, dx, dy) {
-    var d = Math.hypot(dx, dy); if (d > BK_TEN) { dx *= BK_TEN / d; dy *= BK_TEN / d; }
+    // tên to (cỡ tên lớn) thì cho kéo xa hơn để vòng được quanh điểm (sang trái, xuống dưới…)
+    var R = BK_TEN * Math.max(1, ((o && o.coTen) || 22) / 22) + 12, d = Math.hypot(dx, dy); if (d > R) { dx *= R / d; dy *= R / d; }
     o.nhan = Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 ? undefined : { dx: Math.round(dx * 10) / 10, dy: Math.round(dy * 10) / 10 };
   }
 
@@ -2743,9 +2744,15 @@
       if (h.coDinh) { dangKeo = { loai: 'dauPB', dc: dc, i: h.i, M0: M }; return true; }
       dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y, dauPB: h.i, M0: M }; canVe(); return true;
     }
-    if (h.phan === 'tiLe') {   // nút − 100% +: phóng to / thu nhỏ dụng cụ, bấm vào số % để về 100%
-      var kq = h.huong ? GI.dungCu.buocTiLe(dc, h.huong) : GI.dungCu.doiTiLe(dc, 1);
-      thongBao(GI.dungCu.TEN[dc.loai] + ': ' + Math.round(kq * 100) + '%' + (kq !== 1 ? ' · bấm đúp vào dụng cụ để về 100%' : '')); canVe(); return true;
+    if (h.phan === 'tiLe') {   // nút − 100% +: phóng to / thu nhỏ dụng cụ (tới 1000%); bấm vào số % để nhập tỉ lệ
+      var baoTL = function (kq) { thongBao(GI.dungCu.TEN[dc.loai] + ': ' + Math.round(kq * 100) + '%' + (kq !== 1 ? ' · bấm đúp vào dụng cụ để về 100%' : '')); canVe(); };
+      if (h.huong) { baoTL(GI.dungCu.buocTiLe(dc, h.huong)); return true; }
+      hoi({ tieuDe: 'Tỉ lệ ' + GI.dungCu.TEN[dc.loai].toLowerCase(), nhan: 'Phần trăm (20 – 1000)', macDinh: String(Math.round(GI.dungCu.tiLe(dc) * 100)) }).then(function (gt) {
+        if (gt == null) return; var so = parseFloat(String(gt).replace(',', '.').replace('%', ''));
+        if (!isFinite(so) || so <= 0) return thongBao('Hãy nhập một số, ví dụ 250');
+        baoTL(GI.dungCu.doiTiLe(dc, so / 100));
+      });
+      return true;
     }
     if (h.phan === 'ghim') { dc.ghim = !dc.ghim; thongBao(dc.ghim ? 'Đã ghim: kéo dụng cụ sẽ quay quanh điểm đỏ' : 'Đã bỏ ghim: kéo để di chuyển dụng cụ'); canVe(); return true; }
     if (h.phan === 'xoay') { dangKeo = { loai: 'xoayDC', dc: dc, tam: h.tam, a0: Math.atan2(M.y - h.tam.y, M.x - h.tam.x), goc0: dc.goc, x0: dc.x, y0: dc.y }; canVe(); return true; }
