@@ -213,6 +213,7 @@
       '<button class="nut-don" data-cc="moHinh" title="Chèn mô hình GeoLab"><i>' + btHang2('moHinh') + '</i></button>' +
       NHOM_HINH.slice(BAT_DAU_MAU).map(function (n, j) { return oNhom(n, BAT_DAU_MAU + j); }).join('') +
       '<div class="gian"></div>' +
+      (LA_BANG ? '' : '<button class="nut nut-kho-hinh" data-lenh="khoHinh" title="Hình thực tế SVG: kho hình cây, nhà, thang, cột cờ, xe… để chèn vào đề; nhập thêm hình từ Freepik"><i>' + GI.bieuTuong('khoHinh') + '</i>Hình thực tế</button>') +
       '<button class="nut" data-lenh="soDo" id="nut-so-do" title="Ẩn / hiện số đo"><i>' + GI.bieuTuong('soDo') + '</i>Số đo</button>' +
       '<button class="nut" data-lenh="truc" title="Bật / tắt hệ trục toạ độ"><i>' + GI.bieuTuong('truc') + '</i>Hệ trục</button>';
     ganBieuTuong();

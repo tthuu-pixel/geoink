@@ -997,3 +997,5 @@ html.android .tc-ranh b { border-radius: 8px; }
 .kh-nhap-chan select { height: 34px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 8px; font: inherit; }
 .kh-nhap-chan .gian { flex: 1; }
 .kh-loi { color: #B91C1C; background: #FEF2F2; border-radius: 8px; padding: 8px 12px; font-size: 13.5px; }
+#hang-hinh .nut.nut-kho-hinh { min-width: 74px; margin-right: 6px; color: #15803D; border: 1.5px solid #86EFAC; background: #F0FDF4; border-radius: 10px; }
+#hang-hinh .nut.nut-kho-hinh:hover { background: #DCFCE7; border-color: #22C55E; }
