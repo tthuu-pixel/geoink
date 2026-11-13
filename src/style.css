@@ -960,3 +960,40 @@ html.android .tc-ranh b { border-radius: 8px; }
 .kh-rong { grid-column: 1 / -1; color: #64748B; text-align: center; padding: 40px 20px; line-height: 1.7; font-size: 14.5px; }
 .kh-chan { margin-top: 10px; font-size: 12.5px; color: #64748B; }
 .kh-nhac { color: #B45309; }
+.kh-trai { display: flex; flex-direction: column; min-height: 0; }
+.kh-trai .kh-chu-de { flex: 1; }
+.kh-them-cd { margin-top: 6px; font-size: 13px; padding: 6px 10px; }
+.kh-chan { display: flex; gap: 12px; align-items: center; }
+.kh-bao { font-weight: 600; color: #15803D; }
+.kh-bao.loi { color: #B91C1C; }
+#hop-kho-hinh.keo-vao .kh-hop { outline: 3px dashed #22C55E; outline-offset: -8px; }
+#kh-menu { position: fixed; z-index: 100000; min-width: 190px; padding: 4px; background: #fff; border: 1px solid #D1D5DB; border-radius: 10px; box-shadow: 0 10px 28px rgba(15,23,42,.18); }
+#kh-menu button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 8px 12px; border-radius: 7px; font: inherit; font-size: 14px; cursor: pointer; color: #1F2937; }
+#kh-menu button:hover { background: #F1F5F9; }
+#kh-menu button.do { color: #B91C1C; }
+.kh-hoi { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: rgba(15,23,42,.35); border-radius: inherit; }
+.kh-hoi-the { width: min(420px, 90%); background: #fff; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 18px 44px rgba(15,23,42,.3); }
+.kh-hoi-the input, .kh-hoi-the select { height: 38px; padding: 0 10px; border: 1px solid #CBD5E1; border-radius: 9px; font: inherit; }
+.kh-hoi-the small { color: #64748B; line-height: 1.5; }
+.kh-hoi-the > div { display: flex; justify-content: flex-end; gap: 8px; }
+#hop-kho-hinh { position: fixed; }
+#hop-kho-hinh .kh-hop { position: relative; }
+.kh-nhap { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; background: rgba(15,23,42,.4); }
+.kh-nhap-the { width: min(1100px, 94vw); height: min(84vh, 800px); background: #fff; border-radius: 16px; display: flex; flex-direction: column; padding: 16px 18px; box-shadow: 0 20px 50px rgba(15,23,42,.35); }
+.kh-nhap-dau h3 { margin: 0 0 2px; font-size: 20px; }
+.kh-nhap-dau span { color: #64748B; font-size: 13.5px; }
+.kh-nhap-than { flex: 1; min-height: 0; overflow: auto; margin: 12px 0; }
+.kh-nhap-than section { margin-bottom: 18px; }
+.kh-tr-dau { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; color: #334155; }
+.kh-tr-dau .nut.chu { padding: 4px 10px; font-size: 12.5px; }
+.kh-tr-dau b { color: #0F172A; }
+.kh-tr-luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.kh-the { position: relative; border: 1px solid #E2E8F0; border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 6px; background: #fff; }
+.kh-the.tat { opacity: .45; }
+.kh-the .kh-tich { position: absolute; top: 6px; left: 6px; z-index: 1; background: #fff; border-radius: 6px; padding: 2px 4px; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.kh-the .kh-tich input { width: 18px; height: 18px; }
+.kh-the .kh-ten, .kh-the .kh-cd { width: 100%; box-sizing: border-box; height: 30px; padding: 0 8px; border: 1px solid #CBD5E1; border-radius: 7px; font: inherit; font-size: 13px; }
+.kh-nhap-chan { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.kh-nhap-chan select { height: 34px; border: 1px solid #CBD5E1; border-radius: 8px; padding: 0 8px; font: inherit; }
+.kh-nhap-chan .gian { flex: 1; }
+.kh-loi { color: #B91C1C; background: #FEF2F2; border-radius: 8px; padding: 8px 12px; font-size: 13.5px; }

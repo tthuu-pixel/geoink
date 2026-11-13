@@ -3540,6 +3540,7 @@
     }
     var deChon = hs.filter(function (o) { return o.loai === 'deBai'; }), deHet = LA_BANG ? [] : trang().hinh.filter(function (o) { return o.loai === 'deBai'; });
     var anhChon = hs.filter(function (o) { return o.loai === 'anh'; });
+    if (anhChon.length === 1 && !LA_BANG && MT && MT.khoHinh) h += '<button data-mp="luuKho"><span class="o-tich" style="border:0">🖼</span>Lưu vào kho hình thực tế…</button>';
     if (anhChon.length) h += '<button data-mp="khoaAnh">' + tich(anhChon.every(function (o) { return o.coDinh; }) ? 1 : anhChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá ảnh (cố định)</button>';
     if (deChon.length && !LA_BANG) h += '<button data-mp="khoaDe">' + tich(deChon.every(function (o) { return o.coDinh; }) ? 1 : deChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá khung</button>';
     if (deHet.length) h += '<button data-mp="khoaHet"><span class="o-tich" style="border:0">🔒</span>Khoá tất cả khung Câu / Bài</button><button data-mp="moHet"><span class="o-tich" style="border:0">🔓</span>Mở khoá tất cả khung Câu / Bài</button>' + (nhom.length ? '<hr>' : '');
@@ -3562,6 +3563,7 @@
         else if (k === 'khoaDe') doiKhoaDe(deChon, !deChon.every(function (o) { return o.coDinh; }));
         else if (k === 'khoaHet') doiKhoaDe(deHet, true);
         else if (k === 'khoaAnh') doiKhoaDe(anhChon, !anhChon.every(function (o) { return o.coDinh; }));
+        else if (k === 'luuKho') { var tnA = taiNguyen[anhChon[0].tn]; if (tnA) GI.khoHinh.luuAnh(tnA.duLieu, (tnA.ten || 'hinh').replace(/\.[a-z]+$/i, ''), function (d, ten) { chenAnh(d, ten, null, 280); }); }
         else if (k === 'moHet') doiKhoaDe(deHet, false);
         else if (k === 'thuocTinh') { chonId = hs[hs.length - 1].id; moThuocTinh(chonId); }
         if (chonId && !$('#thuoc-tinh').classList.contains('an')) veThuocTinh();

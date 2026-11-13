@@ -242,9 +242,116 @@ function khTimDrive() {   // Google Drive cho máy tính: ổ G:\My Drive (hoặ
   return null;
 }
 function khThuMuc() { const c = khCaiDat(); if (c.thuMuc) return c.thuMuc; return path.join(khTimDrive() || app.getPath('documents'), KH_TEN); }
-function khTaoKhung(goc) { fs.mkdirSync(goc, { recursive: true }); KH_CHU_DE.forEach((t) => fs.mkdirSync(path.join(goc, t), { recursive: true })); }
-ipcMain.handle('kho-hinh', async (e, { hd, tep }) => {
+function khTaoKhung(goc) {   // lần đầu: tạo thư mục kho với đủ các chủ đề; về sau người dùng tự thêm / đổi tên / xoá chủ đề
+  if (fs.existsSync(goc)) return;
+  fs.mkdirSync(goc, { recursive: true }); KH_CHU_DE.forEach((t) => fs.mkdirSync(path.join(goc, t), { recursive: true }));
+}
+// ---- nhập gói Freepik (.zip / .ai / .eps / .svg): đổi sang SVG bằng Inkscape (EPS qua Ghostscript) ----
+const { execFile } = require('child_process');
+function khChay(exe, args, ms) {
+  return new Promise((ok, loi) => execFile(exe, args, { timeout: ms || 180000, windowsHide: true, maxBuffer: 64 * 1024 * 1024 }, (e, so, se) => {
+    if (e) loi(new Error(String(se || '').split(/\r?\n/).filter((d) => d && !/WARNING|Gtk|GLib/.test(d)).slice(-2).join(' ') || e.message)); else ok(so);
+  }));
+}
+function khTimTrong(ds) { for (const p of ds) { try { if (p && fs.statSync(p).isFile()) return p; } catch (e) { } } return null; }
+function khTimInkscape() {
+  if (process.platform === 'win32') {
+    const goc = [process.env.ProgramFiles, process.env['ProgramFiles(x86)'], process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Programs')].filter(Boolean);
+    return khTimTrong([].concat(...goc.map((g) => [path.join(g, 'Inkscape', 'bin', 'inkscape.com'), path.join(g, 'Inkscape', 'bin', 'inkscape.exe'), path.join(g, 'Inkscape', 'inkscape.com')])));
+  }
+  return khTimTrong(['/usr/bin/inkscape', '/usr/local/bin/inkscape', '/opt/homebrew/bin/inkscape', '/Applications/Inkscape.app/Contents/MacOS/inkscape']);
+}
+function khTimGs() {
+  if (process.platform === 'win32') {
+    for (const g of [process.env.ProgramFiles, process.env['ProgramFiles(x86)']].filter(Boolean)) {
+      let ds = []; try { ds = fs.readdirSync(path.join(g, 'gs')).sort().reverse(); } catch (e) { continue; }
+      for (const d of ds) { const p = khTimTrong([path.join(g, 'gs', d, 'bin', 'gswin64c.exe'), path.join(g, 'gs', d, 'bin', 'gswin32c.exe')]); if (p) return p; }
+    }
+    return null;
+  }
+  return khTimTrong(['/usr/bin/gs', '/usr/local/bin/gs', '/opt/homebrew/bin/gs']);
+}
+async function khSangSvg(tep, tam) {
+  const d = path.extname(tep).toLowerCase();
+  if (d === '.svg') return fs.readFileSync(tep, 'utf8');
+  const ink = khTimInkscape(); if (!ink) throw new Error('CHUA_CO_INKSCAPE');
+  let vao = tep;
+  if (d === '.eps' || d === '.ps') {   // EPS: Ghostscript đổi sang PDF trước (Inkscape đọc PDF ổn định hơn)
+    const gs = khTimGs(); if (!gs) throw new Error('CHUA_CO_GHOSTSCRIPT');
+    vao = path.join(tam, path.basename(tep) + '.pdf');
+    await khChay(gs, ['-q', '-dNOPAUSE', '-dBATCH', '-dSAFER', '-dEPSCrop', '-sDEVICE=pdfwrite', '-sOutputFile=' + vao, tep]);
+  } else if (d === '.ai') {   // tệp .ai đời mới là PDF: đổi đuôi cho Inkscape đọc như PDF
+    vao = path.join(tam, path.basename(tep) + '.pdf'); fs.copyFileSync(tep, vao);
+  }
+  const ra = path.join(tam, path.basename(tep) + '.svg');
+  await khChay(ink, [vao, '--export-type=svg', '--export-plain-svg', '--export-filename=' + ra]);
+  return fs.readFileSync(ra, 'utf8');
+}
+function khTenTep(ten) { return String(ten || 'hinh').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || 'hinh'; }
+function khTepMoi(thu, ten, duoi) { let f = path.join(thu, ten + duoi), i = 2; while (fs.existsSync(f)) f = path.join(thu, ten + ' (' + (i++) + ')' + duoi); return f; }
+function khTrongKho(g, p) { const f = path.normalize(path.join(g, p || '')); if (!f.startsWith(g)) throw new Error('Đường dẫn không hợp lệ'); return f; }
+
+ipcMain.handle('kho-hinh', async (e, { hd, tep, du }) => {
   try {
+    du = du || {};
+    if (hd === 'nhapFreepik') {
+      const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn gói tải từ Freepik', properties: ['openFile', 'multiSelections'],
+        filters: [{ name: 'Gói Freepik (.zip, .ai, .eps, .svg)', extensions: ['zip', 'ai', 'eps', 'svg'] }] });
+      if (kq.canceled || !kq.filePaths.length) return { huy: true };
+      const tam = fs.mkdtempSync(path.join(app.getPath('temp'), 'geoink-freepik-')), ra = [], loi = [];
+      for (const f of kq.filePaths) {
+        const ten = path.basename(f).replace(/\.[^.]+$/, '');
+        try {
+          let ds = [f];
+          if (/\.zip$/i.test(f)) {   // giải nén; ưu tiên .ai (không cần Ghostscript), không có mới dùng .eps, rồi .svg
+            const AdmZip = require('adm-zip'), z = new AdmZip(f), muc = z.getEntries().filter((x) => !x.isDirectory && !/__MACOSX/.test(x.entryName));
+            const chon = ['.ai', '.eps', '.svg'].map((d) => muc.filter((x) => path.extname(x.entryName).toLowerCase() === d)).find((x) => x.length) || [];
+            if (!chon.length) { loi.push(path.basename(f) + ': trong gói không có tệp .ai, .eps hay .svg'); continue; }
+            const thu = path.join(tam, String(ra.length) + '-' + ten); fs.mkdirSync(thu, { recursive: true });
+            ds = chon.map((x) => { const p = path.join(thu, path.basename(x.entryName)); fs.writeFileSync(p, x.getData()); return p; });
+          }
+          for (const p of ds) ra.push({ nguon: path.basename(p).replace(/\.[^.]+$/, ''), svg: await khSangSvg(p, tam) });
+        } catch (err) {
+          const m = String(err.message || err);
+          if (m === 'CHUA_CO_INKSCAPE') return { canInkscape: true };
+          loi.push(path.basename(f) + ': ' + (m === 'CHUA_CO_GHOSTSCRIPT' ? 'tệp .eps cần cài thêm Ghostscript (ghostscript.com)' : m));
+        }
+      }
+      try { fs.rmSync(tam, { recursive: true, force: true }); } catch (e2) { }
+      return { ds: ra, loi: loi };
+    }
+    if (hd === 'luuNhieu') {   // du.ds = [{ chuDe (tên thư mục), ten, svg | duLieu (data URL) }]
+      const g = khThuMuc(); khTaoKhung(g); const da = [];
+      for (const h of du.ds || []) {
+        const thu = khTrongKho(g, h.chuDe || ''); fs.mkdirSync(thu, { recursive: true });
+        if (h.svg != null) { const f = khTepMoi(thu, khTenTep(h.ten), '.svg'); fs.writeFileSync(f, h.svg, 'utf8'); da.push(f); }
+        else if (h.duLieu) {
+          const m = String(h.duLieu).match(/^data:image\/(svg\+xml|png|jpeg|webp)[^,]*,(.*)$/); if (!m) continue;
+          const duoi = { 'svg+xml': '.svg', png: '.png', jpeg: '.jpg', webp: '.webp' }[m[1]];
+          const b = /;base64/.test(h.duLieu.slice(0, 60)) ? Buffer.from(m[2], 'base64') : Buffer.from(decodeURIComponent(m[2]), 'utf8');
+          const f = khTepMoi(thu, khTenTep(h.ten), duoi); fs.writeFileSync(f, b); da.push(f);
+        }
+      }
+      return { ok: true, so: da.length };
+    }
+    if (hd === 'doiTen' || hd === 'chuyen') {   // tep: "thư mục/tên.svg"
+      const g = khThuMuc(), f = khTrongKho(g, tep), duoi = path.extname(f);
+      const thuMoi = hd === 'chuyen' ? khTrongKho(g, du.chuDe || '') : path.dirname(f);
+      const moi = khTepMoi(thuMoi, hd === 'doiTen' ? khTenTep(du.ten) : path.basename(f, duoi), duoi);
+      fs.renameSync(f, moi); return { ok: true };
+    }
+    if (hd === 'xoa') { await shell.trashItem(khTrongKho(khThuMuc(), tep)); return { ok: true }; }
+    if (hd === 'taoChuDe') {
+      const g = khThuMuc(); khTaoKhung(g);
+      const so = fs.readdirSync(g, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => parseInt(d.name, 10)).filter((n) => n > 0);
+      const ten = String(so.length ? Math.max.apply(null, so) + 1 : 1).padStart(2, '0') + ' ' + khTenTep(du.ten);
+      fs.mkdirSync(path.join(g, ten), { recursive: true }); return { ok: true, thuMuc: ten };
+    }
+    if (hd === 'doiTenChuDe') {
+      const g = khThuMuc(), cu = khTrongKho(g, du.thuMuc), so = (String(du.thuMuc).match(/^\d+\s*/) || [''])[0];
+      fs.renameSync(cu, path.join(g, so + khTenTep(du.ten))); return { ok: true };
+    }
+    if (hd === 'xoaChuDe') { await shell.trashItem(khTrongKho(khThuMuc(), du.thuMuc)); return { ok: true }; }
     if (hd === 'chonThuMuc') {
       const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn thư mục kho hình', properties: ['openDirectory', 'createDirectory'], defaultPath: khThuMuc() });
       if (kq.canceled || !kq.filePaths[0]) return { huy: true };
@@ -268,8 +375,8 @@ ipcMain.handle('kho-hinh', async (e, { hd, tep }) => {
     const quet = (thu, ten) => {
       let ds = []; try { ds = fs.readdirSync(path.join(g, thu), { withFileTypes: true }); } catch (e) { return; }
       const hinh = ds.filter((d) => d.isFile() && KH_DUOI.test(d.name)).map((d) => (thu ? thu + '/' : '') + d.name).sort((a, b) => a.localeCompare(b, 'vi'));
-      if (thu) chuDe.push({ ten: ten, hinh: hinh });
-      else if (hinh.length) chuDe.push({ ten: 'Chưa xếp chủ đề', hinh: hinh });
+      if (thu) chuDe.push({ ten: ten, thuMuc: thu, hinh: hinh });
+      else if (hinh.length) chuDe.push({ ten: 'Chưa xếp chủ đề', thuMuc: '', hinh: hinh });
       if (!thu) ds.filter((d) => d.isDirectory()).sort((a, b) => a.name.localeCompare(b.name, 'vi')).forEach((d) => quet(d.name, d.name.replace(/^\d+\s*/, '')));
     };
     quet('', '');
