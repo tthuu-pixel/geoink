@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('mayTinh', {
   aiGoi: (yc) => ipcRenderer.invoke('ai-goi', yc),
   quyTacLatex: () => ipcRenderer.invoke('quy-tac-latex'),
   luuChu: (noiDung, ten, loai) => ipcRenderer.invoke('luu-chu', { noiDung, ten, loai }),
+  khoHinh: (hd, tep) => ipcRenderer.invoke('kho-hinh', { hd, tep }),
   // tài khoản GeoLab
   taiKhoan: (hd, duLieu) => ipcRenderer.invoke('tai-khoan', { hd, duLieu }),
   // tự cập nhật

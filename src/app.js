@@ -75,7 +75,7 @@
     khoa: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/>',
     moKhoa: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.6-1.7"/><path d="M12 14.5v2.5"/>',
   };
-  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1, nhapDe: 1, nhapTex: 1, xuatTex: 1, catHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
+  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, dungCu: 1, nhapDe: 1, nhapTex: 1, xuatTex: 1, catHinh: 1, khoHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
   function bieuTuong(k, hang2) {
     if (!hang2 && BT_MAU[k] && GI.bieuTuong) return GI.bieuTuong(k);
     if (!hang2 && BT_NET[k]) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + BT_NET[k] + '</svg>';
@@ -2187,6 +2187,11 @@
       } });
     },
     catHinh: function () { batDauCat(); },
+    khoHinh: function () {
+      $('#menu').classList.add('an');
+      if (!MT || !MT.khoHinh) return thongBao('Kho hình thực tế hiện có trên bản máy tính');
+      GI.khoHinh.mo(function (duLieu, ten) { chenAnh(duLieu, ten, null, 280); });
+    },
     kiemTraCapNhat: function () { $('#menu').classList.add('an'); if (!MT || !MT.kiemTraCapNhat) return thongBao('Chỉ kiểm tra cập nhật được trong app đã cài'); capNhat.tay = true; thongBao('Đang kiểm tra bản mới…'); MT.kiemTraCapNhat(); },
     xuatTex: function () {
       if (LA_BANG) return;   // máy tính bảng: không có chức năng xuất mã
@@ -2509,14 +2514,15 @@
     b = boNhoAnh[id] = new Image(); b.onload = canVe; b.src = r.duLieu; return null;
   }
   // Chèn ảnh (data URL) lên bảng: vừa khoảng 60% khung nhìn, tâm ở giữa màn hình (hoặc chỗ chỉ định)
-  function chenAnh(duLieu, ten, viTri) {
+  function chenAnh(duLieu, ten, viTri, coMH) {   // coMH: cạnh dài muốn có trên màn hình (px), dùng cho hình trong kho
     if (!$('#hop-bieu-do').classList.contains('an')) return aiDocBieuDo({ anh: duLieu });
     if (GI.anhLatex && GI.anhLatex.dangMo()) return GI.anhLatex.themAnh(duLieu, ten);   // đang mở hộp Ảnh → LaTeX   // đang mở hộp biểu đồ: ảnh dán là để AI đọc số liệu
     var img = new Image();
     img.onload = function () {
       var id = 'anh' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); taiNguyen[id] = { ten: ten || 'Ảnh', duLieu: duLieu, loai: 'anh' }; boNhoAnh[id] = img;
-      var rongTG = W / V.s, caoTG = Hh / V.s, k = Math.min(1 / (window.devicePixelRatio || 1) / V.s, 0.6 * rongTG / img.naturalWidth, 0.6 * caoTG / img.naturalHeight);
-      var w = img.naturalWidth * k, h = img.naturalHeight * k, tam = viTri || veTG(W / 2, Hh / 2);
+      var nw = img.naturalWidth || 300, nh = img.naturalHeight || 300;
+      var rongTG = W / V.s, caoTG = Hh / V.s, k = coMH ? coMH / V.s / Math.max(nw, nh) : Math.min(1 / (window.devicePixelRatio || 1) / V.s, 0.6 * rongTG / nw, 0.6 * caoTG / nh);
+      var w = nw * k, h = nh * k, tam = viTri || veTG(W / 2, Hh / 2);
       ghiLichSu(); var o = { id: idMoi('a'), loai: 'anh', x: tam.x - w / 2, y: tam.y - h / 2, w: w, h: h, tn: id }; trang().hinh.push(o); giaTri = H.tinh(trang().hinh);
       chonCongCu('chon'); nhom = [{ h: o.id }]; capNhatChon(false); canVe();
       thongBao('Đã chèn ảnh · kéo để di chuyển, kéo ô vuông ở góc để đổi cỡ');

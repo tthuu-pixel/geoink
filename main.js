@@ -228,6 +228,55 @@ ipcMain.handle('quy-tac-latex', async () => {
   ds = ds.filter((x) => qtPhienBan(x.ma)).sort((a, b) => qtPhienBan(b.ma).localeCompare(qtPhienBan(a.ma)));
   return ds.length ? { ma: ds[0].ma, phienBan: qtPhienBan(ds[0].ma), nguon: ds[0].nguon } : { loi: 'Không có bộ quy tắc' };
 });
+// ----- Kho hình thực tế: một thư mục trên máy (nên đặt trong Google Drive của máy tính để mọi máy cùng có) -----
+//   mỗi thư mục con là một chủ đề; trong đó là các tệp .svg (cũng nhận .png, .jpg, .webp)
+const KH_CHU_DE = ['01 Nhà cửa - công trình', '02 Cột - trụ - đèn', '03 Cây cối - thiên nhiên', '04 Người', '05 Xe cộ - tàu thuyền',
+  '06 Thang - dốc - vui chơi', '07 Hình hộp - lập phương', '08 Hình trụ', '09 Hình nón - cầu', '10 Hình tròn',
+  '11 Mua bán - đời sống', '12 Đồng ruộng - vườn', '13 Khác'];
+const KH_TEN = 'GeoInk - Kho hình thực tế', KH_DUOI = /\.(svg|png|jpe?g|webp)$/i;
+function khCaiDat() { try { return JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'kho-hinh.json'), 'utf8')); } catch (e) { return {}; } }
+function khGhiCaiDat(c) { try { fs.writeFileSync(path.join(app.getPath('userData'), 'kho-hinh.json'), JSON.stringify(c)); } catch (e) { } }
+function khTimDrive() {   // Google Drive cho máy tính: ổ G:\My Drive (hoặc "Drive của tôi")
+  if (process.platform !== 'win32') return null;
+  for (const o of 'GHIJKLMNOPQRSTUVWXYZDEF') for (const t of ['My Drive', 'Drive của tôi']) { const p = o + ':\\' + t; try { if (fs.statSync(p).isDirectory()) return p; } catch (e) { } }
+  return null;
+}
+function khThuMuc() { const c = khCaiDat(); if (c.thuMuc) return c.thuMuc; return path.join(khTimDrive() || app.getPath('documents'), KH_TEN); }
+function khTaoKhung(goc) { fs.mkdirSync(goc, { recursive: true }); KH_CHU_DE.forEach((t) => fs.mkdirSync(path.join(goc, t), { recursive: true })); }
+ipcMain.handle('kho-hinh', async (e, { hd, tep }) => {
+  try {
+    if (hd === 'chonThuMuc') {
+      const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn thư mục kho hình', properties: ['openDirectory', 'createDirectory'], defaultPath: khThuMuc() });
+      if (kq.canceled || !kq.filePaths[0]) return { huy: true };
+      const c = khCaiDat(); c.thuMuc = kq.filePaths[0]; khGhiCaiDat(c);
+    }
+    if (hd === 'moThuMuc') { const g = khThuMuc(); khTaoKhung(g); shell.openPath(g); return { ok: true }; }
+    if (hd === 'doc') {   // nội dung một hình (data URL)
+      const g = khThuMuc(), f = path.normalize(path.join(g, tep));
+      if (!f.startsWith(g) || !KH_DUOI.test(f)) return { loi: 'Tệp không hợp lệ' };
+      let b = fs.readFileSync(f); const d = path.extname(f).toLowerCase();
+      if (d === '.svg') {   // SVG thiếu width/height: lấy theo viewBox để vẽ đúng tỉ lệ
+        let t = b.toString('utf8'); const m = t.match(/<svg\b[^>]*>/i);
+        if (m && !/\swidth=/i.test(m[0])) { const vb = m[0].match(/viewBox=["']\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/i); if (vb) { t = t.replace(m[0], m[0].replace(/<svg/i, '<svg width="' + vb[1] + '" height="' + vb[2] + '"')); b = Buffer.from(t, 'utf8'); } }
+      }
+      const loai = d === '.svg' ? 'image/svg+xml' : d === '.png' ? 'image/png' : d === '.webp' ? 'image/webp' : 'image/jpeg';
+      return { duLieu: 'data:' + loai + ';base64,' + b.toString('base64') };
+    }
+    // quét: danh sách chủ đề và hình
+    const g = khThuMuc(); khTaoKhung(g);
+    const chuDe = [];
+    const quet = (thu, ten) => {
+      let ds = []; try { ds = fs.readdirSync(path.join(g, thu), { withFileTypes: true }); } catch (e) { return; }
+      const hinh = ds.filter((d) => d.isFile() && KH_DUOI.test(d.name)).map((d) => (thu ? thu + '/' : '') + d.name).sort((a, b) => a.localeCompare(b, 'vi'));
+      if (thu) chuDe.push({ ten: ten, hinh: hinh });
+      else if (hinh.length) chuDe.push({ ten: 'Chưa xếp chủ đề', hinh: hinh });
+      if (!thu) ds.filter((d) => d.isDirectory()).sort((a, b) => a.name.localeCompare(b.name, 'vi')).forEach((d) => quet(d.name, d.name.replace(/^\d+\s*/, '')));
+    };
+    quet('', '');
+    return { thuMuc: g, chuDe: chuDe, coDrive: !!khTimDrive() };
+  } catch (err) { return { loi: String(err.message || err) }; }
+});
+
 ipcMain.handle('luu-chu', async (e, { noiDung, ten, loai }) => {   // lưu tệp chữ (.tex) qua hộp thoại Lưu
   const kq = await dialog.showSaveDialog(cuaSo, { title: 'Lưu tệp', defaultPath: ten || 'de.tex', filters: [{ name: loai || 'Tệp LaTeX', extensions: [String(ten || 'de.tex').split('.').pop()] }] });
   if (kq.canceled || !kq.filePath) return { huy: true };
