@@ -6,7 +6,7 @@
 var GI = window.GI || (window.GI = {});
 GI.khoHinh = (function () {
   var MT = window.mayTinh || null;
-  var hop = null, ds = null, chon = 0, tim = '', anhDem = {}, khiChen = null;
+  var hop = null, ds = null, chon = 0, tim = '', anhDem = {}, khiChen = null, daChon = {}, dsDangHien = [];
   function $(s) { return hop.querySelector(s); }
   function thoat(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function tenHinh(tep) { return tep.split('/').pop().replace(/\.[a-z]+$/i, '').replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim(); }
@@ -49,15 +49,20 @@ GI.khoHinh = (function () {
       '<button class="nut chu kh-ai" data-kh="ai" title="AI xem các hình trong chủ đề đang mở: đặt tên tiếng Việt và chuyển sang chủ đề đúng">✨ AI sắp xếp</button>' +
       '<button class="nut chu" data-kh="lamMoi" title="Đọc lại thư mục kho">↻</button><button class="nut chu" data-kh="moThuMuc" title="Mở thư mục kho trong Windows">📂</button>' +
       '<button class="nut chu" data-kh="doiThuMuc" title="Chọn thư mục khác làm kho">Đổi thư mục…</button><button class="nut chu" data-kh="dong">Đóng</button></div>' +
+      '<div class="kh-thanh-chon"><span class="kh-so-chon">Bấm để chọn hình · bấm đúp để chèn lên bảng</span>' +
+      '<button class="nut chu" data-kh="chonHet">Chọn tất cả</button><button class="nut chu" data-kh="boChon">Bỏ chọn</button>' +
+      '<button class="nut chu" data-kh="chuyenChon">Chuyển chủ đề…</button><button class="nut chu kh-ai" data-kh="aiChon">✨ AI đặt tên</button>' +
+      '<button class="nut chu kh-xoa" data-kh="xoaChon">🗑 Xoá</button></div>' +
       '<div class="kh-than"><div class="kh-trai"><div class="kh-chu-de"></div><button class="nut chu kh-them-cd" data-kh="themChuDe">＋ Chủ đề mới</button></div><div class="kh-luoi"></div></div>' +
       '<div class="kh-chan"><span class="kh-bao"></span><span class="kh-tt"></span></div></div>';
     document.body.appendChild(hop);
     hop.addEventListener('pointerdown', function (e) { if (e.target === hop) dong(); });
     hop.addEventListener('click', function (e) {
       var b = e.target.closest('[data-kh]'); if (b) return lenh(b.dataset.kh);
-      var cd = e.target.closest('[data-cd]'); if (cd) { chon = +cd.dataset.cd; tim = ''; $('.kh-tim').value = ''; ve(); return; }
-      var h = e.target.closest('[data-tep]'); if (h) return chenHinh(h.dataset.tep);
+      var cd = e.target.closest('[data-cd]'); if (cd) { chon = +cd.dataset.cd; tim = ''; $('.kh-tim').value = ''; daChon = {}; ve(); return; }
+      var h = e.target.closest('[data-tep]'); if (h) { var t = h.dataset.tep; if (daChon[t]) delete daChon[t]; else daChon[t] = 1; h.classList.toggle('chon', !!daChon[t]); veThanhChon(); }
     });
+    hop.addEventListener('dblclick', function (e) { var h = e.target.closest('[data-tep]'); if (h) { e.preventDefault(); chenHinh(h.dataset.tep); } });
     hop.addEventListener('contextmenu', function (e) {
       var h = e.target.closest('[data-tep]'), cd = e.target.closest('[data-cd]');
       if (h) { e.preventDefault(); return menuHinh(h.dataset.tep, e.clientX, e.clientY); }
@@ -73,7 +78,28 @@ GI.khoHinh = (function () {
     if (k === 'doiThuMuc') return MT.khoHinh('chonThuMuc').then(function (r) { if (r && !r.huy) { anhDem = {}; quet(); } });
     if (k === 'lamMoi') { anhDem = {}; return quet(); }
     if (k === 'nhap') return nhapFreepik();
-    if (k === 'ai') { if (tim) return bao('Xoá ô tìm kiếm, chọn một chủ đề rồi bấm AI sắp xếp', true); return aiSapXep(ds.chuDe[chon] || { hinh: [] }); }
+    if (k === 'chonHet') { dsDangHien.forEach(function (t) { daChon[t] = 1; }); return ve(); }
+    if (k === 'boChon') { daChon = {}; return ve(); }
+    var chonDs = Object.keys(daChon);
+    if (k === 'xoaChon') {
+      if (!chonDs.length) return bao('Chưa chọn hình nào', true);
+      return xacNhan('Xoá ' + chonDs.length + ' hình đã chọn (vào Thùng rác)?', 'xoá').then(function (ok) {
+        if (!ok) return; var v = Promise.resolve();
+        chonDs.forEach(function (t) { v = v.then(function () { return MT.khoHinh('xoa', t); }); });
+        v.then(function () { daChon = {}; anhDem = {}; quet(); bao('Đã xoá ' + chonDs.length + ' hình'); });
+      });
+    }
+    if (k === 'chuyenChon') {
+      if (!chonDs.length) return bao('Chưa chọn hình nào', true);
+      var cds = dsChuDeThat();
+      return hoiNho('Chuyển ' + chonDs.length + ' hình sang chủ đề', { ds: cds.map(function (c) { return c.ten; }), chon: 0, nut: 'Chuyển' }).then(function (i) {
+        if (i == null) return; var v = Promise.resolve();
+        chonDs.forEach(function (t) { v = v.then(function () { return MT.khoHinh('chuyen', t, { chuDe: cds[i].thuMuc }); }); });
+        v.then(function () { daChon = {}; anhDem = {}; quet(); bao('Đã chuyển ' + chonDs.length + ' hình'); });
+      });
+    }
+    if (k === 'aiChon') { if (!chonDs.length) return bao('Chọn các hình cần AI đặt tên (hoặc bấm Chọn tất cả)', true); return aiSapXep({ hinh: chonDs }); }
+    if (k === 'ai') { if (Object.keys(daChon).length) return aiSapXep({ hinh: Object.keys(daChon) }); if (tim) return bao('Xoá ô tìm kiếm, chọn một chủ đề rồi bấm AI sắp xếp', true); return aiSapXep(ds.chuDe[chon] || { hinh: [] }); }
     if (k === 'themChuDe') return hoiNho('Tên chủ đề mới', { gt: '', nut: 'Tạo' }).then(function (ten) {
       if (!ten) return; MT.khoHinh('taoChuDe', null, { ten: ten }).then(function (r) {
         if (r && r.loi) return bao(r.loi, true);
@@ -126,7 +152,7 @@ GI.khoHinh = (function () {
     if (!ds) $('.kh-luoi').innerHTML = '<p class="kh-rong">Đang đọc kho hình…</p>';
     return MT.khoHinh('quet').then(function (r) {
       if (!r || r.loi) { $('.kh-luoi').innerHTML = '<p class="kh-rong">Không đọc được kho: ' + thoat(r && r.loi) + '</p>'; return; }
-      ds = r; if (chon >= ds.chuDe.length) chon = 0;
+      ds = r; if (chon >= ds.chuDe.length) chon = 0; daChon = {};
       if (!ds.chuDe[chon] || !ds.chuDe[chon].hinh.length) { for (var i = 0; i < ds.chuDe.length; i++) if (ds.chuDe[i].hinh.length) { chon = i; break; } }
       var tong = ds.chuDe.reduce(function (t, c) { return t + c.hinh.length; }, 0);
       $('.kh-tt').innerHTML = 'Thư mục kho: <b>' + thoat(ds.thuMuc) + '</b> · ' + tong + ' hình' +
@@ -142,14 +168,16 @@ GI.khoHinh = (function () {
     var dsHinh;
     if (tim) { var q = boDau(tim); dsHinh = []; ds.chuDe.forEach(function (c) { c.hinh.forEach(function (t) { if (boDau(tenHinh(t) + ' ' + c.ten).indexOf(q) >= 0) dsHinh.push(t); }); }); }
     else dsHinh = (ds.chuDe[chon] || { hinh: [] }).hinh;
-    var luoi = $('.kh-luoi');
+    var luoi = $('.kh-luoi'); dsDangHien = dsHinh.slice();
+    Object.keys(daChon).forEach(function (t) { if (dsHinh.indexOf(t) < 0) delete daChon[t]; });
+    veThanhChon();
     if (!dsHinh.length) {
       luoi.innerHTML = tim ? '<p class="kh-rong">Không có hình nào khớp “' + thoat(tim) + '”.</p>'
         : '<div class="kh-rong"><b>Chủ đề này chưa có hình.</b><br>Bấm <b>⬇ Nhập từ Freepik…</b> để thêm hình (chọn gói .zip vừa tải về),<br>hoặc kéo thả tệp .svg vào đây.</div>';
       return;
     }
     luoi.innerHTML = dsHinh.map(function (t) {
-      return '<button class="kh-o" data-tep="' + thoat(t) + '" title="' + thoat(tenHinh(t)) + ' · bấm để chèn lên bảng · chuột phải: đổi tên, chuyển chủ đề, xoá"><span class="kh-anh">' +
+      return '<button class="kh-o' + (daChon[t] ? ' chon' : '') + '" data-tep="' + thoat(t) + '" title="' + thoat(tenHinh(t)) + ' · bấm để chọn · bấm đúp để chèn lên bảng · chuột phải: đổi tên, chuyển chủ đề, xoá"><span class="kh-dau-chon">✓</span><span class="kh-anh">' +
         (anhDem[t] ? '<img src="' + anhDem[t] + '" alt="">' : '') + '</span><small>' + thoat(tenHinh(t)) + '</small></button>';
     }).join('');
     var can = dsHinh.filter(function (t) { return !anhDem[t]; }), dang = 0;
@@ -162,6 +190,11 @@ GI.khoHinh = (function () {
         }; }(t));
       }
     })();
+  }
+  function veThanhChon() {
+    var n = Object.keys(daChon).length, el = hop && $('.kh-so-chon'); if (!el) return;
+    el.textContent = n ? 'Đã chọn ' + n + ' hình' : 'Bấm để chọn hình · bấm đúp để chèn lên bảng';
+    hop.querySelector('.kh-thanh-chon').classList.toggle('co-chon', n > 0);
   }
   function chenHinh(t) {
     var xong = function (d) { if (!d) return; dong(); if (khiChen) khiChen(d, tenHinh(t)); };

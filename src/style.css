@@ -1002,3 +1002,16 @@ html.android .tc-ranh b { border-radius: 8px; }
 .kh-nhap-chan .kh-ai { color: #6D28D9; border-color: #C4B5FD; background: #F5F3FF; }
 .kh-the.ai-xong { border-color: #A78BFA; box-shadow: 0 0 0 2px #EDE9FE; }
 .kh-dau .kh-ai { color: #6D28D9; border-color: #C4B5FD; background: #F5F3FF; }
+.kh-thanh-chon { display: flex; align-items: center; gap: 6px; margin: -4px 0 10px 242px; font-size: 13px; color: #64748B; }
+.kh-thanh-chon .nut.chu { padding: 4px 10px; font-size: 12.5px; }
+.kh-thanh-chon .kh-so-chon { margin-right: auto; }
+.kh-thanh-chon.co-chon .kh-so-chon { color: #15803D; font-weight: 700; }
+.kh-thanh-chon:not(.co-chon) [data-kh="boChon"], .kh-thanh-chon:not(.co-chon) [data-kh="chuyenChon"], .kh-thanh-chon:not(.co-chon) [data-kh="aiChon"], .kh-thanh-chon:not(.co-chon) [data-kh="xoaChon"] { opacity: .45; }
+.kh-thanh-chon .kh-xoa { color: #B91C1C; border-color: #FCA5A5; }
+.kh-thanh-chon .kh-ai { color: #6D28D9; border-color: #C4B5FD; background: #F5F3FF; }
+.kh-o { position: relative; }
+.kh-o .kh-dau-chon { position: absolute; top: 6px; left: 6px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #CBD5E1; background: #fff; color: transparent; font-size: 13px; font-weight: 800; display: grid; place-items: center; z-index: 1; }
+.kh-o:hover .kh-dau-chon { border-color: #22C55E; }
+.kh-o.chon { border-color: #16A34A; box-shadow: 0 0 0 2px #86EFAC; background: #F0FDF4; }
+.kh-o.chon .kh-dau-chon { background: #16A34A; border-color: #16A34A; color: #fff; }
+@media (max-width: 900px) { .kh-thanh-chon { margin-left: 0; flex-wrap: wrap; } }
