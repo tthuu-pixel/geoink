@@ -341,6 +341,12 @@ ipcMain.handle('kho-hinh', async (e, { hd, tep, du }) => {
       fs.renameSync(f, moi); return { ok: true };
     }
     if (hd === 'xoa') { await shell.trashItem(khTrongKho(khThuMuc(), tep)); return { ok: true }; }
+    if (hd === 'sapXep') {   // AI đặt tên + chuyển chủ đề một lần: du = { ten, chuDe }
+      const g = khThuMuc(), f = khTrongKho(g, tep), duoi = path.extname(f);
+      const thu = du.chuDe != null ? khTrongKho(g, du.chuDe) : path.dirname(f);
+      const moi = khTepMoi(thu, du.ten ? khTenTep(du.ten) : path.basename(f, duoi), duoi);
+      if (moi !== f) fs.renameSync(f, moi); return { ok: true };
+    }
     if (hd === 'taoChuDe') {
       const g = khThuMuc(); khTaoKhung(g);
       const so = fs.readdirSync(g, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => parseInt(d.name, 10)).filter((n) => n > 0);

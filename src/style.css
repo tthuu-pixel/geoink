@@ -999,3 +999,6 @@ html.android .tc-ranh b { border-radius: 8px; }
 .kh-loi { color: #B91C1C; background: #FEF2F2; border-radius: 8px; padding: 8px 12px; font-size: 13.5px; }
 #hang-hinh .nut.nut-kho-hinh { min-width: 74px; margin-right: 6px; color: #15803D; border: 1.5px solid #86EFAC; background: #F0FDF4; border-radius: 10px; }
 #hang-hinh .nut.nut-kho-hinh:hover { background: #DCFCE7; border-color: #22C55E; }
+.kh-nhap-chan .kh-ai { color: #6D28D9; border-color: #C4B5FD; background: #F5F3FF; }
+.kh-the.ai-xong { border-color: #A78BFA; box-shadow: 0 0 0 2px #EDE9FE; }
+.kh-dau .kh-ai { color: #6D28D9; border-color: #C4B5FD; background: #F5F3FF; }
