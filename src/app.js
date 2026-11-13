@@ -1846,7 +1846,9 @@
       delete netDang.thang; delete netDang.mep; delete netDang.compa;
       if (laCompa && netDang.pts.length < 3) { huyNetDang(); canVe(); return; }   // chỉ bấm núm, chưa quay
       delete netDang._du; if (henVeNhap) { cancelAnimationFrame(henVeNhap); henVeNhap = 0; }
-      ghiLichSu(); trang().net.push(netDang); netDang = null; nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, cvN.width, cvN.height); canVe(); return;
+      ghiLichSu(); trang().net.push(netDang); netDang = null;
+      canVeLai = false; ve();   // vẽ trang có nét mới ngay trong khung hình này, rồi mới xoá lớp nét tạm: không còn chớp
+      nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.clearRect(0, 0, cvN.width, cvN.height); return;
     }
     if (dangKeo && dangKeo.loai === 'trang') cv.style.cursor = conTroCC();
     if (dangKeo && dangKeo.loai === 'khung') { var dsK = chonTrongKhung(dangKeo.a, dangKeo.b); if (dangKeo.them) dsK.forEach(function (x) { if (!trongNhom(x)) nhom.push(x); }); else nhom = dsK; capNhatChon(false); canVe();
@@ -1930,13 +1932,13 @@
   function duDoanNet(n, e) {
     var ds = [], cuoi = n.pts[n.pts.length - 1];
     var pr = e.getPredictedEvents ? e.getPredictedEvents() : [];
-    pr.slice(0, 3).forEach(function (ev) { var q = toaDo(ev), W2 = veTG(q.x, q.y); ds.push([W2.x, W2.y, cuoi[2]]); });
-    if (!ds.length && n.pts.length >= 3) {   // trình duyệt không đoán: tự kéo dài theo vận tốc nửa khung hình
-      var a = n.pts[n.pts.length - 3], dx = (cuoi[0] - a[0]) / 2, dy = (cuoi[1] - a[1]) / 2, d = Math.hypot(dx, dy) * V.s;
-      if (d > 0.8 && d < 40) ds.push([cuoi[0] + dx * 0.6, cuoi[1] + dy * 0.6, cuoi[2]]);
-    }
-    // bỏ điểm đoán quá xa (đổi hướng đột ngột)
-    return ds.filter(function (q) { return Math.hypot(q[0] - cuoi[0], q[1] - cuoi[1]) * V.s < 60; });
+    if (e.pointerType !== 'pen' || pr.length < 1) return null;
+    var q = toaDo(pr[0]), W2 = veTG(q.x, q.y), d = Math.hypot(W2.x - cuoi[0], W2.y - cuoi[1]) * V.s;
+    if (d < 1 || d > 14) return null;   // chỉ đoán một đoạn rất ngắn theo đúng hướng đang viết
+    var a = n.pts[Math.max(0, n.pts.length - 3)], hx = cuoi[0] - a[0], hy = cuoi[1] - a[1];
+    if (hx * (W2.x - cuoi[0]) + hy * (W2.y - cuoi[1]) <= 0) return null;   // ngược hướng: bỏ
+    ds.push([W2.x, W2.y, cuoi[2]]);
+    return ds;
   }
   function veNhap(M) {
     if (henVeNhap) { cancelAnimationFrame(henVeNhap); henVeNhap = 0; }
