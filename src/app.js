@@ -1215,6 +1215,7 @@
   }
   function batLuoi(M) {
     if (!kieuNen().luoi) return M;
+    if (kieuNen().luoi === 'ke') { var kd = thietLap().khoangDong || 32, gy = Math.round(M.y / kd) * kd; return Math.abs(gy - M.y) < nguong(10) ? { x: M.x, y: gy } : M; }   // giấy kẻ dòng: hút vào dòng kẻ
     var g = { x: Math.round(M.x / DV) * DV, y: Math.round(M.y / DV) * DV };
     return H.kc(g, M) < nguong(10) ? g : M;
   }
