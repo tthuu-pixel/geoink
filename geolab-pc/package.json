@@ -1,7 +1,7 @@
 {
   "name": "geolab-pc",
   "productName": "GeoLab",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GeoLab – Hình học tương tác THCS, chạy trên máy tính Windows không cần mạng.",
   "main": "main.js",
   "author": "Nhóm nghiên cứu khoa học trường TH-THCS An Lạc",
@@ -25,6 +25,7 @@
     "directories": { "output": "dist", "buildResources": "build" },
     "files": ["main.js", "preload.js", "build/icon.png", "package.json"],
     "extraResources": [{ "from": "web", "to": "web", "filter": ["**/*", ".phien-ban.json", ".ds.json"] }],
+    "protocols": [{ "name": "GeoLab", "schemes": ["geolab-mo"] }],
     "win": {
       "target": [{ "target": "nsis", "arch": ["x64"] }],
       "icon": "build/icon.ico"

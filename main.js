@@ -135,10 +135,16 @@ ipcMain.handle('thu-vien', (e, { hd, duong, noiDung }) => {
     return { ok: false, loi: 'Lệnh không hợp lệ' };
   } catch (err) { return { ok: false, loi: String(err.message || err) }; }
 });
-ipcMain.handle('mo-link', (e, url) => {
+// Link GeoLab: máy có cài app GeoLab thì mở bằng app (đúng trang, mang theo phiên); không có app thì mở trang web
+function coAppGeoLab() { try { return process.platform === 'win32' && !!app.getApplicationNameForProtocol('geolab-mo://'); } catch (e) { return false; } }
+ipcMain.handle('mo-link', async (e, url) => {
   if (!/^https?:\/\//.test(url)) return true;
-  // đang khoá: chỉ cho mở GeoLab; tạm thôi "luôn nằm trên" để trình duyệt hiện lên, quay lại GeoInk là khoá tiếp
-  if (dangKhoa) { if (!/^https:\/\/(www\.)?nckh-geolab\.com\//.test(url)) return false; nhuongGeoLab = true; cuaSo.setAlwaysOnTop(false); }
+  const laGeoLab = /^https:\/\/(www\.)?nckh-geolab\.com(\/|$)/.test(url);
+  // đang khoá: chỉ cho mở GeoLab; tạm thôi "luôn nằm trên" để app / trình duyệt hiện lên, quay lại GeoInk là khoá tiếp
+  if (dangKhoa) { if (!laGeoLab) return false; nhuongGeoLab = true; cuaSo.setAlwaysOnTop(false); }
+  if (laGeoLab && coAppGeoLab()) {
+    try { await shell.openExternal(url.replace(/^https:\/\/(www\.)?nckh-geolab\.com\/?/, 'geolab-mo://mo/')); return 'app'; } catch (err) { /* mở app lỗi: dùng web */ }
+  }
   shell.openExternal(url); return true;
 });
 // ----- Khoá GeoInk: chỉ dùng GeoInk (và mở GeoLab), không chuyển sang chương trình khác, không thoát -----

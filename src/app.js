@@ -1619,7 +1619,7 @@
   }
   function moLinkMoHinh(m) {
     var d = GI.MO_HINH.filter(function (x) { return x.ma === m.ma; })[0]; if (!d) return;
-    thongBao('Đang mở “' + d.ten + '” trên GeoLab…');
+    thongBao('Đang mở “' + d.ten + '” bằng GeoLab…');
     GI.taiKhoan.moTrang(d.url);   // mang theo phiên GeoLab nếu đã đăng nhập
   }
 

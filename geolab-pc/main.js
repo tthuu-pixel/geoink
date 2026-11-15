@@ -16,6 +16,20 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'geolab', privileges: { standard
 
 let cuaSo = null;
 
+// ---------- mở từ GeoInk: địa chỉ geolab-mo://mo/<đường dẫn trang>#p=<phiên> → trang tương ứng trong app ----------
+const GIAO_THUC = 'geolab-mo';
+function diaChiTuLenh(argv) {
+  const a = (argv || []).find((x) => typeof x === 'string' && x.toLowerCase().startsWith(GIAO_THUC + ':'));
+  if (!a) return null;
+  try {
+    const u = new URL(a); let p = decodeURIComponent(u.pathname || '/');
+    if (!p || p === '/') p = '/index.html';
+    if (/\.\.|[\\]/.test(p)) return null;
+    return 'geolab://app' + encodeURI(p) + (u.hash || '');
+  } catch (e) { return null; }
+}
+let moDau = diaChiTuLenh(process.argv);
+
 // ---------- thư mục nội dung đang dùng ----------
 function docJson(f) { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return null; } }
 function thuMucDangDung() {
@@ -67,7 +81,7 @@ function taoCuaSo() {
   Menu.setApplicationMenu(null);
   cuaSo.maximize();
   cuaSo.setFullScreen(true);   // mở app: toàn màn hình như GeoInk
-  cuaSo.loadURL('geolab://app/index.html');
+  cuaSo.loadURL(moDau || 'geolab://app/index.html');
   const baoManHinh = () => { if (!cuaSo.isDestroyed()) cuaSo.webContents.send('man-hinh', cuaSo.isFullScreen()); };
   cuaSo.on('enter-full-screen', baoManHinh); cuaSo.on('leave-full-screen', baoManHinh);
   cuaSo.webContents.on('did-finish-load', baoManHinh);
@@ -153,7 +167,12 @@ ipcMain.on('cai-ban-app', () => { if (autoUpdater) autoUpdater.downloadUpdate().
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
-  app.on('second-instance', () => { if (cuaSo) { if (cuaSo.isMinimized()) cuaSo.restore(); cuaSo.focus(); } });
+  app.on('second-instance', (e, argv) => {
+    if (!cuaSo) return; const dc = diaChiTuLenh(argv); if (dc) cuaSo.loadURL(dc);
+    if (cuaSo.isMinimized()) cuaSo.restore(); cuaSo.show(); cuaSo.focus();
+  });
+  // đăng ký địa chỉ geolab-mo:// với Windows để GeoInk mở mô hình thẳng bằng app
+  try { if (app.isPackaged) app.setAsDefaultProtocolClient(GIAO_THUC); else app.setAsDefaultProtocolClient(GIAO_THUC, process.execPath, [path.resolve(process.argv[1] || '.')]); } catch (e) { }
   app.whenReady().then(() => {
     WEB = thuMucDangDung();
     protocol.handle('geolab', phucVu);
