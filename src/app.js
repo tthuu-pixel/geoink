@@ -962,7 +962,7 @@
           var k = o._khung; c.save(); c.setLineDash([5 * px, 4 * px]); c.strokeStyle = mauSang; c.lineWidth = 1.5 * px; c.strokeRect(k.x0 - 5 * px, k.y0 - 5 * px, k.x1 - k.x0 + 10 * px, k.y1 - k.y0 + 10 * px); c.restore();
           if (o.loai === 'deBai' && !o.coDinh) { var kN = 7 * px; c.save(); c.setLineDash([]); c.fillStyle = '#fff'; c.strokeStyle = '#2457C5'; c.lineWidth = 1.6 * px; c.fillRect(k.x1 - kN, k.y1 - kN, 2 * kN, 2 * kN); c.strokeRect(k.x1 - kN, k.y1 - kN, 2 * kN, 2 * kN); c.restore(); }
           veKhoa(c, oKhoa(o), !!o.coDinh, px);
-        } else if (o.loai === 'deBai' && c === ctx && !LA_BANG) { c.save(); if (!o.coDinh) c.globalAlpha = 0.5; veKhoa(c, oKhoa(o), !!o.coDinh, px); c.restore(); }   // khung đề: ổ khoá luôn hiện
+        } else if (o.loai === 'deBai' && c === ctx) { c.save(); if (!o.coDinh) c.globalAlpha = 0.5; veKhoa(c, oKhoa(o), !!o.coDinh, px); c.restore(); }   // khung đề: ổ khoá luôn hiện
       } else if (o.loai === 'thanhTruot') {
         var L = o.dai * px, tt = (o.gt - o.min) / ((o.max - o.min) || 1), X = o.x + L * Math.max(0, Math.min(1, tt));
         c.save(); c.lineCap = 'round';
@@ -1729,7 +1729,7 @@
     if (cc === 'laser') { laser.push({ x: M.x, y: M.y, t: performance.now(), moi: true }); dangKeo = { loai: 'laser' }; chayLaser(); return; }
     if (laMau(cc) && nb === 0) { chenMau(cc, M); return; }
     if (/^k_dung/.test(cc) && nb === 0) { bamDungKhoi(M); return; }
-    if (cc === 'chon' && !LA_BANG) {   // ổ khoá ở góc khung đề: bấm là khoá / mở khoá
+    if (cc === 'chon') {   // ổ khoá ở góc khung đề: bấm là khoá / mở khoá
       var deK = trang().hinh.filter(function (o) { if (o.loai !== 'deBai' || o.an || !o._khung) return false; var P = oKhoa(o); return Math.hypot(M.x - P.x, M.y - P.y) < 13 / V.s; }).pop();
       if (deK) { doiKhoaDe([deK], !deK.coDinh); return; }
     }
@@ -2203,8 +2203,8 @@
     truc: function () { ghiLichSu(); trang().truc = !trang().truc; if (trang().truc) { V.x = -W / 2 / V.s; V.y = -Hh / 2 / V.s; } capNhatNutBat(); canVe(); },
     soDo: function () { hienSo = !hienSo; capNhatNutBat(); canVe(); },
     nhapTex: function () { LENH.nhapTikz(); },
-    nhapDe: function () { if (LA_BANG) return; suaDeBai = null; LENH.nhapTikz('de'); },
-    nhapTepTex: function () { if (LA_BANG) return; $('#menu').classList.add('an'); chonTepTex(); },
+    nhapDe: function () { suaDeBai = null; LENH.nhapTikz('de'); },
+    nhapTepTex: function () { $('#menu').classList.add('an'); chonTepTex(); },
     anhLatex: function () {
       if (LA_BANG) return; $('#menu').classList.add('an');
       GI.anhLatex.mo({ duaLenBang: function (ma) {   // trả về lỗi (chuỗi) hoặc rỗng khi đã đưa lên
@@ -2214,6 +2214,22 @@
       } });
     },
     catHinh: function () { batDauCat(); },
+    // Máy tính bảng (không có Ctrl+V): dán ảnh / mã đề vừa chép; bộ nhớ tạm không có ảnh thì chọn ảnh trong máy (ảnh chụp màn hình, thư viện ảnh, máy ảnh)
+    danAnh: function () {
+      $('#menu').classList.add('an');
+      function docTep(f, ten) { var fr = new FileReader(); fr.onload = function () { chenAnh(fr.result, ten || f.name || 'Ảnh dán'); }; fr.readAsDataURL(f); }
+      function chonTep() {
+        var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+        inp.onchange = function () { if (inp.files[0]) docTep(inp.files[0]); }; inp.click();
+        thongBao('Chọn ảnh đề trong máy (ảnh chụp màn hình, thư viện ảnh…)');
+      }
+      if (!navigator.clipboard || !navigator.clipboard.read) return chonTep();
+      navigator.clipboard.read().then(function (ds) {
+        for (var i = 0; i < ds.length; i++) { var kieu = ds[i].types.filter(function (t) { return /^image\//.test(t); })[0]; if (kieu) return ds[i].getType(kieu).then(function (b) { docTep(b, 'Ảnh dán'); }); }
+        for (var j = 0; j < ds.length; j++) if (ds[j].types.indexOf('text/plain') >= 0) return ds[j].getType('text/plain').then(function (b) { return b.text(); }).then(function (chu) { if (!danChu(chu)) chonTep(); });
+        chonTep();
+      }).catch(chonTep);
+    },
     khoHinh: function () {
       $('#menu').classList.add('an');
       if (!MT || !MT.khoHinh) return thongBao('Kho hình thực tế hiện có trên bản máy tính');
@@ -3595,14 +3611,14 @@
       if (hs.length === 1 && coTen(hs[0]) && nhom.length === 1) h += '<button data-mp="doiTen"><span class="o-tich" style="border:0">✎</span>Đổi tên…</button>';
       h += '<hr>';
     }
-    var deChon = hs.filter(function (o) { return o.loai === 'deBai'; }), deHet = LA_BANG ? [] : trang().hinh.filter(function (o) { return o.loai === 'deBai'; });
+    var deChon = hs.filter(function (o) { return o.loai === 'deBai'; }), deHet = trang().hinh.filter(function (o) { return o.loai === 'deBai'; });
     var anhChon = hs.filter(function (o) { return o.loai === 'anh'; });
     if (anhChon.length === 1 && anhChon[0].ga && [anhChon[0].ga, anhChon[0].gb].some(function (g) { var p = timTheoId(g); return p && p.loai === 'diemTren'; })) h += '<button data-mp="goChan"><span class="o-tich" style="border:0">⚓</span>Gỡ chân hình khỏi đường</button>';
     if (anhChon.length) h += '<button data-mp="latNgang"><span class="o-tich" style="border:0">⇋</span>Lật ngang ảnh</button><button data-mp="latDoc"><span class="o-tich" style="border:0">⇵</span>Lật dọc ảnh</button>';
     if (anhChon.length) h += '<button data-mp="lopAnh">' + tich(anhChon.every(function (o) { return o.lop; }) ? 1 : anhChon.some(function (o) { return o.lop; }) ? 0.5 : 0) + 'Ảnh nằm trên hình vẽ</button>';
     if (anhChon.length === 1 && !LA_BANG && MT && MT.khoHinh) h += '<button data-mp="luuKho"><span class="o-tich" style="border:0">🖼</span>Lưu vào kho hình thực tế…</button>';
     if (anhChon.length) h += '<button data-mp="khoaAnh">' + tich(anhChon.every(function (o) { return o.coDinh; }) ? 1 : anhChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá ảnh (cố định)</button>';
-    if (deChon.length && !LA_BANG) h += '<button data-mp="khoaDe">' + tich(deChon.every(function (o) { return o.coDinh; }) ? 1 : deChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá khung</button>';
+    if (deChon.length) h += '<button data-mp="khoaDe">' + tich(deChon.every(function (o) { return o.coDinh; }) ? 1 : deChon.some(function (o) { return o.coDinh; }) ? 0.5 : 0) + 'Khoá khung</button>';
     if (deHet.length) h += '<button data-mp="khoaHet"><span class="o-tich" style="border:0">🔒</span>Khoá tất cả khung Câu / Bài</button><button data-mp="moHet"><span class="o-tich" style="border:0">🔓</span>Mở khoá tất cả khung Câu / Bài</button>' + (nhom.length ? '<hr>' : '');
     if (nhom.length) h += '<button data-mp="xoa" class="do"><span class="o-tich" style="border:0">🗑</span>Xoá' + (nhom.length > 1 ? ' ' + nhom.length + ' đối tượng' : '') + '</button>';
     if (hs.length) h += '<button data-mp="thuocTinh"><span class="o-tich" style="border:0">⚙</span>Thuộc tính…</button>';
@@ -3719,7 +3735,6 @@
   }
   function moSuaDeBai(o) {
     if (o.coDinh) return thongBao('Khung đã khoá · mở khoá trước khi sửa');
-    if (LA_BANG) return thongBao('Sửa mã LaTeX đề bài chỉ có trên bản máy tính');
     suaDeBai = o; LENH.nhapTikz('de'); $('#tikz-ma').value = o.ma || ''; $('#tikz-loi').innerHTML = '';
   }
   function nhapDeBai(ma, cu) {
@@ -4355,7 +4370,7 @@
   if (!LA_BANG && GI.latexGo) GI.latexGo.ganO($('#tikz-ma'));   // gợi ý lệnh LaTeX khi gõ mã
   $('#tikz-dung').onclick = function () {
     var maDB = $('#tikz-ma').value;
-    if (!LA_BANG && GI.deBai.coMa(maDB)) {   // đề bài LaTeX (ex, bt, vd): chỉ bản máy tính
+    if (GI.deBai.coMa(maDB)) {   // đề bài LaTeX (ex, bt, vd)
       var kqDB = nhapDeBai(maDB, suaDeBai); if (kqDB.loi) { $('#tikz-loi').innerHTML = kqDB.loi; return; }
       suaDeBai = null; $('#hop-tikz').classList.add('an'); return;
     }
@@ -4366,7 +4381,7 @@
     $('#hop-tikz').classList.add('an');
   };
   function danChu(ma) {
-    if (!LA_BANG && GI.deBai.coMa(ma)) { var kqDB = nhapDeBai(ma); if (kqDB.loi) thongBao(kqDB.loi); return true; }
+    if (GI.deBai.coMa(ma)) { var kqDB = nhapDeBai(ma); if (kqDB.loi) thongBao(kqDB.loi); return true; }
     if (!/\\(draw|path|coordinate|begin\{tikzpicture\})/.test(ma)) return false;
     var kq = nhapTikz(ma);
     if (kq.loi || kq.canhBao.length) { $('#tikz-ma').value = ma; LENH.nhapTikz(); $('#tikz-loi').innerHTML = kq.loi || '<b>Đã dựng hình. Một số chỗ chưa hỗ trợ nên bị bỏ qua:</b><br>' + kq.canhBao.map(escHtml).join('<br>'); }

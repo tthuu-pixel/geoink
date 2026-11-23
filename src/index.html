@@ -51,10 +51,11 @@
   <button class="nut" data-lenh="congThuc" title="Chèn công thức"><i data-bt="congThuc"></i></button>
   <button class="nut" data-lenh="mayTinh" title="Máy tính khoa học"><i data-bt="mayTinh"></i></button>
   <button class="nut" data-lenh="dungCu" title="Dụng cụ học tập"><i data-bt="dungCu"></i></button>
-  <button class="nut an-android" data-lenh="nhapDe" title="Nhập đề từ mã LaTeX (\begin{ex}, \begin{bt}): Câu trắc nghiệm, Bài tự luận, lời giải trong khung"><i data-bt="nhapDe"></i></button>
+  <button class="nut" data-lenh="nhapDe" title="Nhập đề từ mã LaTeX (\begin{ex}, \begin{bt}): Câu trắc nghiệm, Bài tự luận, lời giải trong khung"><i data-bt="nhapDe"></i></button>
   <button class="nut an-android" data-lenh="anhLatex" title="Ảnh → LaTeX bằng AI: chụp / dán ảnh đề hoặc PDF, nhận mã LaTeX chuẩn kèm lời giải"><i data-bt="anhLatex"></i></button>
   <button class="nut" data-lenh="nhapTex" title="Nhập mã TeX (TikZ) để dựng hình"><i data-bt="nhapTex"></i></button>
   <button class="nut an-android" data-lenh="xuatTex" title="Quét hình rồi xuất mã TeX (TikZ)"><i data-bt="xuatTex"></i></button>
+  <button class="nut chi-android" data-lenh="danAnh" title="Dán ảnh đề vừa chép (hoặc chọn ảnh trong máy)"><i data-bt="anh"></i></button>
   <button class="nut" data-lenh="catHinh" title="Cắt hình trên bảng thành ảnh nét để dán sang Word (kéo khung quanh hình · Esc để huỷ)"><i data-bt="catHinh"></i></button>
   <div class="gian"></div>
   <span class="ke"></span>
@@ -100,8 +101,8 @@
   <button data-lenh="nhapPdf"><i data-bt="pdf"></i>Nhập tệp PDF…</button>
   <button data-lenh="xuatAnh"><i data-bt="anh"></i>Xuất trang ra ảnh PNG</button>
   <button data-lenh="guiBang" class="chi-android"><i data-bt="luu"></i>Gửi bảng (Zalo, Drive, Gmail…)</button>
-  <button data-lenh="nhapDe" class="an-android"><i data-bt="nhapDe"></i>Nhập đề từ mã LaTeX (ex, bt)…</button>
-  <button data-lenh="nhapTepTex" class="an-android"><i data-bt="nhapDe"></i>Nhập tệp .tex…</button>
+  <button data-lenh="nhapDe"><i data-bt="nhapDe"></i>Nhập đề từ mã LaTeX (ex, bt)…</button>
+  <button data-lenh="nhapTepTex"><i data-bt="nhapDe"></i>Nhập tệp .tex…</button>
   <button data-lenh="anhLatex" class="an-android"><i data-bt="anhLatex"></i>Ảnh → LaTeX bằng AI (ảnh, PDF)…</button>
   <button data-lenh="khoHinh" class="an-android"><i data-bt="khoHinh"></i>Hình thực tế (kho hình SVG)…</button>
   <button data-lenh="nhapTikz"><i data-bt="tikz"></i>Nhập hình từ mã TikZ…</button>
@@ -160,7 +161,7 @@
 \foreach \d/\g in {A/100, B/-135, C/-30, H/-90} \path[draw, fill=white] (\d) circle(1pt) + (\g:9pt) node {$\d$};
 \end{tikzpicture}"></textarea>
     <div class="loi" id="tikz-loi"></div>
-    <div class="hanh-dong"><button class="nut chu an-android" id="tikz-tep" title="Chọn tệp .tex trên máy: có \begin{ex} / \begin{bt} thì đưa đề lên bảng, có tikzpicture thì dựng hình" style="margin-right:auto">📂 Mở tệp .tex…</button><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="tikz-dung">Dựng hình</button></div>
+    <div class="hanh-dong"><button class="nut chu" id="tikz-tep" title="Chọn tệp .tex trên máy: có \begin{ex} / \begin{bt} thì đưa đề lên bảng, có tikzpicture thì dựng hình" style="margin-right:auto">📂 Mở tệp .tex…</button><button class="nut chu" data-dong>Huỷ</button><button class="nut chu chinh" id="tikz-dung">Dựng hình</button></div>
   </div>
 </div>
 

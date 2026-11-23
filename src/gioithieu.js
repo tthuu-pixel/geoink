@@ -34,7 +34,7 @@
         the('trungTruc', 'Dựng hình kiểu GeoGebra', 'Điểm, đường, đường tròn, góc, biến hình… Kéo điểm gốc thì cả hình đổi theo.') +
         the('k_hop', 'Hình không gian 3D', 'Hộp, lăng trụ, chóp, trụ, nón, cầu: xoay, tô mặt, nét khuất, trải phẳng.') +
         the('bieuDo', 'Đồ thị & biểu đồ', 'Đồ thị hàm số, hệ trục Oxy, biểu đồ cột, đoạn thẳng, hình quạt theo kiểu SGK.') +
-        the('tikz', 'TikZ & LaTeX', 'Dán mã TikZ để dựng hình (cả biểu đồ)<span class="an-android">, xuất mã TikZ, nhập đề \\begin{ex}, \\begin{bt}</span>.') +
+        the('tikz', 'TikZ & LaTeX', 'Dán mã TikZ để dựng hình (cả biểu đồ), nhập đề \\begin{ex}, \\begin{bt}<span class="an-android">, xuất mã TikZ</span>.') +
         the('ai', 'Trợ lí AI', 'Đọc số liệu biểu đồ từ mã TikZ, ảnh<span class="an-android">; chuyển ảnh đề thành LaTeX chuẩn kèm lời giải</span>. Dùng khoá API của thầy cô.') +
         the('moHinh', 'Mô hình GeoLab', (soMH ? soMH + ' mô hình' : 'Các mô hình') + ' hình phẳng, hình không gian lớp 6–9 mở ngay từ bảng.') +
         '</div>';
@@ -130,7 +130,7 @@
       return '<ul><li>' + bt('tikz') + ' <b>Nhập hình từ mã TikZ</b> (menu ☰ hoặc nút Nhập mã TeX<span class="an-android">, hoặc dán thẳng lên bảng bằng Ctrl+V</span>): đọc TikZ thuần: <code>\\def</code>, <code>declare function</code>, <code>\\foreach</code>, <code>coordinate</code>, <code>calc</code>, <code>intersection of</code>, <code>name intersections</code>, đường tròn, cung, <code>plot</code>, <code>scope</code>, góc, nhãn. Điểm giữ cách dựng nên kéo điểm gốc thì hình đổi theo.</li>' +
         '<li class="an-android">' + bt('anhLatex') + ' <b>Ảnh → LaTeX bằng AI</b> (menu ☰ hoặc nút trên thanh công cụ): thêm nhiều ảnh, trang PDF (dán, kéo thả, chọn tệp), AI chuyển thành mã <code>ex</code> / <code>bt</code> chuẩn theo bộ quy tắc chuẩn hoá LaTeX Toán, viết lời giải và ghi chú kiểm tra số liệu. Có xem trước, sao chép, lưu .tex, đưa thẳng lên bảng.</li>' +
         '<li class="an-android">' + bt('xuatTex') + ' <b>Xuất mã TeX</b>: bấm nút rồi kéo khung quanh hình (hoặc chọn sẵn hình) để lấy mã TikZ thuần theo khung 4 bước, có nút sao chép.</li>' +
-        '<li class="an-android">' + bt('nhapDe') + ' <b>Nhập đề từ mã LaTeX</b>: dán đề có <code>\\begin{ex}</code> (trắc nghiệm → khung <b>Câu</b>, màu đỏ nâu) và <code>\\begin{bt}</code> (tự luận → khung <b>Bài</b>, màu xanh). Mỗi câu, mỗi bài thành một khung xếp thẳng hàng; lời giải nằm trong khung, <b>bấm đúp vào thanh “Lời giải”</b> để mở / đóng. Đọc được bảng Đúng/Sai, <code>tabular</code>, <code>multicols</code>, <code>immini</code>, hình TikZ đi kèm. Kéo góc dưới phải khung để đổi cỡ.</li>' +
+        '<li>' + bt('nhapDe') + ' <b>Nhập đề từ mã LaTeX</b>: dán đề có <code>\\begin{ex}</code> (trắc nghiệm → khung <b>Câu</b>, màu đỏ nâu) và <code>\\begin{bt}</code> (tự luận → khung <b>Bài</b>, màu xanh). Mỗi câu, mỗi bài thành một khung xếp thẳng hàng; lời giải nằm trong khung, <b>bấm đúp vào thanh “Lời giải”</b> để mở / đóng. Đọc được bảng Đúng/Sai, <code>tabular</code>, <code>multicols</code>, <code>immini</code>, hình TikZ đi kèm. Kéo góc dưới phải khung để đổi cỡ.</li>' +
         '<li class="an-android"><b>Khoá khung Câu / Bài</b>: bấm ổ khoá ở góc trên bên phải khung. Khung đã khoá không sửa, kéo, đổi cỡ hay xoá được; dải Lời giải vẫn bấm đúp để mở / đóng. Chuột phải chỗ trống: <b>Khoá / Mở khoá tất cả khung Câu / Bài</b>.</li>' +
         '<li class="an-android"><b>Nhập tệp .tex</b> (menu ☰): chọn tệp trên máy, có ex / bt thì đưa đề lên bảng, có tikzpicture thì dựng hình.</li></ul>';
     } },
@@ -154,7 +154,8 @@
         '<li>Chạm vào nhóm công cụ có ▽ là xổ danh sách ngay dưới nút.</li>' +
         '<li>Nút <b>Quay lại</b> của Android đóng hộp thoại, menu đang mở; ở màn hình chính thì hỏi trước khi thoát.</li>' +
         '<li>Thư viện sổ lưu trong bộ nhớ riêng của app: nên bật đồng bộ Google Drive hoặc Gửi bảng ra Drive cho sổ quan trọng.</li>' +
-        '<li>Bản máy tính bảng không có xuất mã TikZ, nhập đề LaTeX, Ảnh → LaTeX, công thức $…$ trong khung chữ và khoá khung đề (chỉ có trên máy tính).</li></ul>';
+        '<li><b>Dán ảnh đề</b>: chép ảnh (hoặc mã đề LaTeX) ở app khác rồi bấm nút ' + bt('anh') + ' trên thanh công cụ; bộ nhớ tạm không có ảnh thì chọn ảnh trong máy (ảnh chụp màn hình, thư viện ảnh).</li>' +
+        '<li>Bản máy tính bảng không có xuất mã TikZ, Ảnh → LaTeX, công thức $…$ trong khung chữ (chỉ có trên máy tính).</li></ul>';
     } },
     { id: 'phim-tat', ten: 'Phím tắt', nhom: 'Hướng dẫn sử dụng', chi: 'pc', html: function () {
       var ds = [['Ctrl+Z', 'Hoàn tác'], ['Ctrl+Y', 'Làm lại'], ['Ctrl+S', 'Lưu'], ['Ctrl+Shift+S', 'Lưu thành tệp khác'], ['Ctrl+O', 'Mở'], ['Ctrl+N', 'Bảng mới'],
