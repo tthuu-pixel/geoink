@@ -75,7 +75,7 @@
     khoa: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/>',
     moKhoa: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.6-1.7"/><path d="M12 14.5v2.5"/>',
   };
-  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, giaLap: 1, dungCu: 1, nhapDe: 1, nhapTex: 1, xuatTex: 1, catHinh: 1, khoHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
+  var BT_MAU = { but: 1, tay: 1, dq: 1, chon: 1, keo: 1, congThuc: 1, mayTinh: 1, giaLap: 1, may580: 1, dungCu: 1, nhapDe: 1, nhapTex: 1, xuatTex: 1, catHinh: 1, khoHinh: 1 };   // bút chì, mũi tên, bàn tay: biểu tượng có màu
   function bieuTuong(k, hang2) {
     if (!hang2 && BT_MAU[k] && GI.bieuTuong) return GI.bieuTuong(k);
     if (!hang2 && BT_NET[k]) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + BT_NET[k] + '</svg>';
@@ -2220,7 +2220,7 @@
       var ten = (GI.thuVien.tenSo() || (tenTep ? tenTep.split(/[\\/]/).pop().replace(/\.geoink$/i, '') : 'Bang-GeoInk')) + '.geoink';
       MT.chiaSe(noiDungLuu(), ten, true).then(function (kq) { if (kq && kq.loi) thongBao('Không gửi được: ' + kq.loi); });
     },
-    caiDatBut: moCaiDatBut, thietLapTrang: moThietLapTrang, moi: moi, mo: mo, thuVien: function () { GI.thuVien.mo(); }, nhapPdf: nhapPdf, congThuc: function () { moHopCongThuc(null); }, dungCu: function () { moMenuDungCu($('[data-lenh="dungCu"]')); }, mayTinh: function () { GI.mayTinh.batTat(); }, luu: function () { luu(false); }, luuThanh: function () { luu(true); }, xuatAnh: xuatAnh, hoanTac: hoanTac, lamLai: lamLai,
+    caiDatBut: moCaiDatBut, thietLapTrang: moThietLapTrang, moi: moi, mo: mo, thuVien: function () { GI.thuVien.mo(); }, nhapPdf: nhapPdf, congThuc: function () { moHopCongThuc(null); }, dungCu: function () { moMenuDungCu($('[data-lenh="dungCu"]')); }, mayTinh: function () { GI.mayTinh.batTat(); }, may580: function () { GI.may580.batTat(); }, luu: function () { luu(false); }, luuThanh: function () { luu(true); }, xuatAnh: xuatAnh, hoanTac: hoanTac, lamLai: lamLai,
     xoaTrangNay: function () {
       if (tl.trang.length < 2) return LENH.xoaTrang();
       if (!window.confirm('Xoá trang ' + (tl.so + 1) + '?')) return;
