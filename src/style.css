@@ -1015,3 +1015,88 @@ html.android .tc-ranh b { border-radius: 8px; }
 .kh-o.chon { border-color: #16A34A; box-shadow: 0 0 0 2px #86EFAC; background: #F0FDF4; }
 .kh-o.chon .kh-dau-chon { background: #16A34A; border-color: #16A34A; color: #fff; }
 @media (max-width: 900px) { .kh-thanh-chon { margin-left: 0; flex-wrap: wrap; } }
+
+/* =====================================================================
+   MÁY TÍNH 580 (bố cục kiểu fx-580VN X)
+   ===================================================================== */
+#may-580 { position: fixed; right: 400px; top: 60px; z-index: 46; width: 318px; padding: 8px 12px 16px; border-radius: 22px 22px 30px 30px; outline: none;
+  background: linear-gradient(180deg, #5A6068 0%, #464B52 18%, #3E4249 100%); box-shadow: 0 18px 40px rgba(15,23,42,.45), inset 0 1px 0 rgba(255,255,255,.25), inset 0 -3px 0 rgba(0,0,0,.35);
+  font-family: Arial, Helvetica, sans-serif; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+#may-580.an { display: none; }
+#may-580 .m5-dau { display: flex; align-items: baseline; gap: 8px; padding: 2px 4px 6px; cursor: move; }
+#may-580 .m5-hieu { color: #F1F5F9; font: 800 17px Arial, sans-serif; letter-spacing: .06em; }
+#may-580 .m5-phu { color: #C9CED6; font-size: 9.5px; letter-spacing: .05em; }
+#may-580 .m5-dong { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(0,0,0,.25); color: #fff; font-size: 11px; cursor: pointer; }
+#may-580 .m5-vien { background: #24272C; border-radius: 10px; padding: 8px 9px 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,.6); }
+#may-580 .m5-lcd { position: relative; height: 104px; border-radius: 3px; background: linear-gradient(#CBD6C6, #BAC6B4); box-shadow: inset 0 2px 5px rgba(0,0,0,.35); color: #1B211C; overflow: hidden; }
+#may-580 .m5-tt { height: 13px; display: flex; align-items: center; gap: 5px; padding: 1px 5px 0; font: 700 9px Arial, sans-serif; }
+#may-580 .m5-tt .m5-chi { background: #1B211C; color: #C5D0C0; padding: 0 2px; border-radius: 1px; font-size: 8.5px; line-height: 10px; }
+#may-580 .m5-tt .tt-math { font-size: 9px; }
+#may-580 .m5-tt .tt-ten { margin-left: auto; font-weight: 600; opacity: .55; font-size: 8px; }
+#may-580 .m5-man { position: absolute; left: 0; right: 0; top: 13px; bottom: 0; padding: 0 6px; font: 17px/1.15 "DejaVu Sans Mono", Consolas, "Courier New", monospace; }
+#may-580 .m5-vao { white-space: nowrap; overflow: hidden; height: 46px; display: flex; align-items: center; scrollbar-width: none; }
+#may-580 .m5-ra { position: absolute; right: 7px; bottom: 4px; max-width: 290px; white-space: nowrap; overflow: hidden; text-align: right; font-size: 18px; display: flex; align-items: center; justify-content: flex-end; }
+#may-580 .m-solve { font-size: 14px; line-height: 1.25; text-align: right; }
+#may-580 .m-phan { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; font-size: .86em; line-height: 1.05; }
+#may-580 .m-phan > .m-tu { border-bottom: 1.6px solid currentColor; padding: 0 2px 1px; min-width: .7em; text-align: center; }
+#may-580 .m-phan > .m-mau { padding: 1px 2px 0; min-width: .7em; text-align: center; }
+#may-580 .m-hon { display: inline-flex; align-items: center; }
+#may-580 .m-can { display: inline-flex; align-items: stretch; vertical-align: middle; }
+#may-580 .m-can > .m-dau { display: flex; align-items: flex-end; font-size: 1.05em; margin-right: -1px; }
+#may-580 .m-can > .m-duoi { border-top: 1.6px solid currentColor; padding: 1px 2px 0 1px; margin-top: 2px; display: inline-flex; align-items: center; }
+#may-580 .m-bac { font-size: .55em; margin-right: -4px; align-self: flex-start; }
+#may-580 .m-mu { font-size: .62em; vertical-align: .75em; line-height: 0; }
+#may-580 .m-co { font-size: .62em; vertical-align: -.3em; }
+#may-580 .m-e10 { font-size: .85em; }
+#may-580 .m-am { font-size: .8em; vertical-align: .08em; }
+#may-580 .m-pc { font-weight: 700; font-size: .9em; }
+#may-580 .m-abs { border-left: 1.6px solid currentColor; border-right: 1.6px solid currentColor; padding: 0 2px; margin: 0 1px; }
+#may-580 .m-lon { display: inline-flex; align-items: center; }
+#may-580 .m-ky { font-size: 1.5em; line-height: 1; }
+#may-580 .m-ky2 { font-size: 1.3em; line-height: 1; }
+#may-580 .m-gh { display: inline-flex; flex-direction: column; justify-content: space-between; font-size: .58em; line-height: 1.05; margin-left: -1px; }
+#may-580 .m-gh-dung { align-items: center; }
+#may-580 .m-ddx .m-phan { font-size: .7em; }
+#may-580 .m-tai sub { font-size: .62em; }
+#may-580 .m-ck { text-decoration: overline; }
+#may-580 .m-o { display: inline-block; min-width: .58em; height: .78em; border: 1px dashed rgba(27,33,28,.75); vertical-align: middle; margin: 0 1px; position: relative; }
+#may-580 .m-o .m-ct { position: absolute; left: 1px; top: -1px; }
+#may-580 .m-ct { display: inline-block; width: 0; height: 1em; border-left: 2px solid #111; vertical-align: middle; margin: 0 -1px; animation: m5Nhay 1s steps(1) infinite; }
+@keyframes m5Nhay { 50% { opacity: 0; } }
+#may-580 .m5-loi { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 86px; font-size: 13px; gap: 2px; }
+#may-580 .m5-loi b { font-size: 15px; margin-bottom: 3px; }
+#may-580 .m5-ds { position: relative; padding: 0 12px 0 2px; font-size: 14px; line-height: 21px; }
+#may-580 .m5-ds-lui { position: absolute; right: 2px; top: 0; font-size: 9px; }
+#may-580 .m5-cuon { position: absolute; right: 2px; width: 4px; height: 26%; background: #1B211C; }
+#may-580 .m5-menu-ten { font-size: 11px; font-weight: 700; text-align: center; height: 13px; line-height: 13px; }
+#may-580 .m5-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px 6px; padding: 2px 4px; }
+#may-580 .m5-bt { position: relative; height: 34px; border: 1px solid rgba(27,33,28,.5); border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; text-align: center; }
+#may-580 .m5-bt.chon { background: #1B211C; color: #C5D0C0; }
+#may-580 .m5-bt-so { position: absolute; right: 1px; bottom: 0; font-size: 8px; font-weight: 700; }
+#may-580 .m5-tb { position: absolute; left: 4px; right: 4px; bottom: 3px; background: #1B211C; color: #D7E0D2; font: 11px Arial, sans-serif; padding: 2px 5px; border-radius: 2px; }
+/* bàn phím */
+#may-580 .m5-o { display: flex; flex-direction: column; align-items: center; }
+#may-580 .m5-nhan { display: flex; justify-content: space-between; width: 100%; height: 11px; font: 700 7.5px Arial, sans-serif; line-height: 11px; padding: 0 1px; white-space: nowrap; }
+#may-580 .m5-nhan .s { color: #F2C94C; }
+#may-580 .m5-nhan .a { color: #F06A6A; margin-left: auto; }
+#may-580 .m5-nhan sup, #may-580 .m5-nhan sub { font-size: .8em; line-height: 0; }
+#may-580 .m5-k { width: 100%; height: 25px; border: 0; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center; font: 700 12px Arial, sans-serif; padding: 0;
+  background: linear-gradient(#2E3137, #1E2025); color: #fff; box-shadow: 0 2px 0 #0D0E10, inset 0 1px 0 rgba(255,255,255,.18); }
+#may-580 .m5-k:active { transform: translateY(1px); box-shadow: 0 1px 0 #0D0E10; }
+#may-580 .m5-k sup, #may-580 .m5-k sub { font-size: .7em; line-height: 0; }
+#may-580 .m5-k .k-ps { font-size: 8px; line-height: 7px; }
+#may-580 .m5-k.tron { height: 22px; border-radius: 11px; background: linear-gradient(#DADDE2, #A9AEB6); color: #22252A; font-size: 9px; box-shadow: 0 2px 0 #2A2D33; }
+#may-580 .m5-k.vang { color: #22252A; }
+#may-580 .m5-k.trang { height: 30px; border-radius: 8px; background: linear-gradient(#FFFFFF, #E4E7EC); color: #1B1E23; font-size: 19px; font-weight: 600; box-shadow: 0 2px 0 #8A9099, inset 0 1px 0 #fff; }
+#may-580 .m5-k.xanh { height: 30px; border-radius: 8px; background: linear-gradient(#4C86F0, #2D63D2); color: #fff; font-size: 15px; box-shadow: 0 2px 0 #183C86; }
+#may-580 .m5-tren { display: grid; grid-template-columns: 1fr 108px 1fr; gap: 0 6px; margin-top: 6px; align-items: center; }
+#may-580 .m5-cum { display: grid; grid-template-columns: 1fr 1fr; gap: 0 6px; }
+#may-580 .m5-dpad { position: relative; width: 108px; height: 70px; margin: 0 auto; border-radius: 35px; background: #2A2D33; box-shadow: inset 0 1px 3px rgba(0,0,0,.6); }
+#may-580 .m5-dpad button { position: absolute; border: 0; background: linear-gradient(#DADDE2, #A9AEB6); cursor: pointer; box-shadow: 0 2px 0 #23262B; }
+#may-580 .m5-dpad button:active { transform: translateY(1px); }
+#may-580 .m5-dpad .d-len { left: 34px; top: 4px; width: 40px; height: 18px; border-radius: 12px 12px 6px 6px; }
+#may-580 .m5-dpad .d-xuong { left: 34px; bottom: 4px; width: 40px; height: 18px; border-radius: 6px 6px 12px 12px; }
+#may-580 .m5-dpad .d-trai { left: 6px; top: 20px; width: 26px; height: 30px; border-radius: 14px 6px 6px 14px; }
+#may-580 .m5-dpad .d-phai { right: 6px; top: 20px; width: 26px; height: 30px; border-radius: 6px 14px 14px 6px; }
+#may-580 .m5-cn { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px 5px; margin-top: 4px; }
+#may-580 .m5-so { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 7px; margin-top: 5px; }
