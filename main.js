@@ -135,6 +135,42 @@ ipcMain.handle('thu-vien', (e, { hd, duong, noiDung }) => {
     return { ok: false, loi: 'Lệnh không hợp lệ' };
   } catch (err) { return { ok: false, loi: String(err.message || err) }; }
 });
+// ----- Máy tính giả lập (do người dùng tự chọn: trang web hoặc phần mềm / thư mục trên máy; GeoInk không chứa sẵn) -----
+let cuaSoGL = null;
+function moCuaSoGiaLap(diaChi) {
+  if (cuaSoGL && !cuaSoGL.isDestroyed()) { if (cuaSoGL.webContents.getURL() !== diaChi) cuaSoGL.loadURL(diaChi); cuaSoGL.show(); cuaSoGL.focus(); return; }
+  cuaSoGL = new BrowserWindow({
+    parent: cuaSo, width: 440, height: 860, minWidth: 260, minHeight: 360, title: 'Máy tính giả lập', autoHideMenuBar: true, backgroundColor: '#EEF2F7',
+    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false },
+  });
+  cuaSoGL.setMenu(null);
+  if (dangKhoa) cuaSoGL.setAlwaysOnTop(true, 'screen-saver', 1);   // GeoInk đang khoá (luôn nằm trên): máy tính phải nằm trên GeoInk
+  cuaSoGL.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:\/\//.test(url)) shell.openExternal(url); return { action: 'deny' }; });
+  cuaSoGL.on('closed', () => { cuaSoGL = null; });
+  cuaSoGL.loadURL(diaChi);
+}
+ipcMain.handle('gia-lap', async (e, yc) => {
+  try {
+    yc = yc || {};
+    if (yc.hd === 'chon') {   // chọn phần mềm (.exe) hoặc trang (.html) của trình giả lập đã tải về máy
+      const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn trình giả lập trên máy', properties: ['openFile'],
+        filters: [{ name: 'Phần mềm hoặc trang web', extensions: ['exe', 'html', 'htm', 'lnk'] }, { name: 'Mọi tệp', extensions: ['*'] }] });
+      return kq.canceled || !kq.filePaths.length ? { huy: true } : { duong: kq.filePaths[0] };
+    }
+    if (yc.hd === 'mo') {
+      if (yc.kieu === 'web') {
+        if (!/^https?:\/\/[^\s]+$/i.test(yc.url || '')) return { loi: 'Địa chỉ web phải bắt đầu bằng http:// hoặc https://' };
+        moCuaSoGiaLap(yc.url); return { ok: true };
+      }
+      const f = String(yc.duong || '');
+      if (!f || !fs.existsSync(f)) return { loi: 'Không tìm thấy trình giả lập đã chọn trên máy này' };
+      if (/\.html?$/i.test(f)) { moCuaSoGiaLap(require('url').pathToFileURL(f).href); return { ok: true }; }
+      if (dangKhoa) { nhuongGeoLab = true; cuaSo.setAlwaysOnTop(false); }   // phần mềm riêng: tạm nhường để cửa sổ của nó hiện lên
+      const loi = await shell.openPath(f); return loi ? { loi } : { ok: true };
+    }
+    return { loi: 'Lệnh không hợp lệ' };
+  } catch (err) { return { loi: String(err.message || err) }; }
+});
 // Link GeoLab: máy có cài app GeoLab thì mở bằng app (đúng trang, mang theo phiên); không có app thì mở trang web
 function coAppGeoLab() { try { return process.platform === 'win32' && !!app.getApplicationNameForProtocol('geolab-mo://'); } catch (e) { return false; } }
 ipcMain.handle('mo-link', async (e, url) => {

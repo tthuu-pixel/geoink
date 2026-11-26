@@ -1015,3 +1015,12 @@ html.android .tc-ranh b { border-radius: 8px; }
 .kh-o.chon { border-color: #16A34A; box-shadow: 0 0 0 2px #86EFAC; background: #F0FDF4; }
 .kh-o.chon .kh-dau-chon { background: #16A34A; border-color: #16A34A; color: #fff; }
 @media (max-width: 900px) { .kh-thanh-chon { margin-left: 0; flex-wrap: wrap; } }
+
+/* Máy tính giả lập: hộp chọn trình giả lập */
+.hop-gia-lap { max-width: 520px; }
+.hop-gia-lap .gl-dong { display: flex; align-items: center; gap: 8px; margin: 10px 0 6px; font-weight: 600; font-size: 14px; }
+.hop-gia-lap .gl-url { width: 100%; box-sizing: border-box; height: 34px; padding: 0 10px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 14px; }
+.hop-gia-lap .gl-tep { display: flex; align-items: center; gap: 8px; }
+.hop-gia-lap .gl-duong { flex: 1; min-width: 0; font-size: 13px; color: #374151; background: #F3F4F6; border-radius: 8px; padding: 7px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hop-gia-lap .gl-tep button { height: 32px; padding: 0 12px; border: 1px solid #D1D5DB; border-radius: 8px; background: #fff; cursor: pointer; }
+.tv-hop-chan button.chinh { background: #2563EB; border-color: #2563EB; color: #fff; font-weight: 600; }

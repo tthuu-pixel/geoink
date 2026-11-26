@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('mayTinh', {
   moPdf: () => ipcRenderer.invoke('mo-pdf'),
   xuatAnh: (duLieu, ten) => ipcRenderer.invoke('xuat-anh', { duLieu, ten }),
   moLink: (url) => ipcRenderer.invoke('mo-link', url),
+  giaLap: (yc) => ipcRenderer.invoke('gia-lap', yc),
   toanManHinh: () => ipcRenderer.invoke('toan-man-hinh'),
   khoaApp: (bat) => ipcRenderer.invoke('khoa-app', !!bat),
   khiManHinh: (f) => ipcRenderer.on('trang-thai-man-hinh', (e, tt) => f(tt)),
