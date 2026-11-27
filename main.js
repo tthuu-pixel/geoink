@@ -149,9 +149,42 @@ function moCuaSoGiaLap(diaChi) {
   cuaSoGL.on('closed', () => { cuaSoGL = null; });
   cuaSoGL.loadURL(diaChi);
 }
+// Tìm trình giả lập máy tính cầm tay đã cài trên máy (lối tắt trong Start Menu / Desktop, ứng dụng web cài từ Chrome / Edge, tệp .exe trong Program Files)
+async function timGiaLap() {
+  if (process.platform !== 'win32') return [];
+  const TU = /(fx[-_ ]?\d{3}|(?<![0-9])(570|580|880|991)(?![0-9])|classwiz|casio|emulator|gi[aả] ?l[aậ]p)/i, BO = /(unins|uninstall|setup|update|crash|helper|readme|help)/i;
+  const env = process.env, kq = [], daCo = new Set(); let dem = 0;
+  const goc = [
+    [path.join(env.APPDATA || '', 'Microsoft', 'Windows', 'Start Menu', 'Programs'), 4, false],
+    [path.join(env.ProgramData || 'C:\\ProgramData', 'Microsoft', 'Windows', 'Start Menu', 'Programs'), 4, false],
+    [path.join(env.USERPROFILE || '', 'Desktop'), 1, false], [path.join(env.PUBLIC || 'C:\\Users\\Public', 'Desktop'), 1, false],
+    [path.join(env.USERPROFILE || '', 'OneDrive', 'Desktop'), 1, false],
+    [path.join(env.LOCALAPPDATA || '', 'Programs'), 3, true], [env.ProgramFiles || 'C:\\Program Files', 3, true], [env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 3, true],
+  ];
+  async function duyet(thu, sau, chiThuMucKhop, trongThuMucKhop) {
+    if (sau < 0 || dem > 30000) return;
+    let ds; try { ds = await fs.promises.readdir(thu, { withFileTypes: true }); } catch (e) { return; }
+    for (const m of ds) {
+      if (++dem > 30000) return;
+      const f = path.join(thu, m.name);
+      if (m.isDirectory()) {
+        const khop = TU.test(m.name);
+        if (chiThuMucKhop && !khop && !trongThuMucKhop) continue;   // Program Files: chỉ đi vào thư mục có tên giống trình giả lập
+        await duyet(f, sau - 1, chiThuMucKhop, trongThuMucKhop || khop);
+      } else if (/\.(lnk|exe|url)$/i.test(m.name) && !BO.test(m.name) && (TU.test(m.name) || (trongThuMucKhop && /\.exe$/i.test(m.name)))) {
+        const ten = m.name.replace(/\.(lnk|exe|url)$/i, '');
+        if (daCo.has(ten.toLowerCase())) continue; daCo.add(ten.toLowerCase());
+        kq.push({ ten, duong: f });
+      }
+    }
+  }
+  for (const [g, sau, chi] of goc) if (g && fs.existsSync(g)) await duyet(g, sau, chi, false);
+  return kq.slice(0, 20);
+}
 ipcMain.handle('gia-lap', async (e, yc) => {
   try {
     yc = yc || {};
+    if (yc.hd === 'tim') return { ds: await timGiaLap() };
     if (yc.hd === 'chon') {   // chọn phần mềm (.exe) hoặc trang (.html) của trình giả lập đã tải về máy
       const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn trình giả lập trên máy', properties: ['openFile'],
         filters: [{ name: 'Phần mềm hoặc trang web', extensions: ['exe', 'html', 'htm', 'lnk'] }, { name: 'Mọi tệp', extensions: ['*'] }] });

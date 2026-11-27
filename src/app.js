@@ -2176,26 +2176,42 @@
   // Máy tính giả lập: GeoInk không chứa sẵn trình giả lập nào; người dùng tự chọn trang web, hoặc phần mềm / trang đã tải về máy mình
   var GL_KHOA = 'geoink_gia_lap', GL_WEB_MD = 'https://fx880btgplus.netlify.app/';
   function glDoc() { try { return JSON.parse(localStorage.getItem(GL_KHOA)) || null; } catch (e) { return null; } }
-  function glMo(cd) {
-    if (!cd) return moCaiDatGiaLap();
-    if (MT && MT.giaLap) return MT.giaLap(Object.assign({ hd: 'mo' }, cd)).then(function (kq) { if (kq && kq.loi) { thongBao(kq.loi); moCaiDatGiaLap(); } });
+  function glLuu(cd) { try { localStorage.setItem(GL_KHOA, JSON.stringify(cd)); } catch (er) { } }
+  // Lần đầu (hoặc trình giả lập đã chọn bị gỡ): quét máy tìm trình giả lập đã cài; tìm thấy một cái thì dùng luôn, nhiều cái thì cho chọn
+  function glTim(sauKhiLoi) {
+    if (!(MT && MT.giaLap)) return moCaiDatGiaLap();
+    thongBao('Đang tìm trình giả lập đã cài trên máy…');
+    MT.giaLap({ hd: 'tim' }).then(function (kq) {
+      var ds = (kq && kq.ds) || [];
+      if (ds.length === 1) { var cd = { kieu: 'tep', duong: ds[0].duong, ten: ds[0].ten, url: GL_WEB_MD }; glLuu(cd); thongBao('Đã tìm thấy: ' + ds[0].ten); return glMo(cd, true); }
+      if (!ds.length) thongBao(sauKhiLoi ? 'Trình giả lập đã chọn không còn trên máy, và chưa tìm thấy trình giả lập nào khác đã cài' : 'Chưa tìm thấy trình giả lập nào đã cài trên máy · chọn trang web hoặc chỉ chỗ cài');
+      moCaiDatGiaLap(ds);
+    });
+  }
+  function glMo(cd, daTim) {
+    if (!cd) return glTim(false);
+    if (MT && MT.giaLap) return MT.giaLap(Object.assign({ hd: 'mo' }, cd)).then(function (kq) { if (kq && kq.loi) { if (cd.kieu === 'tep' && !daTim) return glTim(true); thongBao(kq.loi); moCaiDatGiaLap(); } });
     if (cd.kieu === 'web') { if (MT && MT.moLink) MT.moLink(cd.url); else window.open(cd.url, '_blank', 'noopener'); return; }
     thongBao('Trình giả lập trên máy chỉ mở được ở bản máy tính');
   }
-  function moCaiDatGiaLap() {
-    var cd = glDoc() || { kieu: 'web', url: GL_WEB_MD }, coMay = !!(MT && MT.giaLap), duong = cd.duong || '';
+  function moCaiDatGiaLap(dsTim) {
+    var cd = glDoc() || { kieu: dsTim && dsTim.length ? 'tep' : 'web', url: GL_WEB_MD }, coMay = !!(MT && MT.giaLap), duong = cd.duong || '';
+    var veDsTim = function (ds) { return !ds ? '' : !ds.length ? '<div class="gl-trong">Không tìm thấy trình giả lập nào đã cài trên máy.</div>' : ds.map(function (t, i) { return '<button class="gl-tim-muc" data-tim="' + i + '" title="' + escHtml(t.duong).replace(/"/g, '&quot;') + '">' + escHtml(t.ten) + '</button>'; }).join(''); };
     var h = document.createElement('div'); h.className = 'tv-hop';
     h.innerHTML = '<div class="tv-hop-nd hop-gia-lap"><h3>Máy tính giả lập</h3>' +
       '<p class="tv-mo-ta">GeoInk mở trình giả lập trong một cửa sổ nổi trên bảng (kéo đi, đổi cỡ được). GeoInk <b>không chứa sẵn</b> trình giả lập nào: bạn chọn trang web, hoặc phần mềm / trang bạn đã tự tải về máy.</p>' +
       '<label class="gl-dong"><input type="radio" name="gl-kieu" value="web"' + (cd.kieu !== 'tep' ? ' checked' : '') + '> Trang web (cần mạng)</label>' +
       '<input class="gl-url" type="url" spellcheck="false" value="' + escHtml(cd.url || GL_WEB_MD).replace(/"/g, '&quot;') + '" placeholder="https://…">' +
-      (coMay ? '<label class="gl-dong"><input type="radio" name="gl-kieu" value="tep"' + (cd.kieu === 'tep' ? ' checked' : '') + '> Trên máy này (phần mềm .exe hoặc trang .html đã tải về)</label>' +
-        '<div class="gl-tep"><span class="gl-duong">' + escHtml(duong || 'Chưa chọn') + '</span><button data-chon>Chọn…</button></div>' : '') +
+      (coMay ? '<label class="gl-dong"><input type="radio" name="gl-kieu" value="tep"' + (cd.kieu === 'tep' ? ' checked' : '') + '> Trên máy này (phần mềm giả lập đã cài, kể cả ứng dụng cài từ Chrome / Edge)</label>' +
+        '<div class="gl-tep"><span class="gl-duong">' + escHtml(duong || 'Chưa chọn') + '</span><button data-tim-may>Tìm trên máy</button><button data-chon>Chọn…</button></div><div class="gl-ds-tim">' + veDsTim(dsTim) + '</div>' : '') +
       '<div class="tv-hop-chan"><button data-dong>Huỷ</button>&nbsp;<button data-mo class="chinh">Lưu và mở</button></div></div>';
     document.body.appendChild(h);
     var kieu = function () { var r = h.querySelector('[name="gl-kieu"]:checked'); return r ? r.value : 'web'; };
     h.onclick = function (e) {
       if (e.target === h || e.target.hasAttribute('data-dong')) return h.remove();
+      var mt = e.target.closest('[data-tim]');
+      if (mt) { duong = dsTim[+mt.dataset.tim].duong; h.querySelector('.gl-duong').textContent = duong; h.querySelector('[value="tep"]').checked = true; h.querySelectorAll('.gl-tim-muc').forEach(function (b) { b.classList.toggle('chon', b === mt); }); return; }
+      if (e.target.hasAttribute('data-tim-may')) { var o = h.querySelector('.gl-ds-tim'); o.innerHTML = '<div class="gl-trong">Đang tìm…</div>'; return MT.giaLap({ hd: 'tim' }).then(function (kq) { dsTim = (kq && kq.ds) || []; o.innerHTML = veDsTim(dsTim); }); }
       if (e.target.hasAttribute('data-chon')) return MT.giaLap({ hd: 'chon' }).then(function (kq) { if (kq && kq.duong) { duong = kq.duong; h.querySelector('.gl-duong').textContent = duong; h.querySelector('[value="tep"]').checked = true; } });
       if (e.target.hasAttribute('data-mo')) {
         var moi = kieu() === 'tep' ? { kieu: 'tep', duong: duong, url: h.querySelector('.gl-url').value.trim() } : { kieu: 'web', url: h.querySelector('.gl-url').value.trim(), duong: duong };
