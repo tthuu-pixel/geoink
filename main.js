@@ -370,8 +370,8 @@ ipcMain.handle('kho-hinh', async (e, { hd, tep, du }) => {
   try {
     du = du || {};
     if (hd === 'nhapFreepik') {
-      const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn gói tải từ Freepik', properties: ['openFile', 'multiSelections'],
-        filters: [{ name: 'Gói Freepik (.zip, .ai, .eps, .svg)', extensions: ['zip', 'ai', 'eps', 'svg'] }] });
+      const kq = await dialog.showOpenDialog(cuaSo, { title: 'Chọn tệp hình đã tải về', properties: ['openFile', 'multiSelections'],
+        filters: [{ name: 'Tệp hình (.zip, .ai, .eps, .svg)', extensions: ['zip', 'ai', 'eps', 'svg'] }] });
       if (kq.canceled || !kq.filePaths.length) return { huy: true };
       const tam = fs.mkdtempSync(path.join(app.getPath('temp'), 'geoink-freepik-')), ra = [], loi = [];
       for (const f of kq.filePaths) {

@@ -1,7 +1,7 @@
 // Kho hình thực tế (bản máy tính): đọc các hình SVG trong một thư mục trên máy, mỗi thư mục con là một chủ đề.
 // Nên đặt thư mục kho trong Google Drive cho máy tính (ổ G:\My Drive) để mọi máy cùng tài khoản có chung kho.
 //  · Bấm một hình là chèn lên bảng (thành ảnh: kéo, đổi cỡ, khoá như ảnh dán).
-//  · Nhập từ Freepik: chọn gói .zip / .ai / .eps → đổi sang SVG (Inkscape), tự xoá nền, tách từng hình, xem trước rồi lưu vào chủ đề.
+//  · Nhập hình (tải từ Freepik hay trang khác): chọn gói .zip / .ai / .eps → đổi sang SVG (Inkscape), tự xoá nền, tách từng hình, xem trước rồi lưu vào chủ đề.
 //  · Chuột phải vào hình: đổi tên, chuyển chủ đề, xoá. Chuột phải vào chủ đề: đổi tên, xoá. Nút + Chủ đề.
 var GI = window.GI || (window.GI = {});
 GI.khoHinh = (function () {
@@ -45,7 +45,7 @@ GI.khoHinh = (function () {
     hop = document.createElement('div'); hop.id = 'hop-kho-hinh'; hop.className = 'hop an'; hop.setAttribute('role', 'dialog');
     hop.innerHTML = '<div class="hop-noi-dung kh-hop">' +
       '<div class="kh-dau"><h2>Hình thực tế</h2><input class="kh-tim" placeholder="Tìm hình… (ví dụ: cây, thang, cột cờ)" spellcheck="false">' +
-      '<button class="nut chu chinh" data-kh="nhap" title="Chọn gói .zip (hoặc .ai, .eps, .svg) tải từ Freepik: tự đổi sang SVG, xoá nền, tách từng hình">⬇ Nhập từ Freepik…</button>' +
+      '<button class="nut chu chinh" data-kh="nhap" title="Chọn tệp hình đã tải về (.zip, .ai, .eps, .svg) từ bất kì trang nào: tự đổi sang SVG, xoá nền, tách từng hình">⬇ Nhập hình…</button>' +
       '<button class="nut chu kh-ai" data-kh="ai" title="AI xem các hình trong chủ đề đang mở: đặt tên tiếng Việt và chuyển sang chủ đề đúng">✨ AI sắp xếp</button>' +
       '<button class="nut chu" data-kh="lamMoi" title="Đọc lại thư mục kho">↻</button><button class="nut chu" data-kh="moThuMuc" title="Mở thư mục kho trong Windows">📂</button>' +
       '<button class="nut chu" data-kh="doiThuMuc" title="Chọn thư mục khác làm kho">Đổi thư mục…</button><button class="nut chu" data-kh="dong">Đóng</button></div>' +
@@ -173,7 +173,7 @@ GI.khoHinh = (function () {
     veThanhChon();
     if (!dsHinh.length) {
       luoi.innerHTML = tim ? '<p class="kh-rong">Không có hình nào khớp “' + thoat(tim) + '”.</p>'
-        : '<div class="kh-rong"><b>Chủ đề này chưa có hình.</b><br>Bấm <b>⬇ Nhập từ Freepik…</b> để thêm hình (chọn gói .zip vừa tải về),<br>hoặc kéo thả tệp .svg vào đây.</div>';
+        : '<div class="kh-rong"><b>Chủ đề này chưa có hình.</b><br>Bấm <b>⬇ Nhập hình…</b> để thêm hình (chọn tệp .zip, .ai, .eps hoặc .svg vừa tải về),<br>hoặc kéo thả tệp .svg vào đây.</div>';
       return;
     }
     luoi.innerHTML = dsHinh.map(function (t) {
@@ -334,7 +334,7 @@ GI.khoHinh = (function () {
     bao('AI chưa nhận dạng được: ' + (e && e.message || e), true);
   }
 
-  // ---------- Nhập từ Freepik ----------
+  // ---------- Nhập hình (gói tải từ mạng) ----------
   function nhapFreepik() {
     bao('Đang chọn tệp…');
     MT.khoHinh('nhapFreepik').then(function (r) {
@@ -349,7 +349,7 @@ GI.khoHinh = (function () {
   function moXemTruoc(dsTrang, dsLoi) {
     var cds = dsChuDeThat(), cdMacDinh = ds && ds.chuDe[chon] && ds.chuDe[chon].thuMuc ? cds.findIndex(function (c) { return c.thuMuc === ds.chuDe[chon].thuMuc; }) : 0;
     var n = document.createElement('div'); n.className = 'kh-nhap';
-    n.innerHTML = '<div class="kh-nhap-the"><div class="kh-nhap-dau"><h3>Nhập từ Freepik</h3><span>Kiểm tra từng hình: bỏ tích hình không cần, đặt tên, chọn chủ đề rồi bấm Lưu.</span></div>' +
+    n.innerHTML = '<div class="kh-nhap-the"><div class="kh-nhap-dau"><h3>Nhập hình</h3><span>Kiểm tra từng hình: bỏ tích hình không cần, đặt tên, chọn chủ đề rồi bấm Lưu.</span></div>' +
       '<div class="kh-nhap-than"><p class="kh-rong">Đang tách hình…</p></div>' +
       '<div class="kh-nhap-chan"><label>Chủ đề cho tất cả <select class="kh-cd-chung"><option value="">(chọn theo từng hình)</option>' + cds.map(function (c, i) { return '<option value="' + i + '">' + thoat(c.ten) + '</option>'; }).join('') + '</select></label>' +
       '<button class="nut chu kh-ai" data-n="ai" title="AI xem từng hình đã tích, đặt tên tiếng Việt và chọn chủ đề (dùng khoá API trong Cài đặt AI)">✨ AI đặt tên &amp; chủ đề</button>' +
@@ -440,7 +440,7 @@ GI.khoHinh = (function () {
     hop.addEventListener('drop', function (e) {
       e.preventDefault(); e.stopPropagation(); hop.classList.remove('keo-vao');
       var tep = Array.prototype.filter.call(e.dataTransfer.files || [], function (f) { return /\.svg$/i.test(f.name); });
-      if (!tep.length) return bao('Kéo thả nhận tệp .svg; gói .zip / .ai / .eps hãy dùng nút Nhập từ Freepik', true);
+      if (!tep.length) return bao('Kéo thả nhận tệp .svg; gói .zip / .ai / .eps hãy dùng nút Nhập hình', true);
       Promise.all(tep.map(function (f) { return f.text().then(function (s) { return { nguon: f.name.replace(/\.svg$/i, ''), svg: s }; }); })).then(function (dsT) { moXemTruoc(dsT, []); });
     });
   }
