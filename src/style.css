@@ -959,3 +959,8 @@ html.android .tc-ranh b { border-radius: 8px; }
 .hop-gia-lap .gl-phan { border: 1px solid #E5E7EB; border-radius: 10px; padding: 8px 12px 12px; margin-bottom: 10px; }
 .hop-gia-lap .gl-phan h4 { margin: 2px 0 4px; font-size: 15px; }
 .hop-gia-lap .gl-ghi { font-size: 13px; color: #4B5563; margin: 4px 0 8px; }
+
+/* Thanh thuộc tính: một hàng cố định ngay dưới hàng công cụ hình (không nổi theo hình nữa) */
+#thanh-nhanh { left: 0; top: 0; right: 0; max-width: none; height: 42px; box-sizing: border-box; padding: 0 12px; border: 0; border-bottom: 1px solid #E2E8F0; border-radius: 0;
+  background: #FCFCFD; box-shadow: 0 2px 6px rgba(15, 23, 42, .06); scrollbar-width: thin; }
+#thanh-nhanh:not(.an) ~ #goi-y { top: 54px; }

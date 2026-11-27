@@ -3588,19 +3588,10 @@
     if (x + w > bang.clientWidth - 8) x = Math.max(8, b.x0 - w - 14);   // sát mép phải: đặt sang trái hình
     nut.style.left = Math.max(8, Math.min(bang.clientWidth - w - 8, x)) + 'px'; nut.style.top = Math.max(8, Math.min(bang.clientHeight - hN - 70, y)) + 'px';
   }
-  function datViTriThanhNhanh() {
+  function datViTriThanhNhanh() {   // thanh thuộc tính nằm cố định ngay dưới hàng công cụ hình (đầu vùng bảng)
     var el = $('#thanh-nhanh'); if (!el || el.classList.contains('an')) return;
-    if (dangKeo && dangKeo.loai !== 'trang') { el.style.visibility = 'hidden'; return; } el.style.visibility = '';
-    var bang = $('#bang'), wB = bang.clientWidth, w = el.offsetWidth, hEl = el.offsetHeight, x, y;
-    if (el.dataset.cheDo === 'chon') {
-      var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity }, them = function (P) { var q = raMH(P); b.x0 = Math.min(b.x0, q.x); b.y0 = Math.min(b.y0, q.y); b.x1 = Math.max(b.x1, q.x); b.y1 = Math.max(b.y1, q.y); };
-      hinhDangChon().forEach(function (o) { (diemDaiDien(o, giaTri[o.id]) || []).forEach(them); });
-      nhom.forEach(function (x) { if (x.n) { var k = khungNet(x.n); them({ x: k.x0, y: k.y0 }); them({ x: k.x1, y: k.y1 }); } });
-      if (!isFinite(b.x0)) { el.classList.add('an'); return; }
-      x = (b.x0 + b.x1) / 2 - w / 2; y = b.y0 - hEl - 22; if (y < 8) y = b.y1 + 22;
-      y = Math.min(y, bang.clientHeight - hEl - 70);
-    } else { x = wB / 2 - w / 2; var gy = $('#goi-y'); y = gy && !gy.classList.contains('an') ? gy.offsetTop + gy.offsetHeight + 8 : 10; }
-    el.style.left = Math.max(8, Math.min(wB - w - 8, x)) + 'px'; el.style.top = Math.max(8, y) + 'px';
+    el.style.visibility = '';
+    if (el.dataset.cheDo === 'chon' && !hinhDangChon().length && !nhom.some(function (x) { return x.n; })) el.classList.add('an');
   }
   function dongDsTN() { var d = $('#tn-ds'); if (d) d.remove(); tnMo = null; }
   function moDsTN(nut, k, ds, chon) {   // danh sách thả xuống dưới một nút của thanh
