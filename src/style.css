@@ -949,3 +949,13 @@ html.android .tc-ranh b { border-radius: 8px; }
 .hop-gia-lap .gl-tim-muc { padding: 6px 10px; border: 1px solid #CBD5E1; border-radius: 8px; background: #F8FAFC; cursor: pointer; font-size: 13px; }
 .hop-gia-lap .gl-tim-muc.chon { border-color: #2563EB; background: #EFF6FF; color: #1D4ED8; font-weight: 600; }
 .hop-gia-lap .gl-trong { font-size: 13px; color: #6B7280; }
+#menu-gl { position: fixed; z-index: 46; min-width: 270px; padding: 6px; background: #fff; border: 1px solid var(--vien); border-radius: 14px; box-shadow: var(--bong); }
+#menu-gl button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 10px; border: 0; border-radius: 10px; background: transparent; font: 15px var(--phong); color: var(--chu); cursor: pointer; text-align: left; }
+#menu-gl button:hover { background: #F3F4F6; }
+#menu-gl button small { display: block; font-size: 12px; color: #6B7280; font-weight: 400; }
+#menu-gl .gl-ic { flex: none; width: 34px; height: 42px; border-radius: 7px; background: linear-gradient(#4A4F57, #2F3338); display: flex; align-items: flex-start; justify-content: center; padding-top: 5px; box-sizing: border-box; }
+#menu-gl .gl-ic b { font: 700 9px Arial, sans-serif; color: #1B211C; background: #C5D1C0; border-radius: 2px; padding: 1px 3px; }
+#menu-gl .gl-cd { border-top: 1px solid #F1F2F4 !important; border-radius: 0 0 10px 10px !important; height: 40px; font-size: 14px !important; color: #374151 !important; }
+.hop-gia-lap .gl-phan { border: 1px solid #E5E7EB; border-radius: 10px; padding: 8px 12px 12px; margin-bottom: 10px; }
+.hop-gia-lap .gl-phan h4 { margin: 2px 0 4px; font-size: 15px; }
+.hop-gia-lap .gl-ghi { font-size: 13px; color: #4B5563; margin: 4px 0 8px; }
