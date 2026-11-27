@@ -340,7 +340,7 @@ GI.khoHinh = (function () {
     MT.khoHinh('nhapFreepik').then(function (r) {
       bao('');
       if (!r || r.huy) return;
-      if (r.canInkscape) return hoiNho('Cần cài Inkscape (miễn phí) để đọc tệp .ai / .eps', { ds: ['Mở trang tải Inkscape'], chon: 0, nut: 'Mở', ghiChu: 'Cài xong, mở lại GeoInk rồi bấm Nhập từ Freepik lần nữa. Tệp .eps cần cài thêm Ghostscript (ghostscript.com).' })
+      if (r.canInkscape) return hoiNho('Cần cài Inkscape (miễn phí) để đọc tệp .ai / .eps', { ds: ['Mở trang tải Inkscape'], chon: 0, nut: 'Mở', ghiChu: 'Cài xong, mở lại GeoInk rồi bấm Nhập hình lần nữa. Tệp .eps cần cài thêm Ghostscript (ghostscript.com).' })
         .then(function (v) { if (v != null && MT.moLink) MT.moLink('https://inkscape.org/release/'); });
       if (r.loi && r.loi.length && !r.ds.length) return bao(r.loi.join(' · '), true);
       moXemTruoc(r.ds, r.loi || []);
