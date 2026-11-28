@@ -3866,6 +3866,7 @@
       }
       ds.forEach(function (d) {
         var o = { id: idMoi('d'), loai: 'deBai', kieu: d.kieu, dang: d.dang, nhanDe: d.nhanDe, loaiCau: d.loaiCau, so: d.so, dot: dot, x: x0, y: y, rong: rong, co: co, ma: d.ma, doan: d.doan, loiGiai: d.loiGiai || undefined };
+        o.coDinh = cu ? (cu.coDinh || undefined) : true;   // đề mới nhập từ TeX: khoá sẵn (bấm ổ khoá để mở khi cần chỉnh); sửa đề thì giữ như cũ
         trang().hinh.push(o);
         // dựng các hình, ghi kích thước vào khối rồi dàn trang (lời giải mở) để đặt hình đúng chỗ
         var dung = {}, laLG = {}, wNoi = rong - co * 1.6;
@@ -3898,7 +3899,7 @@
       giaTri = H.tinh(trang().hinh); daSua = true; capNhatTieuDe();
       chonCongCu('chon'); nhom = []; capNhatChon(false); canVe(); lamMoiToA4();
       var soCau = ds.filter(function (d) { return d.nhanDe === 'Câu'; }).length, soBai = ds.length - soCau, soLG = ds.filter(function (d) { return d.loiGiai; }).length;
-      thongBao('Đã đưa lên bảng ' + [soCau ? soCau + ' câu trắc nghiệm' : '', soBai ? soBai + ' bài tự luận' : ''].filter(Boolean).join(', ') + (soHinh ? ' · ' + soHinh + ' hình TikZ' : '') + (soLG ? ' · bấm đúp vào dải “Lời giải” để xem' : ''));
+      thongBao('Đã đưa lên bảng ' + [soCau ? soCau + ' câu trắc nghiệm' : '', soBai ? soBai + ' bài tự luận' : ''].filter(Boolean).join(', ') + (soHinh ? ' · ' + soHinh + ' hình TikZ' : '') + (soLG ? ' · bấm đúp vào dải “Lời giải” để xem' : '') + (cu ? '' : ' · khung đã khoá, bấm ổ khoá để mở khi cần chỉnh'));
     });
     return {};
   }
