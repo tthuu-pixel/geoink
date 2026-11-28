@@ -2176,10 +2176,12 @@
   // Máy tính giả lập: GeoInk không chứa sẵn trình giả lập nào.
   //   · Máy 880: mặc định mở trang web giả lập (hoặc trang / phần mềm người dùng chọn)
   //   · Máy 580: phải cài trình giả lập trên máy; lần đầu GeoInk tự tìm chỗ cài, không thấy mới báo chưa cài
-  var GL_WEB_MD = 'https://fx880btgplus.netlify.app/', GL_MAY = { '880': /(?<![0-9])880(?![0-9])/, '580': /(?<![0-9])580(?![0-9])/ };
+  var GL_WEB = { '880': 'https://fx880btgplus.netlify.app/', vinacal: 'https://vinacalapp.pages.dev/' }, GL_WEB_MD = GL_WEB['880'],
+    GL_MAY = { '880': /(?<![0-9])880(?![0-9])/, '580': /(?<![0-9])580(?![0-9])/, vinacal: /vinacal|(?<![0-9])570(?![0-9])/i },
+    GL_TEN = { '880': 'Máy tính 880', '580': 'Máy tính 580', vinacal: 'Máy tính Vinacal' };
   function glDoc(may) {
     try { var v = JSON.parse(localStorage.getItem('geoink_gia_lap_' + may)); if (v) return v; if (may === '880') { v = JSON.parse(localStorage.getItem('geoink_gia_lap')); if (v) return v; } } catch (e) { }
-    return may === '880' ? { kieu: 'web', url: GL_WEB_MD } : null;
+    return GL_WEB[may] ? { kieu: 'web', url: GL_WEB[may] } : null;
   }
   function glLuu(may, cd) { try { if (cd) localStorage.setItem('geoink_gia_lap_' + may, JSON.stringify(cd)); else localStorage.removeItem('geoink_gia_lap_' + may); } catch (er) { } }
   function moMenuGiaLap(nut) {
@@ -2188,6 +2190,7 @@
     var ic = function (so) { return '<span class="gl-ic"><b>' + so + '</b></span>'; };
     el.innerHTML = '<button data-may="880">' + ic('880') + '<span><b>Máy tính 880</b><small>fx-880BTG · trang web giả lập</small></span></button>' +
       '<button data-may="580">' + ic('580') + '<span><b>Máy tính 580</b><small>fx-580VN X · trình giả lập cài trên máy</small></span></button>' +
+      '<button data-may="vinacal">' + ic('570') + '<span><b>Máy tính Vinacal</b><small>Vinacal 570ES Plus II · trang web giả lập</small></span></button>' +
       '<button data-may="caiDat" class="gl-cd"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Chọn lại trình giả lập…</button>';
     document.body.appendChild(el);
     var r = nut.getBoundingClientRect(); el.style.left = Math.min(r.left, window.innerWidth - el.offsetWidth - 8) + 'px'; el.style.top = (r.bottom + 6) + 'px'; vuaManHinh(el);
@@ -2198,7 +2201,7 @@
     var cd = glDoc(may);
     if (!cd) return glTim(may, false);
     if (cd.kieu === 'web' || !(MT && MT.giaLap)) {
-      if (cd.kieu !== 'web') return thongBao('Máy ' + may + ' trên máy này chỉ mở được ở bản GeoInk cho máy tính');
+      if (cd.kieu !== 'web') return thongBao(GL_TEN[may] + ' trên máy này chỉ mở được ở bản GeoInk cho máy tính');
       if (MT && MT.giaLap) return MT.giaLap({ hd: 'mo', kieu: 'web', url: cd.url }).then(function (kq) { if (kq && kq.loi) thongBao(kq.loi); });
       if (MT && MT.moLink) MT.moLink(cd.url); else window.open(cd.url, '_blank', 'noopener'); return;
     }
@@ -2208,13 +2211,13 @@
   }
   // Quét máy tìm trình giả lập đã cài; một kết quả thì dùng luôn, nhiều thì cho chọn, không có thì báo chưa cài
   function glTim(may, sauKhiLoi) {
-    if (!(MT && MT.giaLap)) return thongBao('Máy ' + may + ' cần cài trình giả lập trên máy tính · chỉ có ở bản GeoInk cho máy tính');
-    thongBao('Đang tìm máy ' + may + ' đã cài trên máy…');
+    if (!(MT && MT.giaLap)) return thongBao(GL_TEN[may] + ' cần cài trình giả lập trên máy tính · chỉ có ở bản GeoInk cho máy tính');
+    thongBao('Đang tìm ' + GL_TEN[may].toLowerCase() + ' đã cài trên máy…');
     MT.giaLap({ hd: 'tim' }).then(function (kq) {
       var ds = ((kq && kq.ds) || []).filter(function (t) { return GL_MAY[may].test(t.ten) || GL_MAY[may].test(t.duong); });
       if (ds.length === 1) { glLuu(may, { kieu: 'tep', duong: ds[0].duong, ten: ds[0].ten }); thongBao('Đã tìm thấy: ' + ds[0].ten); return MT.giaLap({ hd: 'mo', kieu: 'tep', duong: ds[0].duong }).then(function (k2) { if (k2 && k2.loi) thongBao(k2.loi); }); }
       if (!ds.length) {
-        if (may === '880') { glLuu('880', null); thongBao('Không thấy máy 880 cài trên máy · mở bản web'); return moMay('880'); }
+        if (GL_WEB[may]) { glLuu(may, null); thongBao('Không thấy ' + GL_TEN[may].toLowerCase() + ' cài trên máy · mở bản web'); return moMay(may); }
         return hoiChuaCai(may, sauKhiLoi);
       }
       moCaiDatGiaLap(may, ds);
@@ -2222,8 +2225,8 @@
   }
   function hoiChuaCai(may, sauKhiLoi) {
     var h = document.createElement('div'); h.className = 'tv-hop';
-    h.innerHTML = '<div class="tv-hop-nd hop-gia-lap"><h3>Chưa cài máy ' + may + '</h3><p class="tv-mo-ta">' + (sauKhiLoi ? 'Trình giả lập máy ' + may + ' đã chọn trước đây không còn trên máy, và ' : '') +
-      'GeoInk không tìm thấy trình giả lập máy ' + may + ' nào đã cài trên máy tính này. Cài trình giả lập rồi bấm lại nút máy tính, GeoInk sẽ tự tìm. Nếu đã cài ở chỗ khác, bấm <b>Chỉ chỗ cài…</b> để chọn tệp chạy (.exe hoặc lối tắt).</p>' +
+    h.innerHTML = '<div class="tv-hop-nd hop-gia-lap"><h3>Chưa cài ' + GL_TEN[may].toLowerCase() + '</h3><p class="tv-mo-ta">' + (sauKhiLoi ? 'Trình giả lập ' + GL_TEN[may].toLowerCase() + ' đã chọn trước đây không còn trên máy, và ' : '') +
+      'GeoInk không tìm thấy trình giả lập ' + GL_TEN[may].toLowerCase() + ' nào đã cài trên máy tính này. Cài trình giả lập rồi bấm lại nút máy tính, GeoInk sẽ tự tìm. Nếu đã cài ở chỗ khác, bấm <b>Chỉ chỗ cài…</b> để chọn tệp chạy (.exe hoặc lối tắt).</p>' +
       '<div class="tv-hop-chan"><button data-dong>Đóng</button>&nbsp;<button data-chon class="chinh">Chỉ chỗ cài…</button></div></div>';
     document.body.appendChild(h);
     h.onclick = function (e) {
@@ -2233,21 +2236,21 @@
   }
   // Hộp chọn lại trình giả lập cho từng máy (may: chỉ mở phần của máy đó, dsTim: kết quả tìm để chọn)
   function moCaiDatGiaLap(chiMay, dsTim) {
-    var coMay = !!(MT && MT.giaLap), tam = { '880': Object.assign({}, glDoc('880')), '580': Object.assign({}, glDoc('580') || { kieu: 'tep' }) }, ds = { '880': null, '580': null };
+    var coMay = !!(MT && MT.giaLap), tam = { '880': Object.assign({}, glDoc('880')), '580': Object.assign({}, glDoc('580') || { kieu: 'tep' }), vinacal: Object.assign({}, glDoc('vinacal')) }, ds = { '880': null, '580': null, vinacal: null };
     if (chiMay && dsTim) ds[chiMay] = dsTim;
-    var veDs = function (may) { var d = ds[may]; return !d ? '' : !d.length ? '<div class="gl-trong">Không tìm thấy máy ' + may + ' nào đã cài.</div>' : d.map(function (t, i) { return '<button class="gl-tim-muc" data-tim="' + may + ':' + i + '" title="' + escHtml(t.duong).replace(/"/g, '&quot;') + '">' + escHtml(t.ten) + '</button>'; }).join(''); };
+    var veDs = function (may) { var d = ds[may]; return !d ? '' : !d.length ? '<div class="gl-trong">Không tìm thấy ' + GL_TEN[may].toLowerCase() + ' nào đã cài.</div>' : d.map(function (t, i) { return '<button class="gl-tim-muc" data-tim="' + may + ':' + i + '" title="' + escHtml(t.duong).replace(/"/g, '&quot;') + '">' + escHtml(t.ten) + '</button>'; }).join(''); };
     var phan = function (may) {
-      var c = tam[may], web = may === '880';
-      return '<div class="gl-phan" data-phan="' + may + '"><h4>Máy tính ' + may + '</h4>' +
+      var c = tam[may], web = !!GL_WEB[may];
+      return '<div class="gl-phan" data-phan="' + may + '"><h4>' + GL_TEN[may] + '</h4>' +
         (web ? '<label class="gl-dong"><input type="radio" name="gl-k' + may + '" value="web"' + (c.kieu !== 'tep' ? ' checked' : '') + '> Trang web (cần mạng)</label>' +
-          '<input class="gl-url" type="url" spellcheck="false" value="' + escHtml(c.url || GL_WEB_MD).replace(/"/g, '&quot;') + '" placeholder="https://…">' : '') +
+          '<input class="gl-url" type="url" spellcheck="false" value="' + escHtml(c.url || GL_WEB[may]).replace(/"/g, '&quot;') + '" placeholder="https://…">' : '') +
         (coMay ? (web ? '<label class="gl-dong"><input type="radio" name="gl-k' + may + '" value="tep"' + (c.kieu === 'tep' ? ' checked' : '') + '> Đã cài trên máy này</label>' : '<p class="gl-ghi">Trình giả lập cài trên máy này (phần mềm hoặc ứng dụng cài từ Chrome / Edge).</p>') +
           '<div class="gl-tep"><span class="gl-duong">' + escHtml(c.kieu === 'tep' && c.duong ? c.duong : 'Chưa chọn') + '</span><button data-tim-may="' + may + '">Tìm trên máy</button><button data-chon="' + may + '">Chọn…</button></div><div class="gl-ds-tim" data-ds="' + may + '">' + veDs(may) + '</div>'
           : (web ? '' : '<p class="gl-ghi">Máy 580 chỉ dùng được ở bản GeoInk cho máy tính (cài trình giả lập trên máy).</p>')) + '</div>';
     };
     var h = document.createElement('div'); h.className = 'tv-hop';
     h.innerHTML = '<div class="tv-hop-nd hop-gia-lap"><h3>Máy tính giả lập</h3><p class="tv-mo-ta">GeoInk mở trình giả lập trong cửa sổ riêng. GeoInk <b>không chứa sẵn</b> trình giả lập nào: dùng trang web, hoặc trình giả lập bạn đã cài trên máy.</p>' +
-      (chiMay ? phan(chiMay) : phan('880') + phan('580')) +
+      (chiMay ? phan(chiMay) : phan('880') + phan('580') + phan('vinacal')) +
       '<div class="tv-hop-chan"><button data-dong>Huỷ</button>&nbsp;<button data-mo class="chinh">Lưu' + (chiMay ? ' và mở' : '') + '</button></div></div>';
     document.body.appendChild(h);
     var datDuong = function (may, d) { tam[may].duong = d; tam[may].kieu = 'tep'; var p = h.querySelector('[data-phan="' + may + '"]'); p.querySelector('.gl-duong').textContent = d; var r = p.querySelector('[value="tep"]'); if (r) r.checked = true; };
@@ -2261,13 +2264,13 @@
       if (ch) { var m2 = ch.dataset.chon; return MT.giaLap({ hd: 'chon' }).then(function (kq) { if (kq && kq.duong) datDuong(m2, kq.duong); }); }
       if (e.target.hasAttribute('data-mo')) {
         var loi = '';
-        (chiMay ? [chiMay] : ['880', '580']).forEach(function (may) {
+        (chiMay ? [chiMay] : ['880', '580', 'vinacal']).forEach(function (may) {
           var p = h.querySelector('[data-phan="' + may + '"]'), c = tam[may], r = p.querySelector('[name="gl-k' + may + '"]:checked');
-          if (may === '880') {
+          if (GL_WEB[may]) {
             c.url = p.querySelector('.gl-url').value.trim(); c.kieu = r ? r.value : 'web';
-            if (c.kieu === 'web' && !/^https?:\/\/\S+$/i.test(c.url)) loi = 'Máy 880: nhập địa chỉ web bắt đầu bằng https://';
-            if (c.kieu === 'tep' && !c.duong) loi = 'Máy 880: bấm “Tìm trên máy” hoặc “Chọn…”';
-            if (!loi) glLuu('880', c);
+            if (c.kieu === 'web' && !/^https?:\/\/\S+$/i.test(c.url)) loi = GL_TEN[may] + ': nhập địa chỉ web bắt đầu bằng https://';
+            if (c.kieu === 'tep' && !c.duong) loi = GL_TEN[may] + ': bấm “Tìm trên máy” hoặc “Chọn…”';
+            if (!loi) glLuu(may, c);
           } else if (c.duong) glLuu('580', { kieu: 'tep', duong: c.duong });
         });
         if (loi) return thongBao(loi);
